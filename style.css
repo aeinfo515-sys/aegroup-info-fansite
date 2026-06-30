@@ -1,17 +1,75 @@
-body{margin:0;font-family:system-ui;background:#f6f7fb;color:#111}
-.top{background:#fff;padding:20px;position:sticky;top:0}
-.tabs{display:flex;gap:18px;margin-top:10px}
-.tabs a{padding:8px 12px;border-radius:10px;background:#f1f1f1}
-.tabs a.active{background:#111;color:#fff}
 
-.card{background:#fff;margin:16px;padding:16px;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px}
-.highlight{border-left:6px solid #ff4da6}
-.bar{height:4px;background:#ff4da6;margin:-16px -16px 12px -16px;border-radius:16px 16px 0 0}
+body{
+margin:0;
+font-family:system-ui;
+background:#f6f7fb;
+color:#222;
+}
 
-.m1{color:#1976d2}
-.m2{color:#d32f2f}
-.m3{color:#7b1fa2}
-.m4{color:#2e7d32}
+.top{
+padding:20px;
+background:white;
+position:sticky;
+top:0;
+border-bottom:1px solid #eee;
+}
 
-@media(max-width:700px){.grid{grid-template-columns:1fr}}
+.tabs{
+display:flex;
+gap:14px;
+margin-top:10px;
+}
+
+.tab{
+padding:8px 12px;
+border-radius:10px;
+text-decoration:none;
+color:#444;
+background:#f1f1f1;
+}
+
+.tab.active{
+background:#ff4fa3;
+color:white;
+}
+
+.card{
+background:white;
+margin:16px;
+padding:16px;
+border-radius:16px;
+box-shadow:0 2px 10px rgba(0,0,0,.06);
+position:relative;
+}
+
+.accent{
+height:4px;
+background:#ff4fa3;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin:16px;
+}
+
+.link{
+text-decoration:none;
+color:inherit;
+}
+
+.member h3{
+margin:0;
+}
+
+.masakado h3{color:#1976d2;}
+.suezawa h3{color:#d32f2f;}
+.kojima h3{color:#7b1fa2;}
+.sano h3{color:#2e7d32;}
+
+@media(max-width:700px){
+.grid{grid-template-columns:1fr;}
+}
