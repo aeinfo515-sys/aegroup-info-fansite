@@ -7,24 +7,42 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
 <header>
 <h1>Aぇ! group Info</h1>
-<p>出演・チケット・SNS</p>
-<input id="search" placeholder="検索...">
+<p>出演・チケット・SNSをまとめてチェック</p>
+
+<input id="search" placeholder="検索（番組・メンバー）">
 </header>
 
+<nav class="tabs">
+<button onclick="show('home')">Home</button>
+<button onclick="show('schedule')">Schedule</button>
+<button onclick="show('tickets')">Tickets</button>
+<button onclick="show('members')">Members</button>
+</nav>
+
 <main>
-<section class="card">
-<h2>📺 出演情報</h2>
-<div id="list"></div>
+
+<section id="home" class="panel active">
+<div class="card"><h2>📺 今日の出演</h2><div id="today"></div></div>
+<div class="card"><h2>🎫 チケット</h2><div id="ticket"></div></div>
+<div class="card"><h2>📱 SNS</h2><a href="#">YouTube</a> / <a href="#">Instagram</a></div>
 </section>
 
-<section class="card">
-<h2>🎫 チケット</h2>
-<p>準備中</p>
+<section id="schedule" class="panel">
+<div class="card"><h2>📅 出演一覧</h2><div id="list"></div></div>
 </section>
 
-<section class="card">
+<section id="tickets" class="panel">
+<div class="card"><h2>🎫 チケット状況</h2>
+<p class="ok">受付中</p>
+<p class="ng">終了</p>
+</div>
+</section>
+
+<section id="members" class="panel">
+<div class="card">
 <h2>👥 メンバー</h2>
 <ul>
 <li class="m">正門良規</li>
@@ -32,7 +50,9 @@
 <li class="k">小島健</li>
 <li class="a">佐野晶哉</li>
 </ul>
+</div>
 </section>
+
 </main>
 
 <script src="script.js"></script>

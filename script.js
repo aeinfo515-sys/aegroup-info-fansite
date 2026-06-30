@@ -1,19 +1,28 @@
 
-async function load(){
- const res=await fetch('data/schedule.json')
- const data=await res.json()
- window.all=data
- render(data)
+const data = [
+ {date:"2026-06-30",title:"ZIP!",time:"5:50〜"},
+ {date:"2026-07-01",title:"THE TIME,",time:"6:00〜"}
+];
+
+function render(){
+ document.getElementById("today").innerHTML =
+ data.map(d=>`<div>${d.date} ${d.title} ${d.time}</div>`).join("");
+
+ document.getElementById("list").innerHTML =
+ data.map(d=>`<div class='card'>${d.date} - ${d.title}</div>`).join("");
+
+ document.getElementById("ticket").innerHTML = "一般発売チェック中";
+}
+render();
+
+function show(id){
+ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
 }
 
-function render(data){
- const el=document.getElementById('list')
- el.innerHTML=data.map(d=>`<div>📅 ${d.date} ｜ ${d.title} ${d.time}</div>`).join('')
-}
-
-document.getElementById('search').addEventListener('input',e=>{
- const v=e.target.value.toLowerCase()
- render(window.all.filter(d=>d.title.toLowerCase().includes(v)))
-})
-
-load()
+document.getElementById("search").addEventListener("input",(e)=>{
+ const v=e.target.value.toLowerCase();
+ const filtered=data.filter(d=>d.title.toLowerCase().includes(v));
+ document.getElementById("list").innerHTML =
+ filtered.map(d=>`<div class='card'>${d.date} - ${d.title}</div>`).join("");
+});
