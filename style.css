@@ -73,3 +73,9 @@ margin:0;
 @media(max-width:700px){
 .grid{grid-template-columns:1fr;}
 }
+
+/* enhanced colors */
+body{background:linear-gradient(180deg,#f6f7fb,#ffffff)}
+.accent{background:linear-gradient(90deg,#ff4fa3,#7b61ff,#4f9cff)}
+.tab.active{background:linear-gradient(90deg,#ff4fa3,#ff7ac6)}
+.card{border:1px solid rgba(255,79,163,0.08)}
