@@ -1,1 +1,1 @@
-console.log('v2');
+document.getElementById('schedule').innerHTML='出演情報は今後ここに表示されます。';
