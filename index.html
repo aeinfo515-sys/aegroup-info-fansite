@@ -1,58 +1,37 @@
 <!doctype html>
-<html lang="ja">
+<html lang='ja'>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width,initial-scale=1'>
 <title>Aぇ! group Info</title>
-<link rel="stylesheet" href="style.css">
+<link rel='stylesheet' href='style.css'>
 </head>
 <body>
-
-<header>
-<h1>Aぇ! group Info</h1>
-<p>出演・チケット・SNSをまとめてチェック</p>
-
-<input id="search" placeholder="検索（番組・メンバー）">
+<header class="header">
+  <h1>Aぇ! group Info</h1>
+  <p>出演情報・チケット・SNS更新をまとめてチェック</p>
+  <input id="search" placeholder="検索">
 </header>
 
-<nav class="tabs">
-<button onclick="show('home')">Home</button>
-<button onclick="show('schedule')">Schedule</button>
-<button onclick="show('tickets')">Tickets</button>
-<button onclick="show('members')">Members</button>
+<nav class="nav">
+  <a href="index.html">Home</a>
+  <a href="schedule.html">Schedule</a>
+  <a href="tickets.html">Tickets</a>
+  <a href="members.html">Members</a>
 </nav>
 
-<main>
+<main class="container">
+  <section class="card accent-blue">
+    <h2>今日の出演</h2>
+    <div id="schedule"></div>
+  </section>
 
-<section id="home" class="panel active">
-<div class="card"><h2>📺 今日の出演</h2><div id="today"></div></div>
-<div class="card"><h2>🎫 チケット</h2><div id="ticket"></div></div>
-<div class="card"><h2>📱 SNS</h2><a href="#">YouTube</a> / <a href="#">Instagram</a></div>
-</section>
-
-<section id="schedule" class="panel">
-<div class="card"><h2>📅 出演一覧</h2><div id="list"></div></div>
-</section>
-
-<section id="tickets" class="panel">
-<div class="card"><h2>🎫 チケット状況</h2>
-<p class="ok">受付中</p>
-<p class="ng">終了</p>
-</div>
-</section>
-
-<section id="members" class="panel">
-<div class="card">
-<h2>👥 メンバー</h2>
-<ul>
-<li class="m">正門良規</li>
-<li class="s">末澤誠也</li>
-<li class="k">小島健</li>
-<li class="a">佐野晶哉</li>
-</ul>
-</div>
-</section>
-
+  <section class="grid">
+    <div class="card accent-red"><h3>チケット</h3></div>
+    <div class="card accent-purple"><h3>SNS更新</h3></div>
+    <div class="card accent-green"><h3>ブログ</h3></div>
+    <div class="card accent-blue"><h3>予定</h3></div>
+  </section>
 </main>
 
 <script src="script.js"></script>
