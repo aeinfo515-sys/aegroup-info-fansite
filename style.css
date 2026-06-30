@@ -1,0 +1,7 @@
+body{font-family:system-ui,sans-serif;background:#f7f7f7;margin:0;color:#222}
+header{background:#fff;padding:24px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.members{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:16px;background:#fff}
+.masakado{color:#1976d2}.suezawa{color:#d32f2f}.kojima{color:#7b1fa2}.sano{color:#2e7d32}
+main{max-width:900px;margin:24px auto;padding:0 16px}
+.card{background:#fff;border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+footer{text-align:center;padding:20px;color:#666}
