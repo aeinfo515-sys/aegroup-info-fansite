@@ -1,64 +1,51 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Aぇ! group Info</title>
-<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="top">
-  <div class="logo">Aぇ! group Info</div>
-  <div class="sub">出演・チケット・SNS更新をまとめてチェック</div>
-  <input class="search" placeholder="検索（準備中）"/>
+  <h1>Aぇ! group Info</h1>
+  <p>出演情報・チケット・SNS更新をひとまとめに</p>
+  <input placeholder="検索（準備中）">
 </header>
 
 <main class="container">
 
-  <section class="grid">
+<section class="card highlight">
+  <h2>今日の出演</h2>
+  <p>最新情報をここに表示</p>
+</section>
 
-    <div class="card">
-      <h2>📺 今日の出演</h2>
-      <div id="schedule">読み込み中...</div>
-    </div>
+<section class="grid">
+  <div class="card">チケット</div>
+  <div class="card">SNS更新</div>
+  <div class="card">ブログ</div>
+  <div class="card">今後の予定</div>
+</section>
 
-    <div class="card">
-      <h2>🎫 チケット</h2>
-      <p>最新情報をチェック</p>
-    </div>
-
-    <div class="card">
-      <h2>📱 SNS更新</h2>
-      <p>各SNSの最新投稿</p>
-    </div>
-
-    <div class="card">
-      <h2>📰 ブログ</h2>
-      <p>更新情報まとめ</p>
-    </div>
-
-  </section>
-
-  <section class="card members">
-    <h2>👥 メンバー</h2>
-    <ul>
-      <li class="b">🔵 正門良規</li>
-      <li class="r">🔴 末澤誠也</li>
-      <li class="p">🟣 小島健</li>
-      <li class="g">🟢 佐野晶哉</li>
-    </ul>
-  </section>
+<section class="card">
+  <h2>メンバー</h2>
+  <ul class="members">
+    <li class="masakado">正門良規</li>
+    <li class="suezawa">末澤誠也</li>
+    <li class="kojima">小島健</li>
+    <li class="sano">佐野晶哉</li>
+  </ul>
+</section>
 
 </main>
 
 <nav class="bottom">
-  <a href="index.html">🏠</a>
-  <a href="#">📺</a>
-  <a href="#">🎫</a>
-  <a href="#">👥</a>
+  <a>Home</a>
+  <a>Schedule</a>
+  <a>Members</a>
+  <a>Settings</a>
 </nav>
 
-<script src="script.js"></script>
 </body>
 </html>
