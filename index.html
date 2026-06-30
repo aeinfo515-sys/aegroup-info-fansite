@@ -7,45 +7,34 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header class="top">
-  <h1>Aぇ! group Info</h1>
-  <p>出演情報・チケット・SNS更新をひとまとめに</p>
-  <input placeholder="検索（準備中）">
+<header>
+<h1>Aぇ! group Info</h1>
+<p>出演・チケット・SNS</p>
+<input id="search" placeholder="検索...">
 </header>
 
-<main class="container">
-
-<section class="card highlight">
-  <h2>今日の出演</h2>
-  <p>最新情報をここに表示</p>
-</section>
-
-<section class="grid">
-  <div class="card">チケット</div>
-  <div class="card">SNS更新</div>
-  <div class="card">ブログ</div>
-  <div class="card">今後の予定</div>
+<main>
+<section class="card">
+<h2>📺 出演情報</h2>
+<div id="list"></div>
 </section>
 
 <section class="card">
-  <h2>メンバー</h2>
-  <ul class="members">
-    <li class="masakado">正門良規</li>
-    <li class="suezawa">末澤誠也</li>
-    <li class="kojima">小島健</li>
-    <li class="sano">佐野晶哉</li>
-  </ul>
+<h2>🎫 チケット</h2>
+<p>準備中</p>
 </section>
 
+<section class="card">
+<h2>👥 メンバー</h2>
+<ul>
+<li class="m">正門良規</li>
+<li class="s">末澤誠也</li>
+<li class="k">小島健</li>
+<li class="a">佐野晶哉</li>
+</ul>
+</section>
 </main>
 
-<nav class="bottom">
-  <a>Home</a>
-  <a>Schedule</a>
-  <a>Members</a>
-  <a>Settings</a>
-</nav>
-
+<script src="script.js"></script>
 </body>
 </html>
