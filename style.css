@@ -53,3 +53,5 @@ margin-top:10px;
 }
 
 header{background:linear-gradient(90deg,#2f80ed,#eb5757,#9b51e0,#27ae60)!important;padding:20px;border-radius:16px;color:#fff}.member-name.mas{color:#2f80ed}.member-name.sue{color:#eb5757}.member-name.koj{color:#9b51e0}.member-name.san{color:#27ae60}.member-card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin:12px 0}
+.member-blue{background:#eef6ff}.member-red{background:#fff0f0}.member-purple{background:#f7f0ff}.member-green{background:#f1fff1}
+.header{background:linear-gradient(90deg,#2f80ed,#eb5757,#9b51e0,#27ae60);}
