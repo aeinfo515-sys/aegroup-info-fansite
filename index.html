@@ -8,45 +8,43 @@
 </head>
 <body>
 
-<header>
-<h1>Aぇ! group Info</h1>
-<p>出演・チケット・SNS更新をまとめてチェック</p>
+<header class="header">
+  <div class="title">Aぇ! group Info</div>
+  <div class="subtitle">出演・チケット・SNSをまとめてチェック</div>
+
+  <nav class="tabs">
+    <a class="tab active" href="index.html">Home</a>
+    <a class="tab" href="schedule.html">Schedule</a>
+    <a class="tab" href="tickets.html">Tickets</a>
+    <a class="tab" href="sns.html">SNS</a>
+    <a class="tab" href="members.html">Members</a>
+  </nav>
 </header>
 
-<main>
+<main class="container">
 
-<section class="card accent-pink">
-<h2>今日の予定</h2>
-
-<div class="block pink">
-<h3>出演</h3>
-<p>本日の出演情報は随時更新</p>
-</div>
-
-<div class="block blue">
-<h3>チケット</h3>
-<p>受付状況を確認</p>
-</div>
-
-<div class="block purple">
-<h3>SNS更新</h3>
-<p>最新投稿をチェック</p>
-</div>
+<section class="card highlight">
+  <div class="bar pink"></div>
+  <h2>今日の予定</h2>
+  <p>出演・チケット・SNS更新をまとめて表示</p>
 </section>
 
 <section class="card">
-<h2>明日以降の予定</h2>
-<div id="future">近日公開予定のスケジュール</div>
+  <div class="bar blue"></div>
+  <h2>出演</h2>
+  <p>本日の出演情報</p>
 </section>
 
 <section class="card">
-<h2>メンバー</h2>
-<ul>
-<li class="m">正門良規 — ギター・音楽の安定感</li>
-<li class="s">末澤誠也 — 圧倒的ボーカル力</li>
-<li class="k">小島健 — リーダー・バラエティ力</li>
-<li class="a">佐野晶哉 — ドラム・音楽センス</li>
-</ul>
+  <div class="bar purple"></div>
+  <h2>SNS更新</h2>
+  <p>最新投稿をチェック</p>
+</section>
+
+<section class="card">
+  <div class="bar green"></div>
+  <h2>チケット</h2>
+  <p>受付情報</p>
 </section>
 
 </main>

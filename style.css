@@ -1,38 +1,64 @@
 
 body{
-font-family:system-ui;
 margin:0;
+font-family:system-ui;
 background:#f6f7fb;
 color:#111;
 }
 
-header{
+.header{
 padding:20px;
-background:linear-gradient(90deg,#ff4fa3,#7c4dff,#4da3ff);
+background:linear-gradient(90deg,#1976d2,#e53935,#8e24aa,#43a047);
 color:white;
+}
+
+.title{font-size:22px;font-weight:700;}
+.subtitle{font-size:12px;opacity:0.9;margin-top:4px;}
+
+.tabs{
+display:flex;
+gap:14px;
+margin-top:14px;
+overflow-x:auto;
+}
+
+.tab{
+color:white;
+text-decoration:none;
+padding:8px 12px;
+border-radius:10px;
+background:rgba(255,255,255,0.15);
+white-space:nowrap;
+}
+
+.tab.active{
+background:white;
+color:#111;
+}
+
+.container{
+padding:16px;
+max-width:900px;
+margin:auto;
 }
 
 .card{
 background:white;
-margin:16px;
-padding:16px;
 border-radius:16px;
-box-shadow:0 6px 20px rgba(0,0,0,.08);
+padding:16px;
+margin-bottom:14px;
+box-shadow:0 4px 14px rgba(0,0,0,0.06);
+position:relative;
 }
 
-.block{
-padding:12px;
-border-left:6px solid transparent;
-margin-top:10px;
+.bar{
+height:4px;
+width:60px;
 border-radius:10px;
-background:#fafafa;
+margin-bottom:10px;
 }
 
-.block.pink{border-color:#ff4fa3}
-.block.blue{border-color:#4da3ff}
-.block.purple{border-color:#7c4dff}
-
-.m{color:#1976d2}
-.s{color:#d32f2f}
-.k{color:#7b1fa2}
-.a{color:#2e7d32}
+.pink{background:#ff4d8d;}
+.blue{background:#1e88e5;}
+.purple{background:#8e24aa;}
+.green{background:#43a047;}
