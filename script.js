@@ -1,1 +1,1 @@
-console.log('Aぇ! group Info loaded');
+console.log('v2');
