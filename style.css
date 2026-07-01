@@ -1,265 +1,156 @@
-
-body{margin:0;font-family:system-ui;background:#f4f6fb;color:#111}
-.hero{
-background:linear-gradient(90deg,#2196f3,#f44336,#9c27b0,#4caf50);
-color:#fff;
-padding:24px;
-text-align:center;
-}
-
-.tabs{
-display:flex;
-gap:18px;
-justify-content:center;
-padding:12px;
-background:#fff;
-position:sticky;
-top:0;
-}
-
-.tabs a{
-text-decoration:none;
-color:#333;
-font-weight:600;
-padding:8px 12px;
-border-radius:10px;
-}
-
-.card{
-background:#fff;
-margin:16px;
-padding:16px;
-border-radius:16px;
-box-shadow:0 2px 10px rgba(0,0,0,.06);
-}
-
-.highlight .bar{
-height:4px;
-background:#ff4da6;
-border-radius:4px;
-margin-bottom:12px;
-}
-
-.member h2{margin:0}
-.blue{color:#1976d2}
-.red{color:#d32f2f}
-.purple{color:#7b1fa2}
-.green{color:#2e7d32}
-
-.block{
-border-top:1px solid #eee;
-padding-top:10px;
-margin-top:10px;
-}
-
-header{background:linear-gradient(90deg,#2f80ed,#eb5757,#9b51e0,#27ae60)!important;padding:20px;border-radius:16px;color:#fff}.member-name.mas{color:#2f80ed}.member-name.sue{color:#eb5757}.member-name.koj{color:#9b51e0}.member-name.san{color:#27ae60}.member-card{background:#fff;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin:12px 0}
-.header{background:linear-gradient(90deg,#2b7cff,#ff4d4d,#9b59ff,#41c95b);} .member.masakado{background:#eaf4ff}.member.suezawa{background:#ffecec}.member.kojima{background:#f5ecff}.member.sano{background:#ecfff0}
-/* ===========================
-   V18 DESIGN UPDATE
-=========================== */
-
-/* 全体 */
-body{
-    background:#f7f8fb;
-    color:#222;
-    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
-}
-
-/* タイトル */
-.site-header{
-    background:linear-gradient(
-        90deg,
-        #2E86FF 0%,
-        #E53935 35%,
-        #8E44AD 70%,
-        #2ECC71 100%
-    );
-    color:#fff;
-    border-radius:20px;
-    padding:28px;
-    margin-bottom:25px;
-    box-shadow:0 12px 30px rgba(0,0,0,.12);
-}
-
-.site-header h1{
-    font-size:34px;
+/* =========================
+   RESET
+========================= */
+*{
     margin:0;
-    font-weight:800;
+    padding:0;
+    box-sizing:border-box;
 }
 
-/* カード共通 */
-.card{
-    background:white;
-    border-radius:18px;
-    padding:22px;
-    margin-bottom:18px;
-    box-shadow:0 8px 24px rgba(0,0,0,.08);
-    transition:.25s;
+body{
+    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+    background:#f6f7fb;
+    color:#222;
 }
 
-.card:hover{
-    transform:translateY(-3px);
-}
-
-/* 見出し */
-.section-title{
-    font-size:24px;
-    font-weight:700;
-    margin-bottom:18px;
-    border-left:6px solid #ff4fa3;
-    padding-left:14px;
-}
-
-/* メンバーカード */
-.member-card{
-    border-radius:18px;
-    padding:22px;
-    margin-bottom:18px;
-}
-
-.member-masakado{
-    background:#e8f2ff;
-}
-
-.member-suezawa{
-    background:#ffe8e8;
-}
-
-.member-kojima{
-    background:#f4ebff;
-}
-
-.member-sano{
-    background:#e9f9ed;
-}
-
-.member-name{
-    font-size:28px;
-    font-weight:800;
-    margin-bottom:15px;
-}
-
-.masakado{
-    color:#2E86FF;
-}
-
-.suezawa{
-    color:#E53935;
-}
-
-.kojima{
-    color:#8E44AD;
-}
-
-.sano{
-    color:#2ECC71;
-}
-
-/* 今日の予定 */
-.today-card{
-    border-left:8px solid #ff4fa3;
-}
-
-/* 今後の予定 */
-.future-item{
-    padding:14px 0;
-    border-bottom:1px solid #ececec;
-}
-
-/* ボタン */
-button,
-.btn{
-    border-radius:999px;
-    padding:12px 22px;
-    border:none;
-    cursor:pointer;
-}
+/* =========================
+   HERO（タイトル）
+========================= */
 .hero{
-background:linear-gradient(90deg,#2E86FF,#E53935,#8E44AD,#2ECC71);
-padding:45px 30px;
-border-radius:22px;
-color:white;
-margin-bottom:25px;
-text-align:center;
+    background:linear-gradient(90deg,#2E86FF,#E53935,#8E44AD,#2ECC71);
+    padding:50px 20px;
+    text-align:center;
+    color:#fff;
+    border-radius:0 0 24px 24px;
 }
 
 .hero h1{
-font-size:42px;
-margin-bottom:10px;
-font-weight:800;
+    font-size:42px;
+    font-weight:800;
 }
 
+.hero p{
+    margin-top:8px;
+    opacity:0.9;
+}
+
+/* =========================
+   TAB
+========================= */
 .tabs{
-display:flex;
-gap:18px;
-margin:20px 0;
+    display:flex;
+    justify-content:flex-start;
+    gap:10px;
+    padding:10px;
+    background:#fff;
+    position:sticky;
+    top:0;
+    z-index:10;
+
+    overflow-x:auto;   /* ←横スクロール許可 */
+    white-space:nowrap; /* ←折り返し防止 */
+    -webkit-overflow-scrolling:touch;
 }
 
 .tabs a{
-text-decoration:none;
-background:white;
-padding:14px 24px;
-border-radius:999px;
-font-weight:700;
-box-shadow:0 6px 18px rgba(0,0,0,.08);
-color:#333;
+    flex:0 0 auto;
+    text-decoration:none;
+    padding:10px 14px;
+    border-radius:999px;
+    background:#f1f1f1;
+    color:#333;
+    font-weight:600;
+    font-size:14px;
 }
 
 .tabs a.active{
-background:#ff4fa3;
-color:white;
+    background:#ff4fa3;
+    color:#fff;
 }
 
+/* =========================
+   CARD
+========================= */
+.card{
+    background:#fff;
+    margin:16px;
+    padding:18px;
+    border-radius:16px;
+    box-shadow:0 4px 14px rgba(0,0,0,0.08);
+}
+
+.section-title{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:12px;
+    border-left:5px solid #ff4fa3;
+    padding-left:10px;
+}
+
+/* =========================
+   HOME
+========================= */
 .home-grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-gap:18px;
-margin-top:20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px;
 }
 
 .info-card{
-background:#fafafa;
-border-radius:16px;
-padding:20px;
-box-shadow:0 5px 15px rgba(0,0,0,.05);
-}
-
-.tv{
-border-left:6px solid #4aa3ff;
-}
-
-.ticket{
-border-left:6px solid #ff6b81;
-}
-
-.sns{
-border-left:6px solid #9b59b6;
-}
-
-.blog{
-border-left:6px solid #2ecc71;
-}
-.profile-item{
-    background:white;
-    padding:12px 16px;
+    background:#fafafa;
+    padding:14px;
     border-radius:12px;
-    margin-top:10px;
-    font-size:15px;
-    box-shadow:0 3px 10px rgba(0,0,0,.05);
+    border-left:5px solid #ddd;
 }
 
+/* 色分け */
+.tv{border-color:#4aa3ff;}
+.ticket{border-color:#ff6b81;}
+.sns{border-color:#9b59b6;}
+.blog{border-color:#2ecc71;}
+
+/* =========================
+   MEMBERS
+========================= */
 .member-card{
-    margin-bottom:24px;
-    border-radius:20px;
+    margin:14px;
+    padding:16px;
+    border-radius:16px;
+    background:#fff;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
 }
 
-.member-card:hover{
-    transform:translateY(-4px);
-    transition:.25s;
+.member-name{
+    font-size:22px;
+    font-weight:800;
+    margin-bottom:10px;
 }
 
-main{
-    max-width:1000px;
-    margin:auto;
-    padding:30px;
+/* 名前カラー */
+.masakado{color:#2E86FF;}
+.suezawa{color:#E53935;}
+.kojima{color:#8E44AD;}
+.sano{color:#2ECC71;}
+
+/* 背景薄色 */
+.member-masakado{background:#eaf4ff;}
+.member-suezawa{background:#ffecec;}
+.member-kojima{background:#f4ecff;}
+.member-sano{background:#ecfff1;}
+
+/* プロフィール */
+.profile-item{
+    background:#fff;
+    padding:10px;
+    margin-top:8px;
+    border-radius:10px;
+    font-size:14px;
+}
+
+/* =========================
+   LIST
+========================= */
+.future-item{
+    padding:12px 0;
+    border-bottom:1px solid #eee;
 }
