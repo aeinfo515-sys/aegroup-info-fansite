@@ -1,51 +1,70 @@
-/* =========================
-   DATA（ここだけ編集すれば全部更新される）
-========================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-const data = {
-  today: {
-    tv: "本日の出演はありません",
-    ticket: "受付情報なし",
-    sns: "更新予定なし",
-    blog: "更新予定なし"
-  },
-
-  future: [
-    { date: "7/2", text: "出演情報" },
-    { date: "7/3", text: "チケット情報" },
-    { date: "7/4", text: "SNS更新予定" }
-  ]
-};
-
-/* =========================
-   HOME更新
-========================= */
-function loadHome(){
-
+  /* ======================
+     HOME
+  ====================== */
   const tv = document.querySelector(".tv p");
   const ticket = document.querySelector(".ticket p");
   const sns = document.querySelector(".sns p");
   const blog = document.querySelector(".blog p");
 
-  if(tv) tv.textContent = data.today.tv;
-  if(ticket) ticket.textContent = data.today.ticket;
-  if(sns) sns.textContent = data.today.sns;
-  if(blog) blog.textContent = data.today.blog;
+  if (typeof DATA !== "undefined") {
 
-  const future = document.querySelector(".card .future-item")?.parentElement;
+    if (tv) tv.textContent = DATA.today.tv;
+    if (ticket) ticket.textContent = DATA.today.ticket;
+    if (sns) sns.textContent = DATA.today.sns;
+    if (blog) blog.textContent = DATA.today.blog;
 
-  if(future){
-    future.innerHTML = "";
-    data.future.forEach(item=>{
-      const div = document.createElement("div");
-      div.className = "future-item";
-      div.innerHTML = `<strong>${item.date}</strong><br>${item.text}`;
-      future.appendChild(div);
-    });
+    const futureBox = document.querySelector(".card .future-item")?.parentElement;
+
+    if (futureBox) {
+      futureBox.innerHTML = "";
+      DATA.future.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "future-item";
+        div.innerHTML = `<strong>${item.date}</strong><br>${item.text}`;
+        futureBox.appendChild(div);
+      });
+    }
   }
-}
 
-/* =========================
-   実行
-========================= */
-document.addEventListener("DOMContentLoaded", loadHome);
+});
+const scheduleBox = document.getElementById("schedule-list");
+
+if (scheduleBox && typeof DATA !== "undefined") {
+  scheduleBox.innerHTML = "";
+
+  DATA.future.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "future-item";
+    div.innerHTML = `<strong>${item.date}</strong><br>${item.text}`;
+    scheduleBox.appendChild(div);
+  });
+}
+const snsBox = document.getElementById("sns-box");
+
+if (snsBox && typeof DATA !== "undefined") {
+
+  const snsData = DATA.sns;
+
+  snsBox.innerHTML = `
+    <div class="future-item"><strong>X（旧Twitter）</strong><br>${snsData.x}</div>
+    <div class="future-item"><strong>Instagram</strong><br>${snsData.insta}</div>
+    <div class="future-item"><strong>YouTube</strong><br>${snsData.youtube}</div>
+    <div class="future-item"><strong>TikTok</strong><br>${snsData.tiktok}</div>
+  `;
+}
+const ticketsBox = document.getElementById("tickets-box");
+
+if (ticketsBox && typeof DATA !== "undefined") {
+
+  ticketsBox.innerHTML = "";
+
+  DATA.tickets.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "future-item";
+    div.innerHTML = `<strong>${item.title}</strong><br>${item.period}`;
+    ticketsBox.appendChild(div);
+  });
+
+}

@@ -47,9 +47,11 @@ body{
     top:0;
     z-index:10;
 
-    overflow-x:auto;   /* ←横スクロール許可 */
-    white-space:nowrap; /* ←折り返し防止 */
+    overflow-x:auto;
+    white-space:nowrap;
     -webkit-overflow-scrolling:touch;
+
+    border-bottom:1px solid #eee;
 }
 
 .tabs a{
