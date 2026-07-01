@@ -1,70 +1,77 @@
-document.addEventListener("DOMContentLoaded", () => {
+const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
-  /* ======================
-     HOME
-  ====================== */
-  const tv = document.querySelector(".tv p");
-  const ticket = document.querySelector(".ticket p");
-  const sns = document.querySelector(".sns p");
-  const blog = document.querySelector(".blog p");
+async function loadSchedule() {
+  try {
 
-  if (typeof DATA !== "undefined") {
+    const response = await fetch(API_URL);
+    const data = await response.json();
 
-    if (tv) tv.textContent = DATA.today.tv;
-    if (ticket) ticket.textContent = DATA.today.ticket;
-    if (sns) sns.textContent = DATA.today.sns;
-    if (blog) blog.textContent = DATA.today.blog;
+    console.log(data);
 
-    const futureBox = document.querySelector(".card .future-item")?.parentElement;
+    // 今日の予定
+    let tv = [];
+    let ticket = [];
+    let sns = [];
+    let blog = [];
 
-    if (futureBox) {
-      futureBox.innerHTML = "";
-      DATA.future.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "future-item";
-        div.innerHTML = `<strong>${item.date}</strong><br>${item.text}`;
-        futureBox.appendChild(div);
-      });
-    }
+    // 今後の予定
+    let future = "";
+
+    data.forEach(item => {
+
+      future += `
+        <div class="future-item">
+          <strong>${item["日付"]} ${item["時間"]}</strong><br>
+          【${item["種類"]}】${item["タイトル"]}<br>
+          ${item["詳細"]}
+        </div>
+      `;
+
+      switch(item["種類"]){
+
+        case "出演":
+          tv.push(`${item["時間"]} ${item["タイトル"]}`);
+          break;
+
+        case "チケット":
+          ticket.push(item["タイトル"]);
+          break;
+
+        case "SNS":
+          sns.push(item["タイトル"]);
+          break;
+
+        case "ブログ":
+          blog.push(item["タイトル"]);
+          break;
+
+      }
+
+    });
+
+    document.getElementById("future-list").innerHTML =
+      future || "予定はありません";
+
+    document.getElementById("today-tv").innerHTML =
+      tv.length ? tv.join("<br>") : "予定はありません";
+
+    document.getElementById("today-ticket").innerHTML =
+      ticket.length ? ticket.join("<br>") : "予定はありません";
+
+    document.getElementById("today-sns").innerHTML =
+      sns.length ? sns.join("<br>") : "予定はありません";
+
+    document.getElementById("today-blog").innerHTML =
+      blog.length ? blog.join("<br>") : "予定はありません";
+
+  } catch (error) {
+
+    console.error(error);
+
+    document.getElementById("future-list").innerHTML =
+      "データの取得に失敗しました";
+
   }
-
-});
-const scheduleBox = document.getElementById("schedule-list");
-
-if (scheduleBox && typeof DATA !== "undefined") {
-  scheduleBox.innerHTML = "";
-
-  DATA.future.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "future-item";
-    div.innerHTML = `<strong>${item.date}</strong><br>${item.text}`;
-    scheduleBox.appendChild(div);
-  });
 }
-const snsBox = document.getElementById("sns-box");
 
-if (snsBox && typeof DATA !== "undefined") {
-
-  const snsData = DATA.sns;
-
-  snsBox.innerHTML = `
-    <div class="future-item"><strong>X（旧Twitter）</strong><br>${snsData.x}</div>
-    <div class="future-item"><strong>Instagram</strong><br>${snsData.insta}</div>
-    <div class="future-item"><strong>YouTube</strong><br>${snsData.youtube}</div>
-    <div class="future-item"><strong>TikTok</strong><br>${snsData.tiktok}</div>
-  `;
-}
-const ticketsBox = document.getElementById("tickets-box");
-
-if (ticketsBox && typeof DATA !== "undefined") {
-
-  ticketsBox.innerHTML = "";
-
-  DATA.tickets.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "future-item";
-    div.innerHTML = `<strong>${item.title}</strong><br>${item.period}`;
-    ticketsBox.appendChild(div);
-  });
-
-}
+loadSchedule();
