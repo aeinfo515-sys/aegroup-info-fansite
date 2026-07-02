@@ -41,7 +41,9 @@ styleInject.innerHTML = `
 document.head.appendChild(styleInject);
 
 function formatDate(dateStr) {
-    if (!dateStr || String(dateStr).includes("1899")) return "";
+    if (!dateStr) return "";
+    const str = String(dateStr);
+    if (str.includes("1899")) return ""; // 1899年は日付としては無視
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return "";
     return `${d.getMonth() + 1}/${d.getDate()}`;
@@ -51,22 +53,20 @@ function formatTime(timeStr) {
     if (!timeStr) return "";
     const str = String(timeStr);
     
-    // 1899-12-29T15:00:00.000Z のような形式から時間部分だけを強引に切り取る安全装置
-    if (str.includes("T") && str.includes("Z")) {
-        const tPart = str.split("T")[1]; // "15:00:00.000Z"
-        const match = tPart.match(/(\d{2}):(\d{2})/);
-        if (match) return `${match[1]}:${match[2]}`;
+    // 【超強力・時間引っこ抜き機能】
+    // "1899-12-29T15:00:00.000Z" のような文字から、真ん中の「15:00」や「09:00」だけを絶対に抽出する
+    if (str.includes("T")) {
+        const parts = str.split("T");
+        if (parts[1]) {
+            const timePart = parts[1].substring(0, 5); // "15:00" をゲット
+            if (timePart !== "00:00") return timePart;
+        }
     }
     
     if (str.includes("00:00")) return "";
-    if (str.includes(":") && !str.includes("GMT")) return str;
+    if (str.includes(":") && !str.includes("GMT")) return str.substring(0, 5);
     
-    const d = new Date(timeStr);
-    if (isNaN(d.getTime())) {
-        const match = str.match(/(\d{2}):(\d{2})/);
-        return match ? `${match[1]}:${match[2]}` : "";
-    }
-    return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+    return "";
 }
 
 function getMemberBadge(text) {
@@ -127,9 +127,7 @@ async function loadSchedule() {
 
         data.forEach(item => {
             if (!item["日付"]) return;
-            
-            // 1899年のバグデータをスキップ
-            if (String(item["日付"]).includes("1899")) return;
+            if (String(item["日付"]).includes("1899")) return; // バグ日付データはスキップ
 
             const itemDate = new Date(item["日付"]).toLocaleDateString("ja-JP", {timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit"}).replace(/\//g, "-");
             const type = item["種類"] || "";
@@ -154,4 +152,12 @@ async function loadSchedule() {
         if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "予定はありません";
 
     } catch (e) {
-        console.error
+        console.error(e);
+    }
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadSchedule);
+} else {
+    loadSchedule();
+}
