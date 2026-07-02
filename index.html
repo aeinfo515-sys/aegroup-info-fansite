@@ -1,44 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aぇ! group Info Fansite</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aぇ! group Info</title>
+
+<link rel="stylesheet" href="style.css">
+
 </head>
+
 <body>
-    <header>
-        <div class="container">
-            <h1>Aぇ! group Info</h1>
-            <nav>
-                <ul>
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li><a href="members.html">Members</a></li>
-                    <li><a href="schedule.html">Schedule</a></li>
-                    <li><a href="sns.html">SNS</a></li>
-                    <li><a href="tickets.html">Tickets</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
 
-    <main class="container">
-        <section class="hero">
-            <h2>Welcome to Aぇ! group Info Fansite</h2>
-            <p>Aぇ! groupの最新情報やプロフィールをお届けするファンサイトです。</p>
-        </section>
+<header class="hero">
+    <h1>Aぇ! group Info</h1>
+    <p>出演情報・チケット・SNS更新をひとまとめに</p>
+</header>
 
-        <section class="whats-new">
-            <h3>What's New</h3>
-            <ul id="news-list">
-                <!-- script.jsから動的に読み込み -->
-            </ul>
-        </section>
-    </main>
+<nav class="tabs">
+    <a href="index.html" class="active">🏠 Home</a>
+    <a href="schedule.html">📅 Schedule</a>
+    <a href="sns.html">📱 SNS</a>
+    <a href="tickets.html">🎫 Tickets</a>
+    <a href="members.html">👤 Members</a>
+</nav>
 
-    <footer>
-        <p>&copy; 2026 Aぇ! group Info Fansite.</p>
-    </footer>
-    <script src="script.js"></script>
+<main>
+
+<section class="card today-card">
+
+<h2 class="section-title">
+🌟 今日の予定
+</h2>
+
+<div class="home-grid">
+
+<div class="info-card tv">
+<h3>📺 出演</h3>
+<p id="today-tv">
+読み込み中...
+</p>
+</div>
+
+<div class="info-card ticket">
+<h3>🎫 チケット</h3>
+<p id="today-ticket">
+読み込み中...
+</p>
+</div>
+
+<div class="info-card sns">
+<h3>📱 SNS更新</h3>
+<p id="today-sns">
+読み込み中...
+</p>
+</div>
+
+<div class="info-card blog">
+<h3>📝 ブログ</h3>
+<p id="today-blog">
+読み込み中...
+</p>
+</div>
+
+</div>
+
+</section>
+
+<section class="card">
+
+<h2 class="section-title">
+📅 今後の予定
+</h2>
+
+<div id="future-list">
+
+<div class="future-item">
+読み込み中...
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+<script src="script.js"></script>
+
 </body>
 </html>
