@@ -1,115 +1,146 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
-function $(id) {
-  return document.getElementById(id);
-}
+const styleInject = document.createElement("style");
+styleInject.innerHTML = `
+    .custom-schedule-item {
+        background: #fdfdfd !important;
+        border-radius: 8px !important;
+        padding: 10px 12px !important;
+        margin-bottom: 10px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
+        border-left: 5px solid #ccc !important;
+        text-align: left !important;
+    }
+    .custom-date-time {
+        font-size: 0.8rem !important;
+        font-weight: bold !important;
+        color: #555 !important;
+        margin-bottom: 3px !important;
+    }
+    .custom-title {
+        font-size: 0.95rem !important;
+        font-weight: bold !important;
+        color: #222 !important;
+        margin-bottom: 4px !important;
+    }
+    .member-badge {
+        display: inline-block !important;
+        padding: 2px 10px !important;
+        border-radius: 12px !important;
+        font-size: 0.75rem !important;
+        font-weight: bold !important;
+        color: #fff !important;
+    }
+    .bg-group { background-color: #ff69b4 !important; }
+    .bg-suezawa { background-color: #ff0000 !important; }
+    .bg-masakado { background-color: #0000ff !important; }
+    .bg-richard { background-color: #ffd700 !important; color: #333 !important; }
+    .bg-kojima { background-color: #800080 !important; }
+    .bg-sano { background-color: #008000 !important; }
+`;
+document.head.appendChild(styleInject);
 
 function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return dateStr;
-  const month = d.getMonth() + 1;
-  const date = d.getDate();
-  return `${month}/${date}`;
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 function formatTime(timeStr) {
-  if (!timeStr) return "";
-  const t = new Date(timeStr);
-  if (isNaN(t.getTime())) return timeStr;
-  const hours = String(t.getHours()).padStart(2, "0");
-  const minutes = String(t.getMinutes()).padStart(2, "0");
-  return `${hours}:${minutes}`;
+    if (!timeStr || timeStr === "00:00") return "";
+    const str = String(timeStr);
+    if (str.includes(":") && !str.includes("GMT")) return str;
+    const d = new Date(timeStr);
+    if (isNaN(d.getTime())) {
+        const match = str.match(/(\d{2}):(\d{2})/);
+        return match ? `${match[1]}:${match[2]}` : "";
+    }
+    return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }
 
-function todayString() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+function getMemberBadge(text) {
+    if (!text) return "";
+    if (text.includes("Aぇ! group")) return `<span class="member-badge bg-group">Aぇ! group</span>`;
+    if (text.includes("末澤")) return `<span class="member-badge bg-suezawa">末澤 誠也</span>`;
+    if (text.includes("正門")) return `<span class="member-badge bg-masakado">正門 良規</span>`;
+    if (text.includes("リチャ")) return `<span class="member-badge bg-richard">草間リチャード敬太</span>`;
+    if (text.includes("小島")) return `<span class="member-badge bg-kojima">小島 健</span>`;
+    if (text.includes("佐野")) return `<span class="member-badge bg-sano">佐野 晶哉</span>`;
+    return `<span class="member-badge" style="background:#777">${text}</span>`;
 }
 
-function normalizeDate(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return "";
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+function getBorderColor(item) {
+    const text = (item["詳細"] || "") + (item["タイトル"] || "");
+    if (text.includes("Aぇ! group")) return "#ff69b4";
+    if (text.includes("末澤")) return "#ff0000";
+    if (text.includes("正門")) return "#0000ff";
+    if (text.includes("リチャ")) return "#ffd700";
+    if (text.includes("小島")) return "#800080";
+    if (text.includes("佐野")) return "#008000";
+    return "#ccc";
 }
 
-function createCard(item) {
-  const timeDisplay = formatTime(item["時間"]);
-  const hasTime = item["時間"] && timeDisplay !== "";
-  return `
-    <div class="list-card">
-      <div class="date">
-        ${formatDate(item["日付"])}
-        ${hasTime ? ` ${timeDisplay}` : ""}
-      </div>
-      <div class="title">${item["タイトル"] || ""}</div>
-      ${item["詳細"] ? `<div class="detail">${item["詳細"]}</div>` : ""}
-    </div>
-  `;
+function createHtmlItem(item, showDate = true) {
+    const time = formatTime(item["時間"]);
+    const date = formatDate(item["日付"]);
+    const member = getMemberBadge(item["詳細"] || item["タイトル"]);
+    const borderColor = getBorderColor(item);
+    
+    let dateTimeText = "";
+    if (showDate && date) dateTimeText += `🗓 ${date}`;
+    if (time) dateTimeText += ` ⏰ ${time}`;
+    if (!dateTimeText) dateTimeText = "Schedule";
+
+    return `
+        <div class="custom-schedule-item" style="border-left-color: ${borderColor} !important;">
+            <div class="custom-date-time">${dateTimeText}</div>
+            <div class="custom-title">${item["タイトル"]}</div>
+            <div>${member}</div>
+        </div>
+    `;
 }
 
 async function loadSchedule() {
-  try {
-    const response = await fetch(API_URL);
-    const data = await response.json();
-    const today = todayString();
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        
+        const now = new Date();
+        const todayStr = now.toLocaleDateString("ja-JP", {timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit"}).replace(/\//g, "-");
 
-    const todayTV = [];
-    const todayTicket = [];
-    const todaySNS = [];
-    const todayBlog = [];
+        const todayTV = [];
+        const todayTicket = [];
+        const todaySNS = [];
+        const todayBlog = [];
+        let futureHTML = "";
 
-    let futureHTML = "";
-    let scheduleHTML = "";
-    let snsHTML = "";
-    let ticketHTML = "";
+        data.forEach(item => {
+            if (!item["日付"]) return;
+            
+            const itemDate = new Date(item["日付"]).toLocaleDateString("ja-JP", {timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit"}).replace(/\//g, "-");
+            const type = item["種類"] || "";
 
-    data.forEach(item => {
-      const type = item["種類"] || "";
-      const itemDate = normalizeDate(item["日付"]);
+            if (itemDate >= todayStr) {
+                futureHTML += createHtmlItem(item, true);
+            }
 
-      if (itemDate >= today) {
-        futureHTML += createCard(item);
-      }
+            if (itemDate === todayStr) {
+                const htmlContent = createHtmlItem(item, false);
+                if (type === "出演") todayTV.push(htmlContent);
+                else if (type === "チケット" || type === "当落" || type === "予約開始") todayTicket.push(htmlContent);
+                else if (type === "SNS" || type === "YouTube") todaySNS.push(htmlContent);
+                else if (type === "ブログ" || type === "雑誌") todayBlog.push(htmlContent);
+            }
+        });
 
-      if (itemDate === today) {
-        const timeDisplay = formatTime(item["時間"]);
-        const timePrefix = timeDisplay ? `[${timeDisplay}] ` : "";
-        switch (type) {
-          case "出演": todayTV.push(`${timePrefix}${item["タイトル"]}`); break;
-          case "チケット": case "当落": case "予約開始": todayTicket.push(`${timePrefix}${item["タイトル"]}`); break;
-          case "SNS": case "YouTube": todaySNS.push(`${timePrefix}${item["タイトル"]}`); break;
-          case "ブログ": todayBlog.push(`${timePrefix}${item["タイトル"]}`); break;
-        }
-      }
+        if (document.getElementById("today-tv")) document.getElementById("today-tv").innerHTML = todayTV.join("") || "None";
+        if (document.getElementById("today-ticket")) document.getElementById("today-ticket").innerHTML = todayTicket.join("") || "None";
+        if (document.getElementById("today-sns")) document.getElementById("today-sns").innerHTML = todaySNS.join("") || "None";
+        if (document.getElementById("today-blog")) document.getElementById("today-blog").innerHTML = todayBlog.join("") || "None";
+        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "None";
 
-      switch (type) {
-        case "出演": scheduleHTML += createCard(item); break;
-        case "SNS": case "ブログ": case "YouTube": snsHTML += createCard(item); break;
-        case "チケット": case "当落": case "予約開始": ticketHTML += createCard(item); break;
-      }
-    });
-
-    if ($("future-list")) $("future-list").innerHTML = futureHTML || "<p>予定はありません</p>";
-    if ($("today-tv")) $("today-tv").innerHTML = todayTV.length ? todayTV.join("<br>") : "予定はありません";
-    if ($("today-ticket")) $("today-ticket").innerHTML = todayTicket.length ? todayTicket.join("<br>") : "予定はありません";
-    if ($("today-sns")) $("today-sns").innerHTML = todaySNS.length ? todaySNS.join("<br>") : "予定はありません";
-    if ($("today-blog")) $("today-blog").innerHTML = todayBlog.length ? todayBlog.join("<br>") : "予定はありません";
-    if ($("schedule-list")) $("schedule-list").innerHTML = scheduleHTML || "<p>予定はありません</p>";
-    if ($("sns-list")) $("sns-list").innerHTML = snsHTML || "<p>予定はありません</p>";
-    if ($("tickets-list")) $("tickets-list").innerHTML = ticketHTML || "<p>予定はありません</p>";
-  } catch (error) {
-    console.error(error);
-    ["future-list", "schedule-list", "sns-list", "tickets-list"].forEach(id => {
-      if ($(id)) $(id).innerHTML = "<p>データの取得に失敗しました。</p>";
-    });
-  }
+    } catch (e) {
+        console.error(e);
+    }
 }
 loadSchedule();
