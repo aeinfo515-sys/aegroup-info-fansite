@@ -1,6 +1,5 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
-// 【強制デザイン注入】style.cssを無視してJSからメンカラとカード風デザインを直接当てる
 const styleInject = document.createElement("style");
 styleInject.innerHTML = `
     .custom-schedule-item {
@@ -32,12 +31,12 @@ styleInject.innerHTML = `
         font-weight: bold !important;
         color: #fff !important;
     }
-    .bg-group { background-color: #ff69b4 !important; } /* ピンク */
-    .bg-suezawa { background-color: #ff0000 !important; } /* 赤 */
-    .bg-masakado { background-color: #0000ff !important; } /* 青 */
-    .bg-richard { background-color: #ffd700 !important; color: #333 !important; } /* 黄 */
-    .bg-kojima { background-color: #800080 !important; } /* 紫 */
-    .bg-sano { background-color: #008000 !important; } /* 緑 */
+    .bg-group { background-color: #ff69b4 !important; }
+    .bg-suezawa { background-color: #ff0000 !important; }
+    .bg-masakado { background-color: #0000ff !important; }
+    .bg-richard { background-color: #ffd700 !important; color: #333 !important; }
+    .bg-kojima { background-color: #800080 !important; }
+    .bg-sano { background-color: #008000 !important; }
 `;
 document.head.appendChild(styleInject);
 
@@ -90,7 +89,7 @@ function createHtmlItem(item, showDate = true) {
     let dateTimeText = "";
     if (showDate && date) dateTimeText += `🗓 ${date}`;
     if (time) dateTimeText += ` ⏰ ${time}`;
-    if (!dateTimeText) dateTimeText = "予定";
+    if (!dateTimeText) dateTimeText = "Schedule";
 
     return `
         <div class="custom-schedule-item" style="border-left-color: ${borderColor} !important;">
@@ -134,11 +133,11 @@ async function loadSchedule() {
             }
         });
 
-        if (document.getElementById("today-tv")) document.getElementById("today-tv").innerHTML = todayTV.join("") || "予定はありません";
-        if (document.getElementById("today-ticket")) document.getElementById("today-ticket").innerHTML = todayTicket.join("") || "予定はありません";
-        if (document.getElementById("today-sns")) document.getElementById("today-sns").innerHTML = todaySNS.join("") || "予定はありません";
-        if (document.getElementById("today-blog")) document.getElementById("today-blog").innerHTML = todayBlog.join("") || "予定はありません";
-        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "予定はありません";
+        if (document.getElementById("today-tv")) document.getElementById("today-tv").innerHTML = todayTV.join("") || "None";
+        if (document.getElementById("today-ticket")) document.getElementById("today-ticket").innerHTML = todayTicket.join("") || "None";
+        if (document.getElementById("today-sns")) document.getElementById("today-sns").innerHTML = todaySNS.join("") || "None";
+        if (document.getElementById("today-blog")) document.getElementById("today-blog").innerHTML = todayBlog.join("") || "None";
+        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "None";
 
     } catch (e) {
         console.error(e);
