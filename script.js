@@ -1,6 +1,5 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
-// 【超・安全注入】画面にデザインを強制的に当てる
 const styleInject = document.createElement("style");
 styleInject.innerHTML = `
     .custom-schedule-item {
@@ -127,25 +126,24 @@ async function loadSchedule() {
 
             if (itemDate === todayStr) {
                 const htmlContent = createHtmlItem(item, false);
-                if (type === "出演") todayTV.push(htmlContent);
-                else if (type === "チケット" || type === "当落" || type === "予約開始") todayTicket.push(htmlContent);
+                if (type === "出演" || type === "TV") todayTV.push(htmlContent);
+                else if (type === "チケット" || type === "当落" || type === "予約開始" || type === "Ticket") todayTicket.push(htmlContent);
                 else if (type === "SNS" || type === "YouTube") todaySNS.push(htmlContent);
-                else if (type === "ブログ" || type === "雑誌") todayBlog.push(htmlContent);
+                else if (type === "ブログ" || type === "雑誌" || type === "Blog") todayBlog.push(htmlContent);
             }
         });
 
-        if (document.getElementById("today-tv")) document.getElementById("today-tv").innerHTML = todayTV.join("") || "None";
-        if (document.getElementById("today-ticket")) document.getElementById("today-ticket").innerHTML = todayTicket.join("") || "None";
-        if (document.getElementById("today-sns")) document.getElementById("today-sns").innerHTML = todaySNS.join("") || "None";
-        if (document.getElementById("today-blog")) document.getElementById("today-blog").innerHTML = todayBlog.join("") || "None";
-        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "None";
+        if (document.getElementById("today-tv")) document.getElementById("today-tv").innerHTML = todayTV.join("") || "予定はありません";
+        if (document.getElementById("today-ticket")) document.getElementById("today-ticket").innerHTML = todayTicket.join("") || "予定はありません";
+        if (document.getElementById("today-sns")) document.getElementById("today-sns").innerHTML = todaySNS.join("") || "予定はありません";
+        if (document.getElementById("today-blog")) document.getElementById("today-blog").innerHTML = todayBlog.join("") || "予定はありません";
+        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "予定はありません";
 
     } catch (e) {
         console.error(e);
     }
 }
 
-// 【重要】画面の読み込み（HTML）が完全に終わってから安全に実行する
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", loadSchedule);
 } else {
