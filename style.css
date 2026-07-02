@@ -1,158 +1,57 @@
-/* =========================
-   RESET
-========================= */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
+/* カード全体の設定 */
+.list-card {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 6px solid #ccc; /* デフォルトの色 */
+    transition: transform 0.2s;
 }
 
-body{
-    font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
-    background:#f6f7fb;
-    color:#222;
+/* 日時（小さめ・太字） */
+.list-card .date-time {
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #666;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* =========================
-   HERO（タイトル）
-========================= */
-.hero{
-    background:linear-gradient(90deg,#2E86FF,#E53935,#8E44AD,#2ECC71);
-    padding:50px 20px;
-    text-align:center;
-    color:#fff;
-    border-radius:0 0 24px 24px;
+/* タイトル（大きく目立つように） */
+.list-card .title {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #333;
+    margin-bottom: 8px;
+    line-height: 1.4;
 }
 
-.hero h1{
-    font-size:42px;
-    font-weight:800;
+/* メンバー・グループ名（バッジ形式） */
+.member-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #fff;
 }
 
-.hero p{
-    margin-top:8px;
-    opacity:0.9;
-}
+/* メンバーカラーの設定 */
+.bg-group { background-color: #ff69b4; } /* Aぇ! group: ピンク */
+.bg-suezawa { background-color: #ff0000; } /* 末澤: 赤 */
+.bg-masakado { background-color: #0000ff; } /* 正門: 青 */
+.bg-richard { background-color: #ffd700; color: #333 !important; } /* リチャ: 黄 */
+.bg-kojima { background-color: #800080; } /* 小島: 紫 */
+.bg-sano { background-color: #008000; } /* 佐野: 緑 */
 
-/* =========================
-   TAB
-========================= */
-.tabs{
-    display:flex;
-    justify-content:flex-start;
-    gap:10px;
-    padding:10px;
-    background:#fff;
-    position:sticky;
-    top:0;
-    z-index:10;
-
-    overflow-x:auto;
-    white-space:nowrap;
-    -webkit-overflow-scrolling:touch;
-
-    border-bottom:1px solid #eee;
-}
-
-.tabs a{
-    flex:0 0 auto;
-    text-decoration:none;
-    padding:10px 14px;
-    border-radius:999px;
-    background:#f1f1f1;
-    color:#333;
-    font-weight:600;
-    font-size:14px;
-}
-
-.tabs a.active{
-    background:#ff4fa3;
-    color:#fff;
-}
-
-/* =========================
-   CARD
-========================= */
-.card{
-    background:#fff;
-    margin:16px;
-    padding:18px;
-    border-radius:16px;
-    box-shadow:0 4px 14px rgba(0,0,0,0.08);
-}
-
-.section-title{
-    font-size:20px;
-    font-weight:700;
-    margin-bottom:12px;
-    border-left:5px solid #ff4fa3;
-    padding-left:10px;
-}
-
-/* =========================
-   HOME
-========================= */
-.home-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:12px;
-}
-
-.info-card{
-    background:#fafafa;
-    padding:14px;
-    border-radius:12px;
-    border-left:5px solid #ddd;
-}
-
-/* 色分け */
-.tv{border-color:#4aa3ff;}
-.ticket{border-color:#ff6b81;}
-.sns{border-color:#9b59b6;}
-.blog{border-color:#2ecc71;}
-
-/* =========================
-   MEMBERS
-========================= */
-.member-card{
-    margin:14px;
-    padding:16px;
-    border-radius:16px;
-    background:#fff;
-    box-shadow:0 3px 10px rgba(0,0,0,0.08);
-}
-
-.member-name{
-    font-size:22px;
-    font-weight:800;
-    margin-bottom:10px;
-}
-
-/* 名前カラー */
-.masakado{color:#2E86FF;}
-.suezawa{color:#E53935;}
-.kojima{color:#8E44AD;}
-.sano{color:#2ECC71;}
-
-/* 背景薄色 */
-.member-masakado{background:#eaf4ff;}
-.member-suezawa{background:#ffecec;}
-.member-kojima{background:#f4ecff;}
-.member-sano{background:#ecfff1;}
-
-/* プロフィール */
-.profile-item{
-    background:#fff;
-    padding:10px;
-    margin-top:8px;
-    border-radius:10px;
-    font-size:14px;
-}
-
-/* =========================
-   LIST
-========================= */
-.future-item{
-    padding:12px 0;
-    border-bottom:1px solid #eee;
+/* 詳細テキスト */
+.list-card .detail-text {
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #eee;
 }
