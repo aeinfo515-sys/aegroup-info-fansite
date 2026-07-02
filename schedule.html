@@ -2,24 +2,91 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>カレンダー - Aぇ! group info</title>
+    <title>スケジュール - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+    <style>
+        /* カレンダー全体の見た目をオシャレに微調整 */
+        .calendar-container { max-width: 900px; margin: 20px auto; padding: 0 10px; }
+        #calendar { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .fc-event { border: none !important; padding: 2px 5px !important; font-size: 0.75rem !important; font-weight: bold !important; border-radius: 4px !important; }
+        /* カレンダー内のメンカラ設定 */
+        .cal-group { background-color: #ff69b4 !important; color: #fff !important; }
+        .cal-suezawa { background-color: #ff0000 !important; color: #fff !important; }
+        .cal-masakado { background-color: #0000ff !important; color: #fff !important; }
+        .cal-richard { background-color: #ffd700 !important; color: #333 !important; }
+        .cal-kojima { background-color: #800080 !important; color: #fff !important; }
+        .cal-sano { background-color: #008000 !important; color: #fff !important; }
+    </style>
 </head>
 <body>
-    <nav class="top-nav">
-        <a href="index.html">Home</a>
-        <a href="schedule.html" class="active">Schedule</a>
+
+    <header class="hero" style="text-align: center; padding: 20px 0;">
+        <h1>Aぇ! group Info</h1>
+        <p>マンスリースケジュール</p>
+    </header>
+
+    <nav class="tabs" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+        <a href="index.html">🏠 Home</a>
+        <a href="schedule.html" class="active">📅 Schedule</a>
+        <a href="sns.html">📱 SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
     </nav>
 
-    <div class="container">
-        <h1 style="text-align:center; margin: 20px 0;">🗓 月間カレンダー</h1>
-        <div id="calendar" style="background:#fff; padding:10px; border-radius:12px;"></div>
-    </div>
+    <main class="calendar-container">
+        <div id="calendar"></div>
+    </main>
 
-    <script src="calendar.js"></script>
+    <script>
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
+
+        function getCalClass(text) {
+            if (text.includes("Aぇ! group")) return "cal-group";
+            if (text.includes("末澤")) return "cal-suezawa";
+            if (text.includes("正門")) return "cal-masakado";
+            if (text.includes("リチャ")) return "cal-richard";
+            if (text.includes("小島")) return "cal-kojima";
+            if (text.includes("佐野")) return "cal-sano";
+            return "";
+        }
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ja',
+                headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+                events: async function(info, successCallback, failureCallback) {
+                    try {
+                        const response = await fetch(CAL_API_URL);
+                        const data = await response.json();
+                        
+                        const events = data.map(item => {
+                            if(!item["日付"]) return null;
+                            const d = new Date(item["日付"]);
+                            const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                            const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
+                            
+                            return {
+                                title: (item["時間"] && item["時間"] !== "00:00" ? item["時間"] + " " : "") + item["タイトル"],
+                                start: dateStr,
+                                className: getCalClass(matchText)
+                            };
+                        }).filter(e => e !== null);
+                        
+                        successCallback(events);
+                    } catch (e) {
+                        console.error(e);
+                        failureCallback(e);
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
 </body>
 </html>
