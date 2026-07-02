@@ -1,6 +1,5 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
-// 【超・安全注入】画面にデザインを強制的に当てる
 const styleInject = document.createElement("style");
 styleInject.innerHTML = `
     .custom-schedule-item {
@@ -43,20 +42,30 @@ document.head.appendChild(styleInject);
 
 function formatDate(dateStr) {
     if (!dateStr) return "";
+    const str = String(dateStr);
+    if (str.includes("1899")) return "";
     const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
     return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 function formatTime(timeStr) {
-    if (!timeStr || timeStr === "00:00") return "";
+    if (!timeStr) return "";
     const str = String(timeStr);
-    if (str.includes(":") && !str.includes("GMT")) return str;
-    const d = new Date(timeStr);
-    if (isNaN(d.getTime())) {
-        const match = str.match(/(\d{2}):(\d{2})/);
-        return match ? `${match[1]}:${match[2]}` : "";
+    
+    // "1899-12-29T15:00:00.000Z" から時間だけを強引に切り取る
+    if (str.includes("T")) {
+        const parts = str.split("T");
+        if (parts[1]) {
+            const timePart = parts[1].substring(0, 5);
+            if (timePart !== "00:00") return timePart;
+        }
     }
-    return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+    
+    if (str.includes("00:00")) return "";
+    if (str.includes(":") && !str.includes("GMT")) return str.substring(0, 5);
+    
+    return "";
 }
 
 function getMemberBadge(text) {
@@ -117,7 +126,8 @@ async function loadSchedule() {
 
         data.forEach(item => {
             if (!item["日付"]) return;
-            
+            if (String(item["日付"]).includes("1899")) return;
+
             const itemDate = new Date(item["日付"]).toLocaleDateString("ja-JP", {timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit"}).replace(/\//g, "-");
             const type = item["種類"] || "";
 
@@ -127,25 +137,24 @@ async function loadSchedule() {
 
             if (itemDate === todayStr) {
                 const htmlContent = createHtmlItem(item, false);
-                if (type === "出演") todayTV.push(htmlContent);
-                else if (type === "チケット" || type === "当落" || type === "予約開始") todayTicket.push(htmlContent);
+                if (type === "出演" || type === "TV") todayTV.push(htmlContent);
+                else if (type === "チケット" || type === "当落" || type === "予約開始" || type === "Ticket") todayTicket.push(htmlContent);
                 else if (type === "SNS" || type === "YouTube") todaySNS.push(htmlContent);
-                else if (type === "ブログ" || type === "雑誌") todayBlog.push(htmlContent);
+                else if (type === "ブログ" || type === "雑誌" || type === "Blog") todayBlog.push(htmlContent);
             }
         });
 
-        if (document.getElementById("today-tv")) document.getElementById("today-tv").innerHTML = todayTV.join("") || "None";
-        if (document.getElementById("today-ticket")) document.getElementById("today-ticket").innerHTML = todayTicket.join("") || "None";
-        if (document.getElementById("today-sns")) document.getElementById("today-sns").innerHTML = todaySNS.join("") || "None";
-        if (document.getElementById("today-blog")) document.getElementById("today-blog").innerHTML = todayBlog.join("") || "None";
-        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "None";
+        if (document.getElementById("today-tv")) document.getElementById("today-tv").innerHTML = todayTV.join("") || "予定はありません";
+        if (document.getElementById("today-ticket")) document.getElementById("today-ticket").innerHTML = todayTicket.join("") || "予定はありません";
+        if (document.getElementById("today-sns")) document.getElementById("today-sns").innerHTML = todaySNS.join("") || "予定はありません";
+        if (document.getElementById("today-blog")) document.getElementById("today-blog").innerHTML = todayBlog.join("") || "予定はありません";
+        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "予定はありません";
 
     } catch (e) {
         console.error(e);
     }
 }
 
-// 【重要】画面の読み込み（HTML）が完全に終わってから安全に実行する
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", loadSchedule);
 } else {
