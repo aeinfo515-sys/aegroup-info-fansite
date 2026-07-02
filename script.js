@@ -1,5 +1,6 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
+// 【超・安全注入】画面にデザインを強制的に当てる
 const styleInject = document.createElement("style");
 styleInject.innerHTML = `
     .custom-schedule-item {
@@ -143,4 +144,10 @@ async function loadSchedule() {
         console.error(e);
     }
 }
-loadSchedule();
+
+// 【重要】画面の読み込み（HTML）が完全に終わってから安全に実行する
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadSchedule);
+} else {
+    loadSchedule();
+}
