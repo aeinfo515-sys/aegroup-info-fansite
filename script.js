@@ -76,8 +76,24 @@ async function loadSchedule() {
             }
         });
 
-        if (document.getElementById("future-list")) {
-            document.getElementById("future-list").innerHTML = todayHTML + futureHTML || "<p>予定はありません</p>";
+        const combinedHTML = todayHTML + futureHTML || "<p>予定はありません</p>";
+
+        // 【無敵モード】HTML内のどこに予定表示エリアがあっても見つけ出して強制上書きする
+        const targetIds = ["future-list", "schedule-list", "list-container", "schedule"];
+        let targetEl = null;
+        
+        for (const id of targetIds) {
+            targetEl = document.getElementById(id);
+            if (targetEl) break;
+        }
+        
+        if (!targetEl) {
+            // 万が一IDが見つからなければ、class名が「container」の場所か、最悪bodyにねじ込む
+            targetEl = document.querySelector(".container") || document.body;
+        }
+
+        if (targetEl) {
+            targetEl.innerHTML = combinedHTML;
         }
     } catch (e) {
         console.error(e);
