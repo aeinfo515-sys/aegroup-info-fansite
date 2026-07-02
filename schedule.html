@@ -1,50 +1,37 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Schedule | Aぇ! group Info</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - Aぇ! group Info</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
+    <header>
+        <div class="container">
+            <h1>Aぇ! group Info</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="members.html">Members</a></li>
+                    <li><a href="schedule.html" class="active">Schedule</a></li>
+                    <li><a href="sns.html">SNS</a></li>
+                    <li><a href="tickets.html">Tickets</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
 
-<header class="hero">
-    <h1>📅 Schedule</h1>
-    <p>出演・チケット・SNS・ブログの予定一覧</p>
-</header>
+    <main class="container">
+        <h2>Schedule</h2>
+        <div id="schedule-container">
+            <!-- script.jsから動的に読み込み -->
+        </div>
+    </main>
 
-<nav class="tabs">
-    <a href="index.html">🏠 Home</a>
-    <a href="schedule.html" class="active">📅 Schedule</a>
-    <a href="sns.html">📱 SNS</a>
-    <a href="tickets.html">🎫 Tickets</a>
-    <a href="members.html">👤 Members</a>
-</nav>
-
-<main>
-
-<section class="card">
-
-<h2 class="section-title">
-📅 今後の予定
-</h2>
-
-<div id="schedule-list">
-
-<div class="future-item">
-読み込み中...
-</div>
-
-</div>
-
-</section>
-
-</main>
-
-<script src="script.js"></script>
-
+    <footer>
+        <p>&copy; 2026 Aぇ! group Info Fansite.</p>
+    </footer>
+    <script src="script.js"></script>
 </body>
 </html>
