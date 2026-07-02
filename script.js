@@ -1,5 +1,47 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
+// 【超絶無敵】CSSが無視されるなら、JSから直接画面にデザインを強制注入する
+const styleInject = document.createElement("style");
+styleInject.innerHTML = `
+    .list-card {
+        background: #fff !important;
+        border-radius: 12px !important;
+        padding: 15px !important;
+        margin-bottom: 12px !important;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+        border-left: 6px solid #ccc !important;
+        font-family: sans-serif !important;
+    }
+    .list-card .date-time {
+        font-size: 0.85rem !important;
+        font-weight: bold !important;
+        color: #666 !important;
+        margin-bottom: 5px !important;
+    }
+    .list-card .title {
+        font-size: 1.1rem !important;
+        font-weight: 800 !important;
+        color: #333 !important;
+        margin-bottom: 8px !important;
+        line-height: 1.4 !important;
+    }
+    .member-badge {
+        display: inline-block !important;
+        padding: 4px 12px !important;
+        border-radius: 20px !important;
+        font-size: 0.8rem !important;
+        font-weight: bold !important;
+        color: #fff !important;
+    }
+    .bg-group { background-color: #ff69b4 !important; }
+    .bg-suezawa { background-color: #ff0000 !important; }
+    .bg-masakado { background-color: #0000ff !important; }
+    .bg-richard { background-color: #ffd700 !important; color: #333 !important; }
+    .bg-kojima { background-color: #800080 !important; }
+    .bg-sano { background-color: #008000 !important; }
+`;
+document.head.appendChild(styleInject);
+
 function formatDate(dateStr) {
     if (!dateStr) return "";
     const d = new Date(dateStr);
@@ -18,7 +60,6 @@ function formatTime(timeStr) {
     return `${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
 }
 
-// メンバー名を判別して色をつける関数
 function getMemberBadge(text) {
     if (!text) return "";
     if (text.includes("Aぇ! group")) return `<span class="member-badge bg-group">Aぇ! group</span>`;
@@ -28,23 +69,6 @@ function getMemberBadge(text) {
     if (text.includes("小島")) return `<span class="member-badge bg-kojima">小島 健</span>`;
     if (text.includes("佐野")) return `<span class="member-badge bg-sano">佐野 晶哉</span>`;
     return `<span class="member-badge" style="background:#666">${text}</span>`;
-}
-
-function createCard(item) {
-    const time = formatTime(item["時間"]);
-    const date = formatDate(item["日付"]);
-    const member = getMemberBadge(item["詳細"] || item["タイトル"]);
-    
-    return `
-        <div class="list-card" style="border-left-color: ${getBorderColor(item)}">
-            <div class="date-time">
-                <span>🗓 ${date}</span>
-                ${time ? `<span>⏰ ${time}</span>` : ""}
-            </div>
-            <div class="title">${item["タイトル"]}</div>
-            <div class="performer">${member}</div>
-        </div>
-    `;
 }
 
 function getBorderColor(item) {
@@ -58,6 +82,21 @@ function getBorderColor(item) {
     return "#ccc";
 }
 
+function createCard(item) {
+    const time = formatTime(item["時間"]);
+    const date = formatDate(item["日付"]);
+    const member = getMemberBadge(item["詳細"] || item["タイトル"]);
+    const borderColor = getBorderColor(item);
+    
+    return `
+        <div class="list-card" style="border-left: 6px solid ${borderColor} !important;">
+            <div class="date-time">🗓 ${date} ${time ? ` ⏰ ${time}` : ""}</div>
+            <div class="title">${item["タイトル"]}</div>
+            <div class="performer">${member}</div>
+        </div>
+    `;
+}
+
 async function loadSchedule() {
     try {
         const response = await fetch(API_URL);
@@ -68,6 +107,7 @@ async function loadSchedule() {
         let futureHTML = "";
 
         data.forEach(item => {
+            if (!item["日付"]) return;
             const itemDate = new Date(item["日付"]).toISOString().split('T')[0];
             if (itemDate === today) {
                 todayHTML += createCard(item);
@@ -78,17 +118,13 @@ async function loadSchedule() {
 
         const combinedHTML = todayHTML + futureHTML || "<p>予定はありません</p>";
 
-        // 【無敵モード】HTML内のどこに予定表示エリアがあっても見つけ出して強制上書きする
         const targetIds = ["future-list", "schedule-list", "list-container", "schedule"];
         let targetEl = null;
-        
         for (const id of targetIds) {
             targetEl = document.getElementById(id);
             if (targetEl) break;
         }
-        
         if (!targetEl) {
-            // 万が一IDが見つからなければ、class名が「container」の場所か、最悪bodyにねじ込む
             targetEl = document.querySelector(".container") || document.body;
         }
 
