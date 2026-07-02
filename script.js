@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzapSq-8wps3-2PBbgDNExHCDhI6Bo2T8ENKwKlaKcdfECfL7rxtu5vmY4nlH5MoPewEg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
 function $(id) {
   return document.getElementById(id);
@@ -15,12 +15,24 @@ function formatDate(dateStr) {
 
 function formatTime(timeStr) {
   if (!timeStr) return "";
-  // コロンが含まれる「HH:mm」形式ならそのまま返す
-  if (typeof timeStr === "string" && timeStr.includes(":")) return timeStr;
-  const t = new Date(timeStr);
-  if (isNaN(t.getTime())) return timeStr;
-  const hours = String(t.getHours()).padStart(2, "0");
-  const minutes = String(t.getMinutes()).padStart(2, "0");
+  const str = String(timeStr);
+  
+  // 「08:00」や「23:00」のような短い時間形式ならそのまま返す
+  if (str.includes(":") && !str.includes("GMT") && str.length <= 8) {
+    return str;
+  }
+  
+  // 長い「GMT+0900 (日本標準時)」などの文字列から時間をぶっこ抜く
+  const d = new Date(timeStr);
+  if (isNaN(d.getTime())) {
+    // 文字列から「08:00」のような部分を無理やり探す
+    const match = str.match(/(\d{2}):(\d{2})/);
+    if (match) return `${match[1]}:${match[2]}`;
+    return str;
+  }
+  
+  const hours = String(d.getHours()).padStart(2, "0");
+  const minutes = String(d.getMinutes()).padStart(2, "0");
   return `${hours}:${minutes}`;
 }
 
