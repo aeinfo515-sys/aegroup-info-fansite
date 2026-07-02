@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzapSq-8wps3-2PBbgDNExHCDhI6Bo2T8ENKwKlaKcdfECfL7rxtu5vmY4nlH5MoPewEg/exec";
 
 function $(id) {
   return document.getElementById(id);
