@@ -41,15 +41,26 @@ styleInject.innerHTML = `
 document.head.appendChild(styleInject);
 
 function formatDate(dateStr) {
-    if (!dateStr) return "";
+    if (!dateStr || String(dateStr).includes("1899")) return "";
     const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return "";
     return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 function formatTime(timeStr) {
-    if (!timeStr || timeStr === "00:00") return "";
+    if (!timeStr) return "";
     const str = String(timeStr);
+    
+    // 1899-12-29T15:00:00.000Z のような形式から時間部分だけを強引に切り取る安全装置
+    if (str.includes("T") && str.includes("Z")) {
+        const tPart = str.split("T")[1]; // "15:00:00.000Z"
+        const match = tPart.match(/(\d{2}):(\d{2})/);
+        if (match) return `${match[1]}:${match[2]}`;
+    }
+    
+    if (str.includes("00:00")) return "";
     if (str.includes(":") && !str.includes("GMT")) return str;
+    
     const d = new Date(timeStr);
     if (isNaN(d.getTime())) {
         const match = str.match(/(\d{2}):(\d{2})/);
@@ -117,6 +128,9 @@ async function loadSchedule() {
         data.forEach(item => {
             if (!item["日付"]) return;
             
+            // 1899年のバグデータをスキップ
+            if (String(item["日付"]).includes("1899")) return;
+
             const itemDate = new Date(item["日付"]).toLocaleDateString("ja-JP", {timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit"}).replace(/\//g, "-");
             const type = item["種類"] || "";
 
@@ -140,12 +154,4 @@ async function loadSchedule() {
         if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = futureHTML || "予定はありません";
 
     } catch (e) {
-        console.error(e);
-    }
-}
-
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadSchedule);
-} else {
-    loadSchedule();
-}
+        console.error
