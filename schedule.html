@@ -1,50 +1,25 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Schedule | Aぇ! group Info</title>
-
-<link rel="stylesheet" href="style.css">
-
+    <meta charset="UTF-8">
+    <title>カレンダー - Aぇ! group info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 </head>
-
 <body>
+    <nav class="top-nav">
+        <a href="index.html">Home</a>
+        <a href="schedule.html" class="active">Schedule</a>
+    </nav>
 
-<header class="hero">
-    <h1>📅 Schedule</h1>
-    <p>出演・チケット・SNS・ブログの予定一覧</p>
-</header>
+    <div class="container">
+        <h1 style="text-align:center; margin: 20px 0;">🗓 月間カレンダー</h1>
+        <div id="calendar" style="background:#fff; padding:10px; border-radius:12px;"></div>
+    </div>
 
-<nav class="tabs">
-    <a href="index.html">🏠 Home</a>
-    <a href="schedule.html" class="active">📅 Schedule</a>
-    <a href="sns.html">📱 SNS</a>
-    <a href="tickets.html">🎫 Tickets</a>
-    <a href="members.html">👤 Members</a>
-</nav>
-
-<main>
-
-<section class="card">
-
-<h2 class="section-title">
-📅 今後の予定
-</h2>
-
-<div id="schedule-list">
-
-<div class="future-item">
-読み込み中...
-</div>
-
-</div>
-
-</section>
-
-</main>
-
-<script src="script.js"></script>
-
+    <script src="calendar.js"></script>
 </body>
 </html>
