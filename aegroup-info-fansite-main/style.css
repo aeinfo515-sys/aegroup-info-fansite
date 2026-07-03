@@ -1,56 +1,162 @@
-
-body{margin:0;font-family:system-ui;background:#f4f6fb;color:#111}
-.hero{
-background:linear-gradient(90deg,#2196f3,#f44336,#9c27b0,#4caf50);
-color:#fff;
-padding:24px;
-text-align:center;
+/* ==========================================
+   全体共通のベースデザイン
+   ========================================== */
+body {
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+    color: #333;
 }
 
-.tabs{
-display:flex;
-gap:18px;
-justify-content:center;
-padding:12px;
-background:#fff;
-position:sticky;
-top:0;
+/* ヘッダー */
+.hero {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    text-align: center;
+    padding: 30px 20px;
+}
+.hero h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+}
+.hero p {
+    margin: 8px 0 0 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
 }
 
-.tabs a{
-text-decoration:none;
-color:#333;
-font-weight:600;
-padding:8px 12px;
-border-radius:10px;
+/* ==========================================
+   🔥 スマホで縦並びになる優秀なタブメニュー
+   ========================================== */
+.tabs {
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    padding: 10px;
+    gap: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.tabs a {
+    display: block;
+    text-align: center;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: #666;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    background: #f8f9fa;
+    flex: 1; /* パソコンでは横いっぱいに均等に広がる */
+    max-width: 150px;
+}
+.tabs a.active, .tabs a:hover {
+    background: #2a5298;
+    color: #fff !important;
 }
 
-.card{
-background:#fff;
-margin:16px;
-padding:16px;
-border-radius:16px;
-box-shadow:0 2px 10px rgba(0,0,0,.06);
+/* 📱 携帯（画面幅が600px以下）の時だけ縦並びにする魔法 */
+@media (max-width: 600px) {
+    .tabs {
+        flex-direction: column; /* 縦並びに変更 */
+        padding: 12px;
+        gap: 6px;
+    }
+    .tabs a {
+        max-width: 100%; /* 横幅いっぱいに広げる */
+        padding: 12px;
+        font-size: 0.95rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
 }
 
-.highlight .bar{
-height:4px;
-background:#ff4da6;
-border-radius:4px;
-margin-bottom:12px;
+/* ==========================================
+   メインコンテンツ & 共通カードデザイン
+   ========================================== */
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 0 15px;
 }
 
-.member h2{margin:0}
-.blue{color:#1976d2}
-.red{color:#d32f2f}
-.purple{color:#7b1fa2}
-.green{color:#2e7d32}
-
-.block{
-border-top:1px solid #eee;
-padding-top:10px;
-margin-top:10px;
+/* もともとの白くて味気なかったページもこれですべてオシャレになります */
+.card, main > section, .container, .member-list, .sns-list, .ticket-list {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
 }
 
-/* v15 member card backgrounds */
-.member-blue{background:#eef6ff}.member-red{background:#fff1f1}.member-purple{background:#f6f0ff}.member-green{background:#f1fff1}
+.section-title, h2 {
+    font-size: 1.2rem;
+    border-bottom: 2px solid #2a5298;
+    padding-bottom: 6px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #1e3c72;
+}
+
+/* 4つの箱（ホーム画面のグリッド） */
+.home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+.info-card {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 15px;
+    border-top: 4px solid #2a5298;
+}
+.info-card h3 {
+    margin: 0 0 10px 0;
+    font-size: 1rem;
+}
+
+/* ==========================================
+   メンバー別・スケジュールアイテム（共通）
+   ========================================== */
+.custom-schedule-item {
+    background: #fdfdfd !important;
+    border-radius: 8px !important;
+    padding: 10px 12px !important;
+    margin-bottom: 10px !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04) !important;
+    border-left: 5px solid #ccc !important;
+    text-align: left !important;
+}
+.custom-date-time {
+    font-size: 0.8rem !important;
+    font-weight: bold !important;
+    color: #555 !important;
+    margin-bottom: 3px !important;
+}
+.custom-title {
+    font-size: 0.95rem !important;
+    font-weight: bold !important;
+    color: #222 !important;
+    margin-bottom: 4px !important;
+}
+
+/* メンバーカラーバッジ */
+.member-badge {
+    display: inline-block !important;
+    padding: 2px 10px !important;
+    border-radius: 12px !important;
+    font-size: 0.75rem !important;
+    font-weight: bold !important;
+    color: #fff !important;
+}
+.bg-group { background-color: #ff69b4 !important; }
+.bg-suezawa { background-color: #ff0000 !important; }
+.bg-masakado { background-color: #0000ff !important; }
+.bg-richard { background-color: #ffd700 !important; color: #333 !important; }
+.bg-kojima { background-color: #800080 !important; }
+.bg-sano { background-color: #008000 !important; }
