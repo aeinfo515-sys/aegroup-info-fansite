@@ -1,22 +1,37 @@
-/* 元の可愛いデザインに戻すためのリセットコード */
+/* ==========================================
+   【完全復活版】元の可愛いデザインを最優先で適用
+   ========================================== */
+
 body {
-    font-family: sans-serif;
-    background-color: #fff0f5; /* 前の薄いピンクの背景 */
-    margin: 0;
-    padding: 0;
+    font-family: sans-serif !important;
+    background-color: #fff0f5 !important; /* 前の薄いピンクの背景を強制指定 */
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* 携帯（スマホ）のときだけタブメニューを縦並びにする設定 */
 @media (max-width: 600px) {
     .tabs {
-        display: flex;
+        display: flex !important;
         flex-direction: column !important; /* 縦並び */
-        gap: 6px;
-        padding: 10px;
+        gap: 6px !important;
+        padding: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
     .tabs a {
+        display: block !important;
         width: 100% !important;
-        box-sizing: border-box;
-        text-align: center;
+        box-sizing: border-box !important;
+        text-align: center !important;
+        padding: 12px !important;
     }
+}
+
+/* 他の味気ないページ（白背景）を元の雰囲気に馴染ませる基本設定 */
+.card, main > section, .container, .member-list, .sns-list, .ticket-list {
+    background: #ffffff !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    margin-bottom: 15px !important;
 }
