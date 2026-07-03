@@ -86,4 +86,82 @@
                         
                         const events = data.map(item => {
                             if(!item["日付"] || String(item["日付"]).includes("1899")) return null;
-                            const d = new Date
+                            const d = new Date(item["日付"]);
+                            const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                            const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
+                            
+                            return {
+                                title: item["タイトル"],
+                                start: dateStr,
+                                className: getCalClass(matchText)
+                            };
+                        }).filter(e => e !== null);
+                        
+                        successCallback(events);
+                    } catch (e) {
+                        console.error(e);
+                        failureCallback(e);
+                    }
+                }
+            });
+            calendar.render();
+        });
+
+        // ポップアップ内の色分けも4人に修正
+        function showDayEvents(dateStr) {
+            const modal = document.getElementById("dayModal");
+            const modalDate = document.getElementById("modalDate");
+            const modalList = document.getElementById("modalList");
+            
+            const parts = dateStr.split("-");
+            modalDate.innerText = `${parseInt(parts[1])}月${parseInt(parts[2])}日の予定`;
+            modalList.innerHTML = "";
+
+            const dayItems = rawEvents.filter(item => {
+                if(!item["日付"]) return false;
+                const d = new Date(item["日付"]);
+                const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                return itemDate === dateStr;
+            });
+
+            if (dayItems.length === 0) {
+                modalList.innerHTML = "<p style='color:#777;'>予定はありません</p>";
+            } else {
+                dayItems.forEach(item => {
+                    let timeStr = "";
+                    if (item["時間"] && String(item["時間"]).includes("T")) {
+                        const td = new Date(item["時間"]);
+                        const h = String(td.getHours()).padStart(2, "0");
+                        const m = String(td.getMinutes()).padStart(2, "0");
+                        if (!(h === "00" && m === "00")) timeStr = `⏰ ${h}:${m} `;
+                    }
+                    
+                    const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
+                    let borderCol = "#ccc";
+                    if (matchText.includes("Aぇ! group")) borderCol = "#ff69b4";
+                    else if (matchText.includes("小島")) borderCol = "#800080";
+                    else if (matchText.includes("正門")) borderCol = "#0000ff";
+                    else if (matchText.includes("末澤")) borderCol = "#ff0000";
+                    else if (matchText.includes("佐野")) borderCol = "#008000";
+
+                    const div = document.createElement("div");
+                    div.className = "modal-item";
+                    div.style.borderLeftColor = borderCol;
+                    div.innerHTML = `<strong>${timeStr}${item["タイトル"]}</strong><br><span style='font-size:0.8rem;color:#666;'>${item["詳細"] || ""}</span>`;
+                    modalList.appendChild(div);
+                });
+            }
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("dayModal").style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("dayModal");
+            if (event.target == modal) modal.style.display = "none";
+        }
+    </script>
+</body>
+</html>
