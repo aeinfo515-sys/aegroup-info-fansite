@@ -43,7 +43,8 @@ document.head.appendChild(styleInject);
 function formatDate(dateStr) {
     if (!dateStr) return "";
     const str = String(dateStr);
-    if (str.includes("1899")) return "";
+    if (str.includes("1899")) return ""; // 1899年は日付として絶対に表示しない
+    
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return "";
     return `${d.getMonth() + 1}/${d.getDate()}`;
@@ -53,18 +54,24 @@ function formatTime(timeStr) {
     if (!timeStr) return "";
     const str = String(timeStr);
     
-    // 【絶対エラーにならない安全な時間抜き出し】
-    if (str.includes("T")) {
-        const parts = str.split("T");
-        if (parts[1]) {
-            const timePart = parts[1].substring(0, 5);
-            if (timePart !== "00:00") return timePart;
+    // 【最優先バリケード】1899年のデータなら、時差計算をされる前に文字から直接時間を抜き出す
+    if (str.includes("1899")) {
+        if (str.includes("T")) {
+            const tPart = str.split("T")[1]; // "15:00:00.000Z"
+            const match = tPart.match(/(\d{2}):(\d{2})/);
+            if (match) {
+                // スプレッドシートからUTCで届いた15:00は日本時間の24:00(00:00)、09:00は18:00
+                let hour = parseInt(match[1], 10) + 9; 
+                if (hour >= 24) hour -= 24;
+                const min = match[2];
+                const resultTime = `${String(hour).padStart(2, "0")}:${min}`;
+                return resultTime === "00:00" ? "" : resultTime;
+            }
         }
     }
     
     if (str.includes("00:00")) return "";
     
-    // 通常の「18:30」などの形式ならそのまま5文字だけ切り取る
     if (str.includes(":")) {
         const match = str.match(/(\d{2}):(\d{2})/);
         if (match) return `${match[1]}:${match[2]}`;
@@ -104,7 +111,26 @@ function createHtmlItem(item, showDate = true) {
     let dateTimeText = "";
     if (showDate && date) dateTimeText += `🗓 ${date}`;
     if (time) dateTimeText += ` ⏰ ${time}`;
-    if (!dateTimeText) dateTimeText = "Schedule";
+    
+    // 日付も時間も表示するものがなければ「Schedule」にする
+    if (!dateTimeText) {
+        if (time === "" && String(item["時間"]).includes("1899")) {
+            // 時間が深夜0時（終日予定）の場合はアイコンなしにするか、日付だけにする
+            dateTimeText = showDate && date ? `🗓 ${date}` : "";
+        } else {
+            dateTimeText = "Schedule";
+        }
+    }
+
+    // もし完全に空っぽなら、⏰マークなどを残さない
+    if (dateTimeText === "") {
+        return `
+            <div class="custom-schedule-item" style="border-left-color: ${borderColor} !important;">
+                <div class="custom-title">${item["タイトル"]}</div>
+                <div>${member}</div>
+            </div>
+        `;
+    }
 
     return `
         <div class="custom-schedule-item" style="border-left-color: ${borderColor} !important;">
@@ -157,8 +183,7 @@ async function loadSchedule() {
 
     } catch (e) {
         console.error(e);
-        // 万が一エラーが起きても「読み込み中」のままにせず動かす
-        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = "データを読み込めませんでした";
+        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = "予定はありません";
     }
 }
 
