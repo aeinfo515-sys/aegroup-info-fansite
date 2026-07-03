@@ -11,24 +11,32 @@
     <style>
         .calendar-container { max-width: 900px; margin: 20px auto; padding: 0 10px; }
         #calendar { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .fc-event { border: none !important; padding: 2px 5px !important; font-size: 0.75rem !important; font-weight: bold !important; border-radius: 4px !important; }
-        /* カレンダー内のメンカラ設定 */
+        .fc-event { border: none !important; padding: 4px 6px !important; font-size: 0.8rem !important; font-weight: bold !important; border-radius: 4px !important; cursor: pointer; }
+        
+        /* メンカラ設定 */
         .cal-group { background-color: #ff69b4 !important; color: #fff !important; }
         .cal-suezawa { background-color: #ff0000 !important; color: #fff !important; }
         .cal-masakado { background-color: #0000ff !important; color: #fff !important; }
         .cal-richard { background-color: #ffd700 !important; color: #333 !important; }
         .cal-kojima { background-color: #800080 !important; color: #fff !important; }
         .cal-sano { background-color: #008000 !important; color: #fff !important; }
+
+        /* 日付クリック時のポップアップ（1日分の予定）の見た目 */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); }
+        .modal-content { background-color: #fff; margin: 15% auto; padding: 20px; border-radius: 12px; max-width: 450px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; }
+        .close-btn { position: absolute; right: 15px; top: 10px; font-size: 24px; cursor: pointer; color: #aaa; }
+        .close-btn:hover { color: #000; }
+        .modal-item { padding: 8px 10px; margin-bottom: 8px; border-left: 5px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.9rem; }
     </style>
 </head>
 <body>
 
-    <header class="hero" style="text-align: center; padding: 20px 0;">
+    <header class="hero">
         <h1>Aぇ! group Info</h1>
         <p>マンスリースケジュール</p>
     </header>
 
-    <nav class="tabs" style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px;">
+    <nav class="tabs">
         <a href="index.html">🏠 Home</a>
         <a href="schedule.html" class="active">📅 Schedule</a>
         <a href="sns.html">📱 SNS</a>
@@ -40,8 +48,17 @@
         <div id="calendar"></div>
     </main>
 
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3 id="modalDate" style="margin-top:0; border-bottom:2px solid #ff69b4; padding-bottom:5px;"></h3>
+            <div id="modalList"></div>
+        </div>
+    </div>
+
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
+        let rawEvents = []; // 届いたデータを一時保存する場所
 
         function getCalClass(text) {
             if (text.includes("Aぇ! group")) return "cal-group";
@@ -59,39 +76,28 @@
                 initialView: 'dayGridMonth',
                 locale: 'ja',
                 headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+                displayEventTime: false, // ⏰ 時間をカレンダー上から非表示にする（要望通りタイトルだけにする）
+                
+                // 日付マスをクリックしたときの動き
+                dateClick: function(info) {
+                    showDayEvents(info.dateStr);
+                },
+                
                 events: async function(info, successCallback, failureCallback) {
                     try {
                         const response = await fetch(CAL_API_URL);
                         const data = await response.json();
+                        rawEvents = data; // ポップアップ用に保存
                         
                         const events = data.map(item => {
-                            if(!item["日付"]) return null;
-                            if(String(item["日付"]).includes("1899")) return null;
+                            if(!item["日付"] || String(item["日付"]).includes("1899")) return null;
                             
                             const d = new Date(item["日付"]);
                             const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                             const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
                             
-                            // 時間データの時差ボケ調整
-                            let timePrefix = "";
-                            if (item["時間"] && String(item["時間"]).includes("T")) {
-                                const td = new Date(item["時間"]);
-                                if (!isNaN(td.getTime())) {
-                                    const h = String(td.getHours()).padStart(2, "0");
-                                    const m = String(td.getMinutes()).padStart(2, "0");
-                                    if (!(h === "00" && m === "00")) {
-                                        timePrefix = `${h}:${m} `;
-                                    }
-                                }
-                            } else if (item["時間"] && String(item["時間"]).includes(":")) {
-                                const match = String(item["時間"]).match(/(\d{2}):(\d{2})/);
-                                if (match && !(match[1] === "00" && match[2] === "00")) {
-                                    timePrefix = `${match[1]}:${match[2]} `;
-                                }
-                            }
-                            
                             return {
-                                title: timePrefix + item["タイトル"],
+                                title: item["タイトル"], // 時間を入れず、タイトルだけを表示
                                 start: dateStr,
                                 className: getCalClass(matchText)
                             };
@@ -106,6 +112,67 @@
             });
             calendar.render();
         });
+
+        // 1日分の予定をポップアップで表示する関数
+        function showDayEvents(dateStr) {
+            const modal = document.getElementById("dayModal");
+            const modalDate = document.getElementById("modalDate");
+            const modalList = document.getElementById("modalList");
+            
+            // 日付の見た目を綺麗にする (2026-07-03 -> 7月3日の予定)
+            const parts = dateStr.split("-");
+            modalDate.innerText = `${parseInt(parts[1])}月${parseInt(parts[2])}日の予定`;
+            modalList.innerHTML = "";
+
+            // クリックされた日付の予定を探す
+            const dayItems = rawEvents.filter(item => {
+                if(!item["日付"]) return false;
+                const d = new Date(item["日付"]);
+                const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                return itemDate === dateStr;
+            });
+
+            if (dayItems.length === 0) {
+                modalList.innerHTML = "<p style='color:#777;'>予定はありません</p>";
+            } else {
+                dayItems.forEach(item => {
+                    // 時間の表示を作成
+                    let timeStr = "";
+                    if (item["時間"] && String(item["時間"]).includes("T")) {
+                        const td = new Date(item["時間"]);
+                        const h = String(td.getHours()).padStart(2, "0");
+                        const m = String(td.getMinutes()).padStart(2, "0");
+                        if (!(h === "00" && m === "00")) timeStr = `⏰ ${h}:${m} `;
+                    }
+                    
+                    const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
+                    let borderCol = "#ccc";
+                    if (matchText.includes("Aぇ! group")) borderCol = "#ff69b4";
+                    else if (matchText.includes("末澤")) borderCol = "#ff0000";
+                    else if (matchText.includes("正門")) borderCol = "#0000ff";
+                    else if (matchText.includes("リチャ")) borderCol = "#ffd700";
+                    else if (matchText.includes("小島")) borderCol = "#800080";
+                    else if (matchText.includes("佐野")) borderCol = "#008000";
+
+                    const div = document.createElement("div");
+                    div.className = "modal-item";
+                    div.style.borderLeftColor = borderCol;
+                    div.innerHTML = `<strong>${timeStr}${item["タイトル"]}</strong><br><span style='font-size:0.8rem;color:#666;'>${item["詳細"] || ""}</span>`;
+                    modalList.appendChild(div);
+                });
+            }
+            modal.style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("dayModal").style.display = "none";
+        }
+
+        // ポップアップの外側をクリックしても閉じるようにする
+        window.onclick = function(event) {
+            const modal = document.getElementById("dayModal");
+            if (event.target == modal) modal.style.display = "none";
+        }
     </script>
 </body>
 </html>
