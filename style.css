@@ -1,23 +1,14 @@
 /* ==========================================
-   🌈 メンバー4人の美しいグラデーションヘッダー
+   🌈 メンバー4人のグラデーションヘッダー
    ========================================== */
 .hero {
-    background: linear-gradient(
-        90deg, 
-        #800080 0%,   /* 小島 (紫) */
-        #0000ff 33%,  /* 正門 (青) */
-        #ff0000 66%,  /* 末澤 (赤) */
-        #008000 100%  /* 佐野 (緑) */
-    ) !important;
+    background: linear-gradient(90deg, #800080 0%, #0000ff 33%, #ff0000 66%, #008000 100%) !important;
     color: white !important;
     text-align: center !important;
     padding: 30px 20px !important;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important; /* 文字をよりくっきり */
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
 }
 
-/* ==========================================
-   🏠 全体の背景（薄ピンク）
-   ========================================== */
 body {
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
     background-color: #fff0f5 !important; 
@@ -25,9 +16,7 @@ body {
     padding: 0 !important;
 }
 
-/* ==========================================
-   🎫 可愛いタブボタンのデザイン
-   ========================================== */
+/* 🎫 可愛いタブボタン */
 .tabs {
     display: flex !important;
     justify-content: center !important;
@@ -35,8 +24,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
     padding: 10px !important;
     gap: 8px !important;
-    position: relative !important; /* スマホで固定されずに動く */
-    z-index: 100 !important;
+    position: relative !important;
 }
 .tabs a {
     display: inline-block !important;
@@ -57,38 +45,15 @@ body {
     border-color: #ff69b4 !important;
 }
 
-/* ==========================================
-   📱 携帯（画面幅が600px以下）の時だけ【縦並びのタブ】
-   ========================================== */
 @media (max-width: 600px) {
-    .tabs {
-        flex-direction: column !important;
-        padding: 12px !important;
-        gap: 8px !important;
-        position: relative !important; /* 携帯で画面上部に固定させない */
-    }
-    .tabs a {
-        display: block !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        max-width: 100% !important;
-        padding: 12px !important;
-        font-size: 1rem !important;
-        border-radius: 25px !important;
-    }
+    .tabs { flex-direction: column !important; padding: 12px !important; gap: 8px !important; }
+    .tabs a { display: block !important; width: 100% !important; padding: 12px !important; border-radius: 25px !important; }
 }
 
-/* ==========================================
-   ✨ SNS・チケット・メンバー・全ページのデザイン統一
-   ========================================== */
-main {
-    max-width: 800px !important;
-    margin: 20px auto !important;
-    padding: 0 15px !important;
-}
+/* ✨ 共通デザイン */
+main { max-width: 800px !important; margin: 20px auto !important; padding: 0 15px !important; }
 
-/* SNS、Tickets、Membersなどの枠をすべてホームと同じ可愛いピンク枠に */
-.card, main > section, .container, .member-list, .sns-list, .ticket-list, .member-card, .sns-card, .ticket-card, #calendar {
+.card, .member-card, .sns-card, .ticket-card {
     background: #ffffff !important;
     border-radius: 12px !important;
     padding: 20px !important;
@@ -97,7 +62,6 @@ main {
     border: 1px solid #ffb6c1 !important;
 }
 
-/* 各種見出しのデザインもピンクに統一 */
 h2, .section-title {
     font-size: 1.2rem !important;
     border-bottom: 2px solid #ff69b4 !important;
@@ -106,3 +70,22 @@ h2, .section-title {
     margin-bottom: 15px !important;
     color: #ff69b4 !important;
 }
+
+/* ==========================================
+   💜💙❤️💚 メンバー個別カラー設定（Membersページ用）
+   ========================================== */
+/* 小島 健 (紫) */
+.border-kojima { border: 3px solid #800080 !important; }
+.text-kojima { color: #800080 !important; border-bottom: 2px solid #800080 !important; }
+
+/* 正門 良規 (青) */
+.border-masakado { border: 3px solid #0000ff !important; }
+.text-masakado { color: #0000ff !important; border-bottom: 2px solid #0000ff !important; }
+
+/* 末澤 誠也 (赤) */
+.border-suezawa { border: 3px solid #ff0000 !important; }
+.text-suezawa { color: #ff0000 !important; border-bottom: 2px solid #ff0000 !important; }
+
+/* 佐野 晶哉 (緑) */
+.border-sano { border: 3px solid #008000 !important; }
+.text-sano { color: #008000 !important; border-bottom: 2px solid #008000 !important; }
