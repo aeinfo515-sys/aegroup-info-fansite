@@ -1,22 +1,22 @@
 /* ==========================================
-   🌈 Aぇ! group メンカラグラデーションヘッダー
+   🌈 メンバー4人の美しいグラデーションヘッダー
    ========================================== */
 .hero {
     background: linear-gradient(
         90deg, 
-        #800080 25%,  /* 小島 */
-        #0000ff 50%,  /* 正門 */
-        #ff0000 75%,   /* 末澤 */
-        #008000 100%,  /* 佐野 */
+        #800080 0%,   /* 小島 (紫) */
+        #0000ff 33%,  /* 正門 (青) */
+        #ff0000 66%,  /* 末澤 (赤) */
+        #008000 100%  /* 佐野 (緑) */
     ) !important;
     color: white !important;
     text-align: center !important;
     padding: 30px 20px !important;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5) !important; /* 文字を見やすく */
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important; /* 文字をよりくっきり */
 }
 
 /* ==========================================
-   🏠 全体の背景（元の可愛い薄ピンク）
+   🏠 全体の背景（薄ピンク）
    ========================================== */
 body {
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
@@ -26,7 +26,7 @@ body {
 }
 
 /* ==========================================
-   🎫 元のオシャレなタブボタンのデザイン
+   🎫 可愛いタブボタンのデザイン
    ========================================== */
 .tabs {
     display: flex !important;
@@ -35,8 +35,7 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
     padding: 10px !important;
     gap: 8px !important;
-    position: sticky !important;
-    top: 0 !important;
+    position: relative !important; /* スマホで固定されずに動く */
     z-index: 100 !important;
 }
 .tabs a {
@@ -45,27 +44,28 @@ body {
     padding: 10px 20px !important;
     text-decoration: none !important;
     color: #555 !important;
-    border-radius: 20px !important; /* 可愛い丸みのあるタブ */
+    border-radius: 20px !important;
     font-size: 0.9rem !important;
     font-weight: bold !important;
     transition: all 0.2s ease !important;
-    background: #fff0f5 !important; /* タブのベース色 */
+    background: #fff0f5 !important;
     border: 1px solid #ffb6c1 !important;
 }
 .tabs a.active, .tabs a:hover {
-    background: #ff69b4 !important; /* アクティブ時は可愛いピンク */
+    background: #ff69b4 !important;
     color: #ffffff !important;
     border-color: #ff69b4 !important;
 }
 
 /* ==========================================
-   📱 携帯（画面幅が600px以下）の時だけ【縦並びのタブ】にする魔法
+   📱 携帯（画面幅が600px以下）の時だけ【縦並びのタブ】
    ========================================== */
 @media (max-width: 600px) {
     .tabs {
-        flex-direction: column !important; /* 綺麗に縦並びにする */
+        flex-direction: column !important;
         padding: 12px !important;
         gap: 8px !important;
+        position: relative !important; /* 携帯で画面上部に固定させない */
     }
     .tabs a {
         display: block !important;
@@ -74,6 +74,35 @@ body {
         max-width: 100% !important;
         padding: 12px !important;
         font-size: 1rem !important;
-        border-radius: 25px !important; /* スマホでも可愛い丸型をキープ */
+        border-radius: 25px !important;
     }
+}
+
+/* ==========================================
+   ✨ SNS・チケット・メンバー・全ページのデザイン統一
+   ========================================== */
+main {
+    max-width: 800px !important;
+    margin: 20px auto !important;
+    padding: 0 15px !important;
+}
+
+/* SNS、Tickets、Membersなどの枠をすべてホームと同じ可愛いピンク枠に */
+.card, main > section, .container, .member-list, .sns-list, .ticket-list, .member-card, .sns-card, .ticket-card, #calendar {
+    background: #ffffff !important;
+    border-radius: 12px !important;
+    padding: 20px !important;
+    margin-bottom: 20px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+    border: 1px solid #ffb6c1 !important;
+}
+
+/* 各種見出しのデザインもピンクに統一 */
+h2, .section-title {
+    font-size: 1.2rem !important;
+    border-bottom: 2px solid #ff69b4 !important;
+    padding-bottom: 6px !important;
+    margin-top: 0 !important;
+    margin-bottom: 15px !important;
+    color: #ff69b4 !important;
 }
