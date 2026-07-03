@@ -4,12 +4,10 @@
 .hero {
     background: linear-gradient(
         90deg, 
-        #ff0000 0%,   /* 末澤 */
-        #0000ff 20%,  /* 正門 */
-        #ffd700 40%,  /* リチャ */
-        #800080 60%,  /* 小島 */
-        #008000 80%,  /* 佐野 */
-        #ff69b4 100%  /* グループ */
+        #800080 25%,  /* 小島 */
+        #0000ff 50%,  /* 正門 */
+        #ff0000 75%,   /* 末澤 */
+        #008000 100%,  /* 佐野 */
     ) !important;
     color: white !important;
     text-align: center !important;
