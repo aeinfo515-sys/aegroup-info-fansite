@@ -9,7 +9,6 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
     <style>
-        /* カレンダー全体の見た目をオシャレに微調整 */
         .calendar-container { max-width: 900px; margin: 20px auto; padding: 0 10px; }
         #calendar { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .fc-event { border: none !important; padding: 2px 5px !important; font-size: 0.75rem !important; font-weight: bold !important; border-radius: 4px !important; }
@@ -67,12 +66,32 @@
                         
                         const events = data.map(item => {
                             if(!item["日付"]) return null;
+                            if(String(item["日付"]).includes("1899")) return null;
+                            
                             const d = new Date(item["日付"]);
                             const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                             const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
                             
+                            // 時間データの時差ボケ調整
+                            let timePrefix = "";
+                            if (item["時間"] && String(item["時間"]).includes("T")) {
+                                const td = new Date(item["時間"]);
+                                if (!isNaN(td.getTime())) {
+                                    const h = String(td.getHours()).padStart(2, "0");
+                                    const m = String(td.getMinutes()).padStart(2, "0");
+                                    if (!(h === "00" && m === "00")) {
+                                        timePrefix = `${h}:${m} `;
+                                    }
+                                }
+                            } else if (item["時間"] && String(item["時間"]).includes(":")) {
+                                const match = String(item["時間"]).match(/(\d{2}):(\d{2})/);
+                                if (match && !(match[1] === "00" && match[2] === "00")) {
+                                    timePrefix = `${match[1]}:${match[2]} `;
+                                }
+                            }
+                            
                             return {
-                                title: (item["時間"] && item["時間"] !== "00:00" ? item["時間"] + " " : "") + item["タイトル"],
+                                title: timePrefix + item["タイトル"],
                                 start: dateStr,
                                 className: getCalClass(matchText)
                             };
