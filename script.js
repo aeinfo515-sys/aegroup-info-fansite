@@ -43,8 +43,7 @@ document.head.appendChild(styleInject);
 function formatDate(dateStr) {
     if (!dateStr) return "";
     const str = String(dateStr);
-    if (str.includes("1899")) return ""; // 1899年は日付として絶対に表示しない
-    
+    if (str.includes("1899")) return "";
     const d = new Date(dateStr);
     if (isNaN(d.getTime())) return "";
     return `${d.getMonth() + 1}/${d.getDate()}`;
@@ -54,27 +53,23 @@ function formatTime(timeStr) {
     if (!timeStr) return "";
     const str = String(timeStr);
     
-    // 【最優先バリケード】1899年のデータなら、時差計算をされる前に文字から直接時間を抜き出す
-    if (str.includes("1899")) {
-        if (str.includes("T")) {
-            const tPart = str.split("T")[1]; // "15:00:00.000Z"
-            const match = tPart.match(/(\d{2}):(\d{2})/);
-            if (match) {
-                // スプレッドシートからUTCで届いた15:00は日本時間の24:00(00:00)、09:00は18:00
-                let hour = parseInt(match[1], 10) + 9; 
-                if (hour >= 24) hour -= 24;
-                const min = match[2];
-                const resultTime = `${String(hour).padStart(2, "0")}:${min}`;
-                return resultTime === "00:00" ? "" : resultTime;
-            }
+    // 【決定版・時差ボケ解消システム】
+    if (str.includes("T")) {
+        const d = new Date(timeStr);
+        if (!isNaN(d.getTime())) {
+            // 日本時間に自動変換して、時と分を綺麗に取り出す
+            const jstHours = String(d.getHours()).padStart(2, "0");
+            const jstMinutes = String(d.getMinutes()).padStart(2, "0");
+            if (jstHours === "00" && jstMinutes === "00") return ""; // 終日予定
+            return `${jstHours}:${jstMinutes}`;
         }
     }
     
-    if (str.includes("00:00")) return "";
-    
-    if (str.includes(":")) {
-        const match = str.match(/(\d{2}):(\d{2})/);
-        if (match) return `${match[1]}:${match[2]}`;
+    // すでに普通の「18:30」などの文字で届いている場合
+    const match = str.match(/(\d{2}):(\d{2})/);
+    if (match) {
+        if (match[1] === "00" && match[2] === "00") return "";
+        return `${match[1]}:${match[2]}`;
     }
     
     return "";
@@ -111,30 +106,10 @@ function createHtmlItem(item, showDate = true) {
     let dateTimeText = "";
     if (showDate && date) dateTimeText += `🗓 ${date}`;
     if (time) dateTimeText += ` ⏰ ${time}`;
-    
-    // 日付も時間も表示するものがなければ「Schedule」にする
-    if (!dateTimeText) {
-        if (time === "" && String(item["時間"]).includes("1899")) {
-            // 時間が深夜0時（終日予定）の場合はアイコンなしにするか、日付だけにする
-            dateTimeText = showDate && date ? `🗓 ${date}` : "";
-        } else {
-            dateTimeText = "Schedule";
-        }
-    }
-
-    // もし完全に空っぽなら、⏰マークなどを残さない
-    if (dateTimeText === "") {
-        return `
-            <div class="custom-schedule-item" style="border-left-color: ${borderColor} !important;">
-                <div class="custom-title">${item["タイトル"]}</div>
-                <div>${member}</div>
-            </div>
-        `;
-    }
 
     return `
         <div class="custom-schedule-item" style="border-left-color: ${borderColor} !important;">
-            <div class="custom-date-time">${dateTimeText}</div>
+            ${dateTimeText ? `<div class="custom-date-time">${dateTimeText}</div>` : ''}
             <div class="custom-title">${item["タイトル"]}</div>
             <div>${member}</div>
         </div>
@@ -183,7 +158,6 @@ async function loadSchedule() {
 
     } catch (e) {
         console.error(e);
-        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = "予定はありません";
     }
 }
 
