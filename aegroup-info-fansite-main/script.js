@@ -53,7 +53,7 @@ function formatTime(timeStr) {
     if (!timeStr) return "";
     const str = String(timeStr);
     
-    // "1899-12-29T15:00:00.000Z" から時間だけを強引に切り取る
+    // 【絶対エラーにならない安全な時間抜き出し】
     if (str.includes("T")) {
         const parts = str.split("T");
         if (parts[1]) {
@@ -63,7 +63,12 @@ function formatTime(timeStr) {
     }
     
     if (str.includes("00:00")) return "";
-    if (str.includes(":") && !str.includes("GMT")) return str.substring(0, 5);
+    
+    // 通常の「18:30」などの形式ならそのまま5文字だけ切り取る
+    if (str.includes(":")) {
+        const match = str.match(/(\d{2}):(\d{2})/);
+        if (match) return `${match[1]}:${match[2]}`;
+    }
     
     return "";
 }
@@ -152,6 +157,8 @@ async function loadSchedule() {
 
     } catch (e) {
         console.error(e);
+        // 万が一エラーが起きても「読み込み中」のままにせず動かす
+        if (document.getElementById("future-list")) document.getElementById("future-list").innerHTML = "データを読み込めませんでした";
     }
 }
 
