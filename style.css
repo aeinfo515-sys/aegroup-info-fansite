@@ -1,37 +1,81 @@
 /* ==========================================
-   【完全復活版】元の可愛いデザインを最優先で適用
+   🌈 Aぇ! group メンカラグラデーションヘッダー
    ========================================== */
+.hero {
+    background: linear-gradient(
+        90deg, 
+        #ff0000 0%,   /* 末澤 */
+        #0000ff 20%,  /* 正門 */
+        #ffd700 40%,  /* リチャ */
+        #800080 60%,  /* 小島 */
+        #008000 80%,  /* 佐野 */
+        #ff69b4 100%  /* グループ */
+    ) !important;
+    color: white !important;
+    text-align: center !important;
+    padding: 30px 20px !important;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5) !important; /* 文字を見やすく */
+}
 
+/* ==========================================
+   🏠 全体の背景（元の可愛い薄ピンク）
+   ========================================== */
 body {
-    font-family: sans-serif !important;
-    background-color: #fff0f5 !important; /* 前の薄いピンクの背景を強制指定 */
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
+    background-color: #fff0f5 !important; 
     margin: 0 !important;
     padding: 0 !important;
 }
 
-/* 携帯（スマホ）のときだけタブメニューを縦並びにする設定 */
+/* ==========================================
+   🎫 元のオシャレなタブボタンのデザイン
+   ========================================== */
+.tabs {
+    display: flex !important;
+    justify-content: center !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+    padding: 10px !important;
+    gap: 8px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+}
+.tabs a {
+    display: inline-block !important;
+    text-align: center !important;
+    padding: 10px 20px !important;
+    text-decoration: none !important;
+    color: #555 !important;
+    border-radius: 20px !important; /* 可愛い丸みのあるタブ */
+    font-size: 0.9rem !important;
+    font-weight: bold !important;
+    transition: all 0.2s ease !important;
+    background: #fff0f5 !important; /* タブのベース色 */
+    border: 1px solid #ffb6c1 !important;
+}
+.tabs a.active, .tabs a:hover {
+    background: #ff69b4 !important; /* アクティブ時は可愛いピンク */
+    color: #ffffff !important;
+    border-color: #ff69b4 !important;
+}
+
+/* ==========================================
+   📱 携帯（画面幅が600px以下）の時だけ【縦並びのタブ】にする魔法
+   ========================================== */
 @media (max-width: 600px) {
     .tabs {
-        display: flex !important;
-        flex-direction: column !important; /* 縦並び */
-        gap: 6px !important;
-        padding: 10px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
+        flex-direction: column !important; /* 綺麗に縦並びにする */
+        padding: 12px !important;
+        gap: 8px !important;
     }
     .tabs a {
         display: block !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        text-align: center !important;
+        max-width: 100% !important;
         padding: 12px !important;
+        font-size: 1rem !important;
+        border-radius: 25px !important; /* スマホでも可愛い丸型をキープ */
     }
-}
-
-/* 他の味気ないページ（白背景）を元の雰囲気に馴染ませる基本設定 */
-.card, main > section, .container, .member-list, .sns-list, .ticket-list {
-    background: #ffffff !important;
-    border-radius: 8px !important;
-    padding: 15px !important;
-    margin-bottom: 15px !important;
 }
