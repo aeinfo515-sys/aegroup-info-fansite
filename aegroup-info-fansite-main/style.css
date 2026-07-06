@@ -7,7 +7,7 @@
     text-align: center !important;
     padding: 30px 20px !important;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
-    position: relative;
+    position: relative !important;
 }
 
 body {
@@ -17,9 +17,7 @@ body {
     padding: 0 !important;
 }
 
-/* ==========================================
-   🎫 パソコン版のタブボタン（横並び）
-   ========================================== */
+/* 🎫 パソコン版のタブボタン（通常は横並び） */
 .tabs {
     display: flex !important;
     justify-content: center !important;
@@ -45,27 +43,27 @@ body {
     border-color: #ff69b4 !important;
 }
 
-/* 📱 スマホ用メニューボタン（初期状態は隠す） */
+/* 📱 スマホ用メニューボタン（ハンバーガーボタン） */
 .menu-trigger {
     display: none;
     position: absolute;
-    top: 20px;
+    top: 25px;
     right: 20px;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     color: white;
     background: rgba(0,0,0,0.3);
     border: none;
-    padding: 5px 12px;
+    padding: 6px 12px;
     border-radius: 5px;
     cursor: pointer;
     z-index: 1000;
 }
 
 /* ==========================================
-   📱 スマホ（画面幅600px以下）のハンバーガーメニュー設定
+   📱 スマホ（画面幅600px以下）のハンバーガーメニュー
    ========================================== */
 @media (max-width: 600px) {
-    .menu-trigger { display: block !important; } /* ボタンを表示 */
+    .menu-trigger { display: block !important; } /* スマホでのみ三本線を表示 */
     
     .tabs {
         display: none !important; /* 最初は隠す */
@@ -79,8 +77,9 @@ body {
         padding: 15px !important;
         box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
         z-index: 999 !important;
+        gap: 10px !important;
     }
-    /* ボタンが押されて「show」クラスがついたら上からヌッと出す */
+    /* ☰ が押されたらメニューが飛び出す */
     .tabs.show {
         display: flex !important;
     }
@@ -113,48 +112,14 @@ h2, .section-title {
     color: #ff69b4 !important;
 }
 
-/* ==========================================
-   ⏱️ スケジュール画面：タイムライン・今日の予定のデザイン
-   ========================================== */
-.timeline-container {
-    position: relative;
-    padding-left: 25px;
-    margin-top: 15px;
-}
-.timeline-container::before {
-    content: '';
-    position: absolute;
-    left: 7px;
-    top: 5px;
-    bottom: 5px;
-    width: 2px;
-    background: #ffb6c1;
-}
-.timeline-item {
-    position: relative;
-    margin-bottom: 15px;
-    background: #fff5f7;
-    padding: 10px 15px;
-    border-radius: 8px;
-    border-left: 4px solid #ff69b4;
-}
-.timeline-item::before {
-    content: '●';
-    position: absolute;
-    left: -23px;
-    top: 10px;
-    color: #ff69b4;
-    font-size: 0.8rem;
-}
-.update-time {
-    font-size: 0.75rem;
-    color: #999;
-    font-weight: bold;
-    display: block;
-    margin-bottom: 3px;
-}
+/* スケジュール画面：タイムライン */
+.timeline-container { position: relative; padding-left: 25px; margin-top: 15px; }
+.timeline-container::before { content: ''; position: absolute; left: 7px; top: 5px; bottom: 5px; width: 2px; background: #ffb6c1; }
+.timeline-item { position: relative; margin-bottom: 15px; background: #fff5f7; padding: 10px 15px; border-radius: 8px; border-left: 4px solid #ff69b4; }
+.timeline-item::before { content: '●'; position: absolute; left: -23px; top: 10px; color: #ff69b4; font-size: 0.8rem; }
+.update-time { font-size: 0.75rem; color: #999; font-weight: bold; display: block; margin-bottom: 3px; }
 
-/* 💜💙❤️💚 メンバーカラー（Membersページ・ポップアップ用） */
+/* メンカラ設定 */
 .border-masakado { border: 2px solid #90caf9 !important; background-color: #f0f7ff !important; }
 .text-masakado { color: #1e88e5 !important; }
 .border-suezawa { border: 2px solid #ffab91 !important; background-color: #fff5f5 !important; }
@@ -163,6 +128,7 @@ h2, .section-title {
 .text-kojima { color: #8e24aa !important; }
 .border-sano { border: 2px solid #a5d6a7 !important; background-color: #f1f9f1 !important; }
 .text-sano { color: #43a047 !important; }
-
 .member-links { margin-left: 15px; display: inline-flex; gap: 12px; vertical-align: middle; }
-.member-links a { text-decoration: none; font-size: 1.4
+.member-links a { text-decoration: none; font-size: 1.4rem; }
+.link-ig { color: #E1306C; } .link-blog { color: #ff69b4; } .link-yt { color: #FF0000; }
+@media (max-width: 600px) { .member-links { display: flex; margin-left: 0; margin-top: 10px; } }
