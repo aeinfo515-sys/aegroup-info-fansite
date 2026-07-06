@@ -1,28 +1,25 @@
 /* ==========================================
-   🌈 ヘッダー：全てのページ共通の鮮やかな4人グラデーション
+   🌈 ヘッダー：共通の鮮やかな4人グラデーション
    ========================================== */
 .hero {
-    background: linear-gradient(
-        90deg, 
-        #800080 0%,   /* 小島 (紫) */
-        #0000ff 33%,  /* 正門 (青) */
-        #ff0000 66%,  /* 末澤 (赤) */
-        #008000 100%  /* 佐野 (緑) */
-    ) !important;
+    background: linear-gradient(90deg, #800080 0%, #0000ff 33%, #ff0000 66%, #008000 100%) !important;
     color: white !important;
     text-align: center !important;
     padding: 30px 20px !important;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
+    position: relative;
 }
 
 body {
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
-    background-color: #fff0f5 !important; /* 元の可愛い薄ピンク */
+    background-color: #fff0f5 !important; 
     margin: 0 !important;
     padding: 0 !important;
 }
 
-/* 🎫 タブボタン */
+/* ==========================================
+   🎫 パソコン版のタブボタン（横並び）
+   ========================================== */
 .tabs {
     display: flex !important;
     justify-content: center !important;
@@ -30,18 +27,15 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
     padding: 10px !important;
     gap: 8px !important;
-    position: relative !important;
 }
 .tabs a {
     display: inline-block !important;
-    text-align: center !important;
     padding: 10px 20px !important;
     text-decoration: none !important;
     color: #555 !important;
     border-radius: 20px !important;
     font-size: 0.9rem !important;
     font-weight: bold !important;
-    transition: all 0.2s ease !important;
     background: #fff0f5 !important;
     border: 1px solid #ffb6c1 !important;
 }
@@ -51,15 +45,57 @@ body {
     border-color: #ff69b4 !important;
 }
 
-@media (max-width: 600px) {
-    .tabs { flex-direction: column !important; padding: 12px !important; gap: 8px !important; }
-    .tabs a { display: block !important; width: 100% !important; padding: 12px !important; border-radius: 25px !important; }
+/* 📱 スマホ用メニューボタン（初期状態は隠す） */
+.menu-trigger {
+    display: none;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 1.8rem;
+    color: white;
+    background: rgba(0,0,0,0.3);
+    border: none;
+    padding: 5px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1000;
 }
 
-/* ✨ 共通カードデザイン */
-main { max-width: 800px !important; margin: 20px auto !important; padding: 0 15px !important; }
+/* ==========================================
+   📱 スマホ（画面幅600px以下）のハンバーガーメニュー設定
+   ========================================== */
+@media (max-width: 600px) {
+    .menu-trigger { display: block !important; } /* ボタンを表示 */
+    
+    .tabs {
+        display: none !important; /* 最初は隠す */
+        flex-direction: column !important;
+        position: absolute !important;
+        top: 100% !important;
+        left: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        background: #ffffff !important;
+        padding: 15px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+        z-index: 999 !important;
+    }
+    /* ボタンが押されて「show」クラスがついたら上からヌッと出す */
+    .tabs.show {
+        display: flex !important;
+    }
+    .tabs a {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 12px !important;
+        border-radius: 10px !important;
+        text-align: left !important;
+    }
+}
 
-.card, .member-card, .sns-card, .ticket-card, #calendar {
+/* ✨ 共通カード */
+main, .calendar-container { max-width: 800px !important; margin: 20px auto !important; padding: 0 15px !important; }
+.card, .member-card, .sns-card, .ticket-card, #calendar, .schedule-section {
     background: #ffffff !important;
     border-radius: 12px !important;
     padding: 20px !important;
@@ -77,36 +113,56 @@ h2, .section-title {
     color: #ff69b4 !important;
 }
 
-/* 💜💙❤️💚 メンバー詳細カードの淡い色味（キープ） */
+/* ==========================================
+   ⏱️ スケジュール画面：タイムライン・今日の予定のデザイン
+   ========================================== */
+.timeline-container {
+    position: relative;
+    padding-left: 25px;
+    margin-top: 15px;
+}
+.timeline-container::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: #ffb6c1;
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 15px;
+    background: #fff5f7;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border-left: 4px solid #ff69b4;
+}
+.timeline-item::before {
+    content: '●';
+    position: absolute;
+    left: -23px;
+    top: 10px;
+    color: #ff69b4;
+    font-size: 0.8rem;
+}
+.update-time {
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 3px;
+}
+
+/* 💜💙❤️💚 メンバーカラー（Membersページ・ポップアップ用） */
 .border-masakado { border: 2px solid #90caf9 !important; background-color: #f0f7ff !important; }
-.text-masakado { color: #1e88e5 !important; border-bottom: none !important; }
-
+.text-masakado { color: #1e88e5 !important; }
 .border-suezawa { border: 2px solid #ffab91 !important; background-color: #fff5f5 !important; }
-.text-suezawa { color: #e53935 !important; border-bottom: none !important; }
-
+.text-suezawa { color: #e53935 !important; }
 .border-kojima { border: 2px solid #ce93d8 !important; background-color: #f9f0fb !important; }
-.text-kojima { color: #8e24aa !important; border-bottom: none !important; }
-
+.text-kojima { color: #8e24aa !important; }
 .border-sano { border: 2px solid #a5d6a7 !important; background-color: #f1f9f1 !important; }
-.text-sano { color: #43a047 !important; border-bottom: none !important; }
+.text-sano { color: #43a047 !important; }
 
-/* 🔗 SNSリンク用アイコン */
-.member-links {
-    margin-left: 15px;
-    display: inline-flex;
-    gap: 12px;
-    vertical-align: middle;
-}
-.member-links a {
-    text-decoration: none;
-    font-size: 1.4rem;
-    transition: opacity 0.2s;
-}
-.member-links a:hover { opacity: 0.6; }
-.link-ig { color: #E1306C; }
-.link-blog { color: #ff69b4; }
-.link-yt { color: #FF0000; }
-
-@media (max-width: 600px) {
-    .member-links { display: flex; margin-left: 0; margin-top: 10px; }
-}
+.member-links { margin-left: 15px; display: inline-flex; gap: 12px; vertical-align: middle; }
+.member-links a { text-decoration: none; font-size: 1.4
