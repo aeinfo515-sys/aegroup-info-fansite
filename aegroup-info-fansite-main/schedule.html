@@ -39,20 +39,6 @@
     </nav>
 
     <main class="calendar-container">
-        <section class="schedule-section">
-            <h2>✨ 本日更新された情報</h2>
-            <div id="timelineList" class="timeline-container">
-                <p style="color:#777; font-size:0.9rem;">本日更新された情報はありません</p>
-            </div>
-        </section>
-
-        <section class="schedule-section">
-            <h2>📢 今日の予定</h2>
-            <div id="todayList">
-                <p style="color:#777; font-size:0.9rem;">今日の予定はありません</p>
-            </div>
-        </section>
-
         <div id="calendar"></div>
     </main>
 
@@ -104,8 +90,6 @@
                         const response = await fetch(CAL_API_URL);
                         const data = await response.json();
                         rawEvents = data;
-                        
-                        buildSpecialSections(data);
 
                         const events = data.map(item => {
                             if(!item["日付"] || String(item["日付"]).includes("1899")) return null;
@@ -129,61 +113,6 @@
             });
             calendar.render();
         });
-
-        function buildSpecialSections(data) {
-            const timelineList = document.getElementById("timelineList");
-            const todayList = document.getElementById("todayList");
-            
-            const now = new Date();
-            const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-            
-            let timelineHtml = "";
-            let todayHtml = "";
-
-            data.forEach(item => {
-                if(!item["日付"]) return;
-                
-                const ed = new Date(item["日付"]);
-                const eDateStr = ed.getFullYear() + '-' + String(ed.getMonth()+1).padStart(2,'0') + '-' + String(ed.getDate()).padStart(2,'0');
-                
-                const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
-                const borderCol = getBorderColor(matchText);
-                
-                let timeStr = "";
-                if (item["時間"] && String(item["時間"]).includes("T")) {
-                    const td = new Date(item["時間"]);
-                    const h = String(td.getHours()).padStart(2, "0");
-                    const m = String(td.getMinutes()).padStart(2, "0");
-                    if (!(h === "00" && m === "00")) timeStr = `⏰ ${h}:${m} `;
-                }
-
-                if (item["タイムスタンプ"]) {
-                    const ts = new Date(item["タイムスタンプ"]);
-                    const tsStr = ts.getFullYear() + '-' + String(ts.getMonth()+1).padStart(2,'0') + '-' + String(ts.getDate()).padStart(2,'0');
-                    
-                    if (tsStr === todayStr) {
-                        const displayTime = String(ts.getHours()).padStart(2,'0') + ":" + String(ts.getMinutes()).padStart(2,'0');
-                        timelineHtml += `
-                            <div class="timeline-item" style="border-left-color: ${borderCol};">
-                                <span class="update-time">⏰ ${displayTime} 更新 (対象日: ${ed.getMonth()+1}/${ed.getDate()})</span>
-                                <strong>${timeStr}${item["タイトル"]}</strong><br>
-                                <span style="font-size:0.8rem; color:#666;">${item["詳細"] || ""}</span>
-                            </div>`;
-                    }
-                }
-
-                if (eDateStr === todayStr) {
-                    todayHtml += `
-                        <div class="modal-item" style="border-left: 5px solid ${borderCol};">
-                            <strong>${timeStr}${item["タイトル"]}</strong><br>
-                            <span style="font-size:0.8rem; color:#666;">${item["詳細"] || ""}</span>
-                        </div>`;
-                }
-            });
-
-            if(timelineHtml) timelineList.innerHTML = timelineHtml;
-            if(todayHtml) todayList.innerHTML = todayHtml;
-        }
 
         function showDayEvents(dateStr) {
             const modal = document.getElementById("dayModal");
