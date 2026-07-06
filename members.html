@@ -83,5 +83,21 @@
 
     </main>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 現在のサイトのURLのベース（https://〜〜.github.io/リポジトリ名/ まで）を自動で取得
+            const currentUrl = window.location.href;
+            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/aegroup-info-fansite-main/'));
+            
+            if (baseUrl) {
+                // 各タブのリンクを絶対URLに強制書き換え
+                const tabs = document.querySelectorAll(".tabs a");
+                tabs[0].href = baseUrl + "/index.html";     // Home
+                tabs[1].href = baseUrl + "/schedule.html";  // Schedule
+                tabs[2].href = baseUrl + "/sns.html";       // SNS
+                tabs[3].href = baseUrl + "/tickets.html";   // Tickets
+            }
+        });
+    </script>
 </body>
 </html>
