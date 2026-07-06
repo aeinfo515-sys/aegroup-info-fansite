@@ -15,9 +15,10 @@ body {
     background-color: #fff0f5 !important; 
     margin: 0 !important;
     padding: 0 !important;
+    overflow-x: hidden; /* メニューが右から出るときの横スクロールを防ぐ */
 }
 
-/* 🎫 パソコン版のタブボタン（通常は横並び） */
+/* 🎫 パソコン版のタブボタン（横並び） */
 .tabs {
     display: flex !important;
     justify-content: center !important;
@@ -43,7 +44,7 @@ body {
     border-color: #ff69b4 !important;
 }
 
-/* 📱 スマホ用メニューボタン（ハンバーガーボタン） */
+/* 📱 スマホ用メニューボタン（ハンバーガー） */
 .menu-trigger {
     display: none;
     position: absolute;
@@ -56,33 +57,38 @@ body {
     padding: 6px 12px;
     border-radius: 5px;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 1001; /* メニュー背景より手前に配置 */
 }
 
 /* ==========================================
-   📱 スマホ（画面幅600px以下）のハンバーガーメニュー
+   📱 スマホ版：右からヌッと出てくるメニュー（ドロワー）
    ========================================== */
 @media (max-width: 600px) {
-    .menu-trigger { display: block !important; } /* スマホでのみ三本線を表示 */
+    .menu-trigger { display: block !important; }
     
     .tabs {
-        display: none !important; /* 最初は隠す */
+        display: flex !important;
         flex-direction: column !important;
-        position: absolute !important;
-        top: 100% !important;
-        left: 0 !important;
-        width: 100% !important;
+        position: fixed !important;
+        top: 0 !important;
+        right: -250px !important; /* 最初は画面の右外側に隠す */
+        width: 250px !important;
+        height: 100vh !important;
         box-sizing: border-box !important;
         background: #ffffff !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
-        z-index: 999 !important;
-        gap: 10px !important;
+        padding: 70px 20px 20px 20px !important; /* ボタンに被らないよう上を開ける */
+        box-shadow: -4px 0 12px rgba(0,0,0,0.1) !important;
+        z-index: 1000 !important;
+        transition: right 0.3s ease !important; /* なめらかに動かす */
+        gap: 12px !important;
+        justify-content: flex-start !important;
     }
-    /* ☰ が押されたらメニューが飛び出す */
+    
+    /* ☰ が押されたら、右から画面内に入ってくる */
     .tabs.show {
-        display: flex !important;
+        right: 0 !important;
     }
+    
     .tabs a {
         width: 100% !important;
         box-sizing: border-box !important;
@@ -92,7 +98,7 @@ body {
     }
 }
 
-/* ✨ 共通カード */
+/* ✨ 共通カードデザイン */
 main, .calendar-container { max-width: 800px !important; margin: 20px auto !important; padding: 0 15px !important; }
 .card, .member-card, .sns-card, .ticket-card, #calendar, .schedule-section {
     background: #ffffff !important;
@@ -112,14 +118,14 @@ h2, .section-title {
     color: #ff69b4 !important;
 }
 
-/* スケジュール画面：タイムライン */
+/* ⏱️ タイムライン形式のデザイン */
 .timeline-container { position: relative; padding-left: 25px; margin-top: 15px; }
 .timeline-container::before { content: ''; position: absolute; left: 7px; top: 5px; bottom: 5px; width: 2px; background: #ffb6c1; }
 .timeline-item { position: relative; margin-bottom: 15px; background: #fff5f7; padding: 10px 15px; border-radius: 8px; border-left: 4px solid #ff69b4; }
 .timeline-item::before { content: '●'; position: absolute; left: -23px; top: 10px; color: #ff69b4; font-size: 0.8rem; }
-.update-time { font-size: 0.75rem; color: #999; font-weight: bold; display: block; margin-bottom: 3px; }
+.update-time { font-size: 0.75rem; color: #e53935; font-weight: bold; display: block; margin-bottom: 3px; }
 
-/* メンカラ設定 */
+/* メンカラ設定（Membersページ・ポップアップ用） */
 .border-masakado { border: 2px solid #90caf9 !important; background-color: #f0f7ff !important; }
 .text-masakado { color: #1e88e5 !important; }
 .border-suezawa { border: 2px solid #ffab91 !important; background-color: #fff5f5 !important; }
