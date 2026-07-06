@@ -1,53 +1,53 @@
-<!doctype html>
-<html lang='ja'>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
-<meta charset='utf-8'>
-<meta name='viewport' content='width=device-width,initial-scale=1'>
-<title>Aぇ! group Info</title>
-<link rel='stylesheet' href='style.css'>
+    <meta charset="UTF-8">
+    <title>Aぇ! group info - ファンサイト</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
 
-<header class="hero">
-<h1>Aぇ! group Info</h1>
-<p>出演情報・チケット・SNS更新をひとまとめに。</p>
-</header>
+    <header class="hero">
+        <h1>Aぇ! group Info</h1>
+        <p>非公式ファンインフォメーションサイト</p>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </header>
 
-<nav class="tabs">
-<a href="index.html">Home</a>
-<a href="schedule.html">Schedule</a>
-<a href="tickets.html">Tickets</a>
-<a href="members.html">Members</a>
-</nav>
+    <nav class="tabs" id="navTabs">
+        <a href="index.html" class="active">🏠 Home</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="sns.html">📱 SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
+    </nav>
 
-<main>
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+        
+        <section class="card" style="text-align: center; border: 1px solid #ffb6c1; border-radius: 12px; padding: 25px; background: #fff;">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ff69b4; padding-bottom: 8px; margin-top:0;">✨ Welcome to Aぇ! group info ✨</h2>
+            <p style="line-height: 1.8; color: #555;">
+                Aぇ! groupのスケジュールや各種SNS、チケット情報などをまとめている非公式ファンサイトです！<br>
+                上のメニュー（スマホは右上の ☰ ボタン）から各ページへ移動できます。
+            </p>
+        </section>
 
-<section class="card highlight">
-<div class="bar"></div>
-<h2>今日の予定</h2>
+        <section class="card" style="border: 1px solid #ffb6c1; border-radius: 12px; padding: 20px; background: #fff; margin-top: 20px;">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ff69b4; padding-bottom: 8px; margin-top:0;">📢 サイトからのお知らせ</h2>
+            <ul style="padding-left: 20px; line-height: 1.8; color: #555; margin-bottom:0;">
+                <li>サイトをリニューアルし、全ページ共通で鮮やかな4人グラデーションヘッダーになりました！</li>
+                <li>スマホでの表示を改善し、ECサイト風のハンバーガーメニューに対応しました。</li>
+                <li>スケジュールタブに、スプレッドシート連動の「本日更新された情報」タイムラインを追加しました！</li>
+            </ul>
+        </section>
 
-<div class="block">
-<h3>出演</h3>
-<p>情報更新予定</p>
-</div>
+    </main>
 
-<div class="block">
-<h3>チケット</h3>
-<p>受付状況表示</p>
-</div>
-
-<div class="block">
-<h3>SNS更新</h3>
-<p>更新予定</p>
-</div>
-</section>
-
-<section class="card">
-<h2>今後の予定</h2>
-<p>スケジュール準備中</p>
-</section>
-
-</main>
-
+    <script>
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
+        }
+    </script>
 </body>
 </html>
