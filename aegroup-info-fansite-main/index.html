@@ -29,9 +29,9 @@
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         
         <section class="card">
-            <h2>🆕 ゲリラ更新情報</h2>
+            <h2>🆕 更新情報</h2>
             <div id="timelineList" class="timeline-container">
-                <p style="color:#777; font-size:0.9rem;">本日、予定外の急な更新情報はありません</p>
+                <p style="color:#777; font-size:0.9rem;">本日、急な更新情報はありません</p>
             </div>
         </section>
 
@@ -45,7 +45,7 @@
         <section class="card">
             <h2>💡 サイトについて</h2>
             <p style="line-height: 1.8; color: #555; margin: 0;">
-                Aぇ! groupのスケジュールや各種SNS、チケット情報などをまとめている非公式ファンサイトです！<br>
+                Aぇ! groupのスケジュールや各種SNS、チケット情報などをまとめている非公式ファンサイトです。<br>
                 スマホでは右上の ☰ ボタンを押すと、右側からスマートにメニューが開きます。
             </p>
         </section>
@@ -55,7 +55,6 @@
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
 
-        // 右から出るメニューの開け閉め
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
         }
@@ -84,7 +83,6 @@
                 let todayHtml = "";
 
                 data.forEach(item => {
-                    // 🌟 今日の予定の判定
                     if (item["日付"]) {
                         const ed = new Date(item["日付"]);
                         const eDateStr = ed.getFullYear() + '-' + String(ed.getMonth()+1).padStart(2,'0') + '-' + String(ed.getDate()).padStart(2,'0');
@@ -108,7 +106,6 @@
                                 </div>`;
                         }
 
-                        // 🌟 タイムラインの判定：「予定外の更新」に文字が入っていて、かつ本日更新されたもの
                         if (item["予定外の更新"] && item["タイムスタンプ"]) {
                             const ts = new Date(item["タイムスタンプ"]);
                             const tsStr = ts.getFullYear() + '-' + String(ts.getMonth()+1).padStart(2,'0') + '-' + String(ts.getDate()).padStart(2,'0');
@@ -117,7 +114,7 @@
                                 const displayTime = String(ts.getHours()).padStart(2,'0') + ":" + String(ts.getMinutes()).padStart(2,'0');
                                 timelineHtml += `
                                     <div class="timeline-item" style="border-left-color: ${borderCol};">
-                                        <span class="update-time">🔥 急遽解禁！(${displayTime} 情報更新)</span>
+                                        <span class="update-time">🔥 新着情報 (${displayTime} 更新)</span>
                                         <strong>${item["予定外の更新"]}</strong><br>
                                         <span style="font-size:0.8rem; color:#666;">対象日: ${ed.getMonth()+1}/${ed.getDate()} - ${item["タイトル"]}</span>
                                     </div>`;
