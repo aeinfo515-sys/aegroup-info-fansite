@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>メンバー紹介 - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -15,10 +15,10 @@
     </header>
 
     <nav class="tabs">
-        <a href="../index.html">🏠 Home</a>
-        <a href="../schedule.html">📅 Schedule</a>
-        <a href="../sns.html">📱 SNS</a>
-        <a href="../tickets.html">🎫 Tickets</a>
+        <a href="index.html">🏠 Home</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="sns.html">📱 SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
         <a href="members.html" class="active">👤 Members</a>
     </nav>
 
@@ -83,21 +83,5 @@
 
     </main>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // 現在のサイトのURLのベース（https://〜〜.github.io/リポジトリ名/ まで）を自動で取得
-            const currentUrl = window.location.href;
-            const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf('/aegroup-info-fansite-main/'));
-            
-            if (baseUrl) {
-                // 各タブのリンクを絶対URLに強制書き換え
-                const tabs = document.querySelectorAll(".tabs a");
-                tabs[0].href = baseUrl + "/index.html";     // Home
-                tabs[1].href = baseUrl + "/schedule.html";  // Schedule
-                tabs[2].href = baseUrl + "/sns.html";       // SNS
-                tabs[3].href = baseUrl + "/tickets.html";   // Tickets
-            }
-        });
-    </script>
 </body>
 </html>
