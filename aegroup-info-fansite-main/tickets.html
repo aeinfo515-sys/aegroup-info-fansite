@@ -1,1 +1,43 @@
-<h1>Tickets</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>チケット情報 - Aぇ! group info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Aぇ! group Info</h1>
+        <p>コンサート・舞台 チケット情報</p>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <nav class="tabs" id="navTabs">
+        <a href="index.html">🏠 Home</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="sns.html">📱 SNS</a>
+        <a href="tickets.html" class="active">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
+    </nav>
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+        <section class="card">
+            <h2>🎫 現在受付中のチケット・FC情報</h2>
+            <p style="color:#555; line-height:1.6;">ファンクラブ先行受付や一般発売などの最新チケット情報は、詳細が決定次第スプレッドシートやこちらに掲載されます。</p>
+            <div style="background:#fff0f5; padding:15px; border-radius:8px; border:1px solid #ffb6c1; font-size:0.9rem;">
+                📌 <strong>FAMILY CLUB 会員サイト：</strong><br>
+                <a href="https://web.familyclub.jp/" target="_blank" style="color:#ff69b4; font-weight:bold;">https://web.familyclub.jp/</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
+        }
+    </script>
+</body>
+</html>
