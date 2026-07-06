@@ -26,7 +26,7 @@
 
     <header class="hero">
         <h1>Aぇ! group Info</h1>
-        <p>マンスリースケジュール</p>
+        <p>インフォメーションサイト(非公式)</p>
         <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     </header>
 
@@ -89,9 +89,11 @@
                     try {
                         const response = await fetch(CAL_API_URL);
                         const data = await response.json();
-                        rawEvents = data;
+                        
+                        // 🌟 「予定外の更新」が入っていない純粋な予定だけをカレンダーに登録する
+                        rawEvents = data.filter(item => !item["予定外の更新"]);
 
-                        const events = data.map(item => {
+                        const events = rawEvents.map(item => {
                             if(!item["日付"] || String(item["日付"]).includes("1899")) return null;
                             const d = new Date(item["日付"]);
                             const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
