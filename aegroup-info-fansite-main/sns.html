@@ -1,1 +1,44 @@
-<h1>SNS</h1>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>SNS公式リンク - Aぇ! group info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Aぇ! group Info</h1>
+        <p>公式SNS・動画リンク集</p>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <nav class="tabs" id="navTabs">
+        <a href="index.html">🏠 Home</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="sns.html" class="active">📱 SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
+    </nav>
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+        <section class="card" style="text-align: center;">
+            <h2>📱 公式SNSリンク</h2>
+            <p>Aぇ! groupの最新情報はこちらから！</p>
+            <div style="display: flex; flex-direction: column; gap: 15px; max-width: 300px; margin: 0 auto;">
+                <a href="https://www.youtube.com/@Aegroup_official" target="_blank" style="background:#FF0000; color:white; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold;"><i class="fa-brands fa-youtube"></i> YouTube公式チャンネル</a>
+                <a href="https://www.instagram.com/aegroup_official_515/" target="_blank" style="background:#E1306C; color:white; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold;"><i class="fa-brands fa-instagram"></i> Instagram公式アカウント</a>
+                <a href="https://x.com/Aegroup_official" target="_blank" style="background:#000000; color:white; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold;"><i class="fa-brands fa-x-twitter"></i> X公式アカウント</a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
+        }
+    </script>
+</body>
+</html>
