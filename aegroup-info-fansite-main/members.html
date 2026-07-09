@@ -6,12 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 各メンバーの淡いメンカラ背景指定 */
+        .bg-masakado { background-color: #e6f0ff !important; } /* 淡い青 */
+        .bg-suezawa { background-color: #ffe6e6 !important; }  /* 淡い赤 */
+        .bg-kojima { background-color: #f3e6f5 !important; }   /* 淡い紫 */
+        .bg-sano { background-color: #e8f5e9 !important; }     /* 淡い緑 */
+    </style>
 </head>
 <body>
 
     <header class="hero">
         <h1>Aぇ! group Info</h1>
-        <p>メンバープロフィール</p>
+        <p>インフォメーションサイト(非公式)</p>
         <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     </header>
 
@@ -24,64 +31,76 @@
     </nav>
 
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+        <h2 class="section-title">👤 Members</h2>
         
-        <section class="member-card border-masakado">
-            <h2 class="text-masakado">
+        <!-- 正門良規 -->
+        <section class="member-card border-masakado bg-masakado">
+            <h2 class="text-masakado" style="margin-top:0; border-bottom:none; padding-bottom:0;">
                 正門良規
-                <span class="member-links">
-                    <a href="https://www.instagram.com/kadostagram_official/" target="_blank" class="link-ig" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2079?ima=3121" target="_blank" class="link-blog" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
+                <span class="member-links" style="display:inline-block; margin-left:10px;">
+                    <a href="https://www.instagram.com/kadostagram_official/" target="_blank" class="link-ig" title="Instagram" style="color: #E1306C; margin-right:10px;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2079?ima=3121" target="_blank" class="link-blog" title="個人ブログ" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
                 </span>
             </h2>
-            <p>生年月日：1996年11月28日（29歳）<br>
-            出身：大阪府<br>
-            血液型：AB型<br>
-            担当：ギター</p>
+            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
+                生年月日：1996年11月28日（29歳）<br>
+                出身：大阪府<br>
+                血液型：AB型<br>
+                担当：ギター
+            </p>
         </section>
 
-        <section class="member-card border-suezawa">
-            <h2 class="text-suezawa">
+        <!-- 末澤誠也 -->
+        <section class="member-card border-suezawa bg-suezawa">
+            <h2 class="text-suezawa" style="margin-top:0; border-bottom:none; padding-bottom:0;">
                 末澤誠也
-                <span class="member-links">
-                    <a href="https://www.instagram.com/suezawa.seiya.0824/" target="_blank" class="link-ig" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2080?ima=3225" target="_blank" class="link-blog" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
+                <span class="member-links" style="display:inline-block; margin-left:10px;">
+                    <a href="https://www.instagram.com/suezawa.seiya.0824/" target="_blank" class="link-ig" title="Instagram" style="color: #E1306C; margin-right:10px;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2080?ima=3225" target="_blank" class="link-blog" title="個人ブログ" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
                 </span>
             </h2>
-            <p>生年月日：1994年8月24日（31歳）<br>
-            出身：兵庫県<br>
-            血液型：O型<br>
-            担当：ボーカル</p>
+            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
+                生年月日：1994年8月24日（31歳）<br>
+                出身：兵庫県<br>
+                血液型：O型<br>
+                担当：ボーカル
+            </p>
         </section>
 
-        <section class="member-card border-kojima">
-            <h2 class="text-kojima">
+        <!-- 小島健 -->
+        <section class="member-card border-kojima bg-kojima">
+            <h2 class="text-kojima" style="margin-top:0; border-bottom:none; padding-bottom:0;">
                 小島健
-                <span class="member-links">
-                    <a href="https://www.instagram.com/kozzy.s_boss/" target="_blank" class="link-ig" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2082?ima=3242" target="_blank" class="link-blog" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
-                    <a href="https://www.youtube.com/@saikyokan_kojimaken" target="_blank" class="link-yt" title="最強漢小島健伝説 YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <span class="member-links" style="display:inline-block; margin-left:10px;">
+                    <a href="https://www.instagram.com/kozzy.s_boss/" target="_blank" class="link-ig" title="Instagram" style="color: #E1306C; margin-right:10px;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2082?ima=3242" target="_blank" class="link-blog" title="個人ブログ" style="color: #ff69b4; margin-right:10px;"><i class="fa-solid fa-pen-nib"></i></a>
+                    <a href="https://www.youtube.com/channel/UCSzP6GqorG6WOfN_3C_b0Hw" target="_blank" class="link-yt" title="最強漢小島健伝説 YouTube" style="color: #FF0000;"><i class="fa-brands fa-youtube"></i></a>
                 </span>
             </h2>
-            <p>生年月日：1999年6月25日（27歳）<br>
-            出身：大阪府<br>
-            血液型：B型<br>
-            担当：キーボード</p>
+            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
+                生年月日：1999年6月25日（27歳）<br>
+                出身：大阪府<br>
+                血液型：B型<br>
+                担当：キーボード
+            </p>
         </section>
 
-        <section class="member-card border-sano">
-            <h2 class="text-sano">
+        <!-- 佐野晶哉 -->
+        <section class="member-card border-sano bg-sano">
+            <h2 class="text-sano" style="margin-top:0; border-bottom:none; padding-bottom:0;">
                 佐野晶哉
-                <span class="member-links">
-                    <a href="https://www.instagram.com/sano.masaya.0313/" target="_blank" class="link-ig" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2083?ima=3301" target="_blank" class="link-blog" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
+                <span class="member-links" style="display:inline-block; margin-left:10px;">
+                    <a href="https://www.instagram.com/sano.masaya.0313/" target="_blank" class="link-ig" title="Instagram" style="color: #E1306C; margin-right:10px;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2083?ima=3301" target="_blank" class="link-blog" title="個人ブログ" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
                 </span>
             </h2>
-            <p>生年月日：2002年3月13日（24歳）<br>
-            出身：兵庫県<br>
-            血液型：B型<br>
-            担当：ドラム</p>
+            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
+                生年月日：2002年3月13日（24歳）<br>
+                出身：兵庫県<br>
+                血液型：B型<br>
+                担当：ドラム
+            </p>
         </section>
-
     </main>
 
     <script>
