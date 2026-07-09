@@ -76,6 +76,24 @@
             return "#ccc";
         }
 
+        async function fetchWithCache() {
+            const cacheKey = 'aegroup_cal_data';
+            const cacheTimeKey = 'aegroup_cal_time';
+            const cachedData = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(cacheTimeKey);
+            const now = Date.now();
+
+            if (cachedData && cachedTime && (now - cachedTime < 10 * 60 * 1000)) {
+                return JSON.parse(cachedData);
+            }
+
+            const response = await fetch(CAL_API_URL);
+            const data = await response.json();
+            localStorage.setItem(cacheKey, JSON.stringify(data));
+            localStorage.setItem(cacheTimeKey, now.toString());
+            return data;
+        }
+
         document.addEventListener('DOMContentLoaded', async function() {
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -87,10 +105,7 @@
                 dateClick: function(info) { showDayEvents(info.dateStr); },
                 events: async function(info, successCallback, failureCallback) {
                     try {
-                        const response = await fetch(CAL_API_URL);
-                        const data = await response.json();
-                        
-                        // 🌟 「予定外の更新」が入っていない純粋な予定だけをカレンダーに登録する
+                        const data = await fetchWithCache();
                         rawEvents = data.filter(item => !item["予定外の更新"]);
 
                         const events = rawEvents.map(item => {
@@ -108,7 +123,6 @@
                         
                         successCallback(events);
                     } catch (e) {
-                        console.error(e);
                         failureCallback(e);
                     }
                 }
