@@ -102,6 +102,8 @@
                 headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
                 displayEventTime: false,
                 height: 'auto',
+                // ★ カレンダーのマスの中の表示順を「時間の早い順(start)」に指定
+                eventOrder: 'start',
                 dateClick: function(info) { showDayEvents(info.dateStr); },
                 events: async function(info, successCallback, failureCallback) {
                     try {
@@ -114,9 +116,20 @@
                             const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                             const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
                             
+                            // カレンダー上での並び替えのために start（時間付き）を正確に作成
+                            let startStr = dateStr;
+                            if (item["時間"] && String(item["時間"]).includes("T")) {
+                                const td = new Date(item["時間"]);
+                                const h = String(td.getHours()).padStart(2, "0");
+                                const m = String(td.getMinutes()).padStart(2, "0");
+                                if (!(h === "00" && m === "00")) {
+                                    startStr = `${dateStr}T${h}:${m}:00`;
+                                }
+                            }
+
                             return {
                                 title: item["タイトル"],
-                                start: dateStr,
+                                start: startStr,
                                 className: getCalClass(matchText)
                             };
                         }).filter(e => e !== null);
@@ -139,7 +152,6 @@
             modalDate.innerText = `${parseInt(parts[1])}月${parseInt(parts[2])}日の予定`;
             modalList.innerHTML = "";
 
-            // 該当日の予定を抽出
             let dayItems = rawEvents.filter(item => {
                 if(!item["日付"]) return false;
                 const d = new Date(item["日付"]);
@@ -147,9 +159,8 @@
                 return itemDate === dateStr;
             });
 
-            // ★ 時間順（早い順）にソートする処理を追加
             dayItems.sort((a, b) => {
-                let timeA = "23:59"; // 時間がないものは後ろに
+                let timeA = "23:59";
                 let timeB = "23:59";
 
                 if (a["時間"] && String(a["時間"]).includes("T")) {
