@@ -10,7 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
     <style>
-        .fc-event { border: none !important; padding: 3px 5px !important; font-size: 0.75rem !important; font-weight: bold !important; border-radius: 4px !important; cursor: pointer; }
+        .fc-event { border: none !important; padding: 2px 4px !important; font-size: 0.75rem !important; font-weight: bold !important; border-radius: 3px !important; cursor: pointer; }
         .cal-group { background-color: #ff69b4 !important; color: #fff !important; }
         .cal-kojima { background-color: #800080 !important; color: #fff !important; }
         .cal-masakado { background-color: #0000ff !important; color: #fff !important; }
@@ -102,8 +102,6 @@
                 headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
                 displayEventTime: false,
                 height: 'auto',
-                // ★ カレンダーのマスの中の表示順を「時間の早い順(start)」に指定
-                eventOrder: 'start',
                 dateClick: function(info) { showDayEvents(info.dateStr); },
                 events: async function(info, successCallback, failureCallback) {
                     try {
@@ -116,20 +114,9 @@
                             const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                             const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
                             
-                            // カレンダー上での並び替えのために start（時間付き）を正確に作成
-                            let startStr = dateStr;
-                            if (item["時間"] && String(item["時間"]).includes("T")) {
-                                const td = new Date(item["時間"]);
-                                const h = String(td.getHours()).padStart(2, "0");
-                                const m = String(td.getMinutes()).padStart(2, "0");
-                                if (!(h === "00" && m === "00")) {
-                                    startStr = `${dateStr}T${h}:${m}:00`;
-                                }
-                            }
-
                             return {
                                 title: item["タイトル"],
-                                start: startStr,
+                                start: dateStr,
                                 className: getCalClass(matchText)
                             };
                         }).filter(e => e !== null);
@@ -159,10 +146,10 @@
                 return itemDate === dateStr;
             });
 
+            // 1日の詳細だけ時間順に綺麗に並べる
             dayItems.sort((a, b) => {
                 let timeA = "23:59";
                 let timeB = "23:59";
-
                 if (a["時間"] && String(a["時間"]).includes("T")) {
                     const tdA = new Date(a["時間"]);
                     timeA = String(tdA.getHours()).padStart(2, "0") + ":" + String(tdA.getMinutes()).padStart(2, "0");
