@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <title>メンバー紹介 - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+    <!-- 末尾に ?v=2 を付けて古い記憶を強制削除 -->
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css?v=2">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .bg-masakado { background-color: #e6f0ff !important; }
@@ -12,12 +13,10 @@
         .bg-kojima { background-color: #f3e6f5 !important; }
         .bg-sano { background-color: #e8f5e9 !important; }
         
-        /* リンクが絶対にクリックの邪魔をされない＆押しやすくなるスタイル */
-        .member-header { display: flex; justify-content: space-between; align-items: center; border-bottom: none; margin-bottom: 10px; padding-bottom: 0; }
-        .member-name { margin: 0; font-size: 1.5rem; font-weight: bold; }
-        .member-links-box { display: flex; gap: 14px; z-index: 10; position: relative; }
-        .member-links-box a { font-size: 1.6rem; text-decoration: none; padding: 5px; display: inline-block; transition: transform 0.2s; }
-        .member-links-box a:active { transform: scale(1.2); }
+        .member-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px; }
+        .member-name { margin: 0; font-size: 1.4rem; font-weight: bold; }
+        .member-links { display: flex; gap: 12px; }
+        .member-links a { font-size: 1.4rem; text-decoration: none; }
     </style>
 </head>
 <body>
@@ -39,12 +38,13 @@
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         <h2 class="section-title">👤 Members</h2>
         
+        <!-- 正門良規 -->
         <section class="member-card border-masakado bg-masakado">
             <div class="member-header">
                 <span class="member-name text-masakado">正門良規</span>
-                <div class="member-links-box">
-                    <a href="https://www.instagram.com/kadostagram_official/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2079?ima=3121" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
+                <div class="member-links">
+                    <a href="https://www.instagram.com/kadostagram_official/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2079?ima=3121" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
                 </div>
             </div>
             <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
@@ -55,12 +55,13 @@
             </p>
         </section>
 
+        <!-- 末澤誠也 -->
         <section class="member-card border-suezawa bg-suezawa">
             <div class="member-header">
                 <span class="member-name text-suezawa">末澤誠也</span>
-                <div class="member-links-box">
-                    <a href="https://www.instagram.com/suezawa.seiya.0824/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2080?ima=3225" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
+                <div class="member-links">
+                    <a href="https://www.instagram.com/suezawa.seiya.0824/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2080?ima=3225" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
                 </div>
             </div>
             <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
@@ -71,13 +72,14 @@
             </p>
         </section>
 
+        <!-- 小島健 -->
         <section class="member-card border-kojima bg-kojima">
             <div class="member-header">
                 <span class="member-name text-kojima">小島健</span>
-                <div class="member-links-box">
-                    <a href="https://www.instagram.com/kozzy.s_boss/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2082?ima=3242" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
-                    <a href="https://www.youtube.com/channel/UCSzP6GqorG6WOfN_3C_b0Hw" target="_blank" rel="noopener noreferrer" style="color: #FF0000;" title="最強漢小島健伝説 YouTube"><i class="fa-brands fa-youtube"></i></a>
+                <div class="member-links">
+                    <a href="https://www.instagram.com/kozzy.s_boss/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2082?ima=3242" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
+                    <a href="https://www.youtube.com/channel/UCSzP6GqorG6WOfN_3C_b0Hw" target="_blank" rel="noopener noreferrer" style="color: #FF0000;"><i class="fa-brands fa-youtube"></i></a>
                 </div>
             </div>
             <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
@@ -88,12 +90,13 @@
             </p>
         </section>
 
+        <!-- 佐野晶哉 -->
         <section class="member-card border-sano bg-sano">
             <div class="member-header">
                 <span class="member-name text-sano">佐野晶哉</span>
-                <div class="member-links-box">
-                    <a href="https://www.instagram.com/sano.masaya.0313/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2083?ima=3301" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;" title="個人ブログ"><i class="fa-solid fa-pen-nib"></i></a>
+                <div class="member-links">
+                    <a href="https://www.instagram.com/sano.masaya.0313/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://web.familyclub.jp/s/jwb/diary/F2083?ima=3301" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
                 </div>
             </div>
             <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
