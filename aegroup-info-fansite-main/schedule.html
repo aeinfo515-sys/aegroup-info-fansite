@@ -16,8 +16,23 @@
         .cal-masakado { background-color: #0000ff !important; color: #fff !important; }
         .cal-suezawa { background-color: #ff0000 !important; color: #fff !important; }
         .cal-sano { background-color: #008000 !important; color: #fff !important; }
+        
+        /* ⬇️ 詳細画面（モーダル）全体の配置調整 */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); }
-        .modal-content { background-color: #fff; margin: 20% auto; padding: 20px; border-radius: 12px; max-width: 350px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); position: relative; }
+        
+        /* ⬇️ 予定が多い時に枠の中でスクロールできるように修正 */
+        .modal-content { 
+            background-color: #fff; 
+            margin: 15% auto; 
+            padding: 20px; 
+            border-radius: 12px; 
+            max-width: 350px; 
+            max-height: 70vh; /* 画面の高さの7割までに制限 */
+            overflow-y: auto; /* はみ出た分をスクロールできるようにする */
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
+            position: relative; 
+        }
+        
         .close-btn { position: absolute; right: 15px; top: 10px; font-size: 24px; cursor: pointer; color: #aaa; }
         .modal-item { padding: 8px 10px; margin-bottom: 8px; border-left: 5px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.9rem; }
     </style>
@@ -146,7 +161,7 @@
                 return itemDate === dateStr;
             });
 
-            // 1日の詳細だけ時間順に綺麗に並べる
+            // 1日の詳細だけ時間順に並べる
             dayItems.sort((a, b) => {
                 let timeA = "23:59";
                 let timeB = "23:59";
