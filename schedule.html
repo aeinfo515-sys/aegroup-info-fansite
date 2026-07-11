@@ -17,20 +17,36 @@
         .cal-suezawa { background-color: #ff0000 !important; color: #fff !important; }
         .cal-sano { background-color: #008000 !important; color: #fff !important; }
         
-        /* ⬇️ 詳細画面（モーダル）全体の配置調整 */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); }
+        /* ⬇️ PC・スマホ両方で、画面中央に綺麗にポップアップを表示する設定 */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.4); 
+            display: none; /* JSで制御 */
+            justify-content: center;
+            align-items: center;
+        }
         
-        /* ⬇️ 予定が多い時に枠の中でスクロールできるように修正 */
+        /* ⬇️ PCでもスマホでも、はみ出た予定が100%スクロールできるようになる枠の設定 */
         .modal-content { 
             background-color: #fff; 
-            margin: 15% auto; 
+            width: 90%;
+            max-width: 350px; 
             padding: 20px; 
             border-radius: 12px; 
-            max-width: 350px; 
-            max-height: 70vh; /* 画面の高さの7割までに制限 */
-            overflow-y: auto; /* はみ出た分をスクロールできるようにする */
             box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
-            position: relative; 
+            position: relative;
+            
+            /* 画面全体の高さの最大70%までに枠を制限 */
+            max-height: 70vh; 
+            /* 縦に中身がはみ出したら、自動で枠内にスクロールバーを出す */
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; /* スマホ用 */
         }
         
         .close-btn { position: absolute; right: 15px; top: 10px; font-size: 24px; cursor: pointer; color: #aaa; }
@@ -57,7 +73,7 @@
         <div id="calendar"></div>
     </main>
 
-    <div id="dayModal" class="modal">
+    <div id="dayModal" class="modal" onclick="if(event.target == this) closeModal()">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
             <h3 id="modalDate" style="margin-top:0; border-bottom:2px solid #ff69b4; padding-bottom:5px; color:#ff69b4;"></h3>
@@ -197,7 +213,11 @@
                     modalList.appendChild(div);
                 });
             }
-            modal.style.display = "block";
+            // flexを使って表示
+            modal.style.display = "flex";
+            
+            // モーダルを開いた時に一番上にスクロール位置をリセット
+            document.querySelector('.modal-content').scrollTop = 0;
         }
         function closeModal() { document.getElementById("dayModal").style.display = "none"; }
     </script>
