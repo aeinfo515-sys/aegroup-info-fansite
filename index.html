@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* ⬇️ 新着情報のカード内の見栄えを整える設定 */
+        /* 新着情報の枠のデザイン */
         .update-item { 
             padding: 12px 15px; 
             margin-bottom: 12px; 
@@ -16,7 +16,7 @@
             font-size: 0.95rem;
         }
         
-        /* ⬇️ 長いURLを消して、代わりに表示するスッキリしたリンクボタン */
+        /* URLを消して、代わりに表示するスッキリしたリンクボタン */
         .update-link-btn {
             display: inline-block;
             margin-top: 8px;
@@ -32,7 +32,7 @@
             opacity: 0.8;
         }
         
-        /* メンバーごとの左側の線の色を設定 */
+        /* メンバーごとの左側の線の色 */
         .border-group { border-left: 5px solid #ff69b4; }
         .border-kojima { border-left: 5px solid #800080; }
         .border-masakado { border-left: 5px solid #0000ff; }
@@ -71,8 +71,9 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバー名に合わせて左側の色を自動判定する
+        // 色分けの判定（エラーが出ないように安全に処理）
         function getBorderClass(text) {
+            if (!text) return "border-default";
             if (text.includes("Aぇ! group")) return "border-group";
             if (text.includes("小島")) return "border-kojima";
             if (text.includes("正門")) return "border-masakado";
@@ -81,8 +82,9 @@
             return "border-default";
         }
 
-        // リンク先が何のSNSか判定してボタンの文字を変える
+        // ボタンの文字をURLから自動判別
         function getLinkButtonText(url) {
+            if (!url) return "🔗 リンク先を開く";
             if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る";
             if (url.includes("instagram.com")) return "📸 Instagramの投稿を見る";
             if (url.includes("x.com") || url.includes("twitter.com")) return "🐦 X(旧Twitter)を見る";
@@ -96,8 +98,17 @@
                 const response = await fetch(CAL_API_URL);
                 const data = await response.json();
                 
-                // 「予定外の更新」のみを絞り込む
-                const updates = data.filter(item => item["予定外の更新"] === true || String(item["予定外の更新"]).toLowerCase() === "true");
+                if (!Array.isArray(data)) {
+                    document.getElementById("updateList").innerText = "データの形式が正しくありません。";
+                    return;
+                }
+
+                // 「予定外の更新」を安全に絞り込み
+                const updates = data.filter(item => {
+                    if (!item) return false;
+                    const val = item["予定外の更新"];
+                    return val === true || String(val).toLowerCase() === "true";
+                });
                 
                 const updateList = document.getElementById("updateList");
                 updateList.innerHTML = "";
@@ -107,14 +118,38 @@
                     return;
                 }
 
-                // 新しい更新順（下にあるものを上）にする場合は reverse() を使用
+                // 最新順にループ
                 updates.reverse().forEach(item => {
-                    // スプレッドシート内の列（詳細、タイトル、リンク等）をチェック
+                    // どの列名でも対応できるように安全に取得
                     const titleText = item["タイトル"] || item["詳細"] || "SNS更新";
-                    const linkUrl = item["リンク"] || item["URL"] || "";
-                    const memberName = item["詳細"] || ""; // 小島、Aぇ! group等が入る列
+                    const linkUrl = item["リンク"] || item["URL"] || item["外部リンク"] || "";
+                    const memberName = item["担当"] || item["詳細"] || ""; 
                     
                     let timeStr = "";
                     if (item["時間"] && String(item["時間"]).includes("T")) {
-                        const td = new Date(item["時間"]);
-                        timeStr = ` (${String(td.getHours
+                        try {
+                            const td = new Date(item["時間"]);
+                            timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
+                        } catch(e) {}
+                    }
+
+                    // 元々表示されていた、スクショにある「剥き出しの長いURL」を検出して安全に退避させる処理
+                    let finalTitle = titleText;
+                    let targetUrl = linkUrl;
+                    if (String(titleText).startsWith("http")) {
+                        finalTitle = "SNS更新情報";
+                        if (!targetUrl) targetUrl = titleText;
+                    }
+
+                    const borderClass = getBorderClass(memberName + finalTitle);
+                    const div = document.createElement("div");
+                    div.className = `update-item ${borderClass}`;
+                    
+                    let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br>`;
+                    htmlContent += `<strong>${finalTitle}</strong>`;
+                    
+                    if (memberName && memberName !== finalTitle && !String(memberName).startsWith("http")) {
+                        htmlContent += `<br><span style="font-size:0.85rem; color:#666;">担当: ${memberName}</span>`;
+                    }
+
+                    // リンク
