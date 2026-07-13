@@ -45,6 +45,22 @@
         
         .close-btn { position: absolute; right: 15px; top: 10px; font-size: 24px; cursor: pointer; color: #aaa; }
         .modal-item { padding: 8px 10px; margin-bottom: 8px; border-left: 5px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.9rem; }
+        
+        /* ⬇️ 追加したリンクボタンの見た目 */
+        .modal-link-btn {
+            display: inline-block;
+            margin-top: 6px;
+            padding: 4px 10px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .modal-link-btn:hover {
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -112,7 +128,6 @@
                 dateClick: function(info) { showDayEvents(info.dateStr); },
                 events: async function(info, successCallback, failureCallback) {
                     try {
-                        // ⬇️ キャッシュを一切使わず、開くたびに必ず最新データを読み込むように修正
                         const response = await fetch(CAL_API_URL);
                         const data = await response.json();
                         
@@ -177,24 +192,4 @@
                     let timeStr = "";
                     if (item["時間"] && String(item["時間"]).includes("T")) {
                         const td = new Date(item["時間"]);
-                        const h = String(td.getHours()).padStart(2, "0");
-                        const m = String(td.getMinutes()).padStart(2, "0");
-                        if (!(h === "00" && m === "00")) timeStr = `⏰ ${h}:${m} `;
-                    }
-                    const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
-                    const borderCol = getBorderColor(matchText);
-
-                    const div = document.createElement("div");
-                    div.className = "modal-item";
-                    div.style.borderLeftColor = borderCol;
-                    div.innerHTML = `<strong>${timeStr}${item["タイトル"]}</strong><br><span style='font-size:0.8rem;color:#666;'>${item["詳細"] || ""}</span>`;
-                    modalList.appendChild(div);
-                });
-            }
-            modal.style.display = "flex";
-            document.querySelector('.modal-content').scrollTop = 0;
-        }
-        function closeModal() { document.getElementById("dayModal").style.display = "none"; }
-    </script>
-</body>
-</html>
+                        const
