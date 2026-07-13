@@ -2,14 +2,43 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Aぇ! group info - ファンサイト</title>
+    <title>Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        .modal-item { padding: 8px 10px; margin-bottom: 8px; border-left: 5px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.9rem; }
-        .timeline-link { text-decoration: none; color: inherit; display: block; }
-        .timeline-link:hover .timeline-item { background: #ffebee !important; transition: background 0.2s ease; }
+        /* ⬇️ 新着情報のカード内の見栄えを整える設定 */
+        .update-item { 
+            padding: 12px 15px; 
+            margin-bottom: 12px; 
+            background: #f9f9f9; 
+            border-radius: 8px; 
+            font-size: 0.95rem;
+        }
+        
+        /* ⬇️ 長いURLを消して、代わりに表示するスッキリしたリンクボタン */
+        .update-link-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background-color: #ff69b4; /* Aぇ! groupのピンク */
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .update-link-btn:hover {
+            opacity: 0.8;
+        }
+        
+        /* メンバーごとの左側の線の色を設定 */
+        .border-group { border-left: 5px solid #ff69b4; }
+        .border-kojima { border-left: 5px solid #800080; }
+        .border-masakado { border-left: 5px solid #0000ff; }
+        .border-suezawa { border-left: 5px solid #ff0000; }
+        .border-sano { border-left: 5px solid #008000; }
+        .border-default { border-left: 5px solid #ccc; }
     </style>
 </head>
 <body>
@@ -31,24 +60,7 @@
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         <section class="card">
             <h2>🆕 更新情報</h2>
-            <div id="timelineList" class="timeline-container">
-                <p style="color:#777; font-size:0.9rem;">今日の更新情報はありません</p>
-            </div>
-        </section>
-
-        <section class="card">
-            <h2>📢 今日の予定</h2>
-            <div id="todayList">
-                <p style="color:#777; font-size:0.9rem;">今日の予定はありません</p>
-            </div>
-        </section>
-
-        <section class="card">
-            <h2>💡 サイトについて</h2>
-            <p style="line-height: 1.8; color: #555; margin: 0;">
-                Aぇ! groupのスケジュールや各種SNS、チケット情報などをまとめている非公式ファンサイトです。<br>
-                スマホでは右上の ☰ ボタンを押すと、右側からスマートにメニューが開きます。
-            </p>
+            <div id="updateList">🔑 読み込み中...</div>
         </section>
     </main>
 
@@ -59,87 +71,50 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        function getBorderColor(text) {
-            if (text.includes("Aぇ! group")) return "#ff69b4";
-            if (text.includes("小島")) return "#800080";
-            if (text.includes("正門")) return "#0000ff";
-            if (text.includes("末澤")) return "#ff0000";
-            if (text.includes("佐野")) return "#008000";
-            return "#ff69b4";
+        // メンバー名に合わせて左側の色を自動判定する
+        function getBorderClass(text) {
+            if (text.includes("Aぇ! group")) return "border-group";
+            if (text.includes("小島")) return "border-kojima";
+            if (text.includes("正門")) return "border-masakado";
+            if (text.includes("末澤")) return "border-suezawa";
+            if (text.includes("佐野")) return "border-sano";
+            return "border-default";
         }
 
-        // 高速化：データをキャッシュする関数
-        async function fetchWithCache() {
-            const cacheKey = 'aegroup_cal_data';
-            const cacheTimeKey = 'aegroup_cal_time';
-            const cachedData = localStorage.getItem(cacheKey);
-            const cachedTime = localStorage.getItem(cacheTimeKey);
-            const now = Date.now();
-
-            if (cachedData && cachedTime && (now - cachedTime < 10 * 60 * 1000)) {
-                return JSON.parse(cachedData);
-            }
-
-            const response = await fetch(CAL_API_URL);
-            const data = await response.json();
-            localStorage.setItem(cacheKey, JSON.stringify(data));
-            localStorage.setItem(cacheTimeKey, now.toString());
-            return data;
+        // リンク先が何のSNSか判定してボタンの文字を変える
+        function getLinkButtonText(url) {
+            if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る";
+            if (url.includes("instagram.com")) return "📸 Instagramの投稿を見る";
+            if (url.includes("x.com") || url.includes("twitter.com")) return "🐦 X(旧Twitter)を見る";
+            if (url.includes("youtube.com")) return "📺 YouTubeを見る";
+            if (url.includes("familyclub.jp")) return "✍️ ブログを見る";
+            return "🔗 リンク先を開く";
         }
 
-        document.addEventListener('DOMContentLoaded', async function() {
+        async function loadUpdates() {
             try {
-                const data = await fetchWithCache();
-                const timelineList = document.getElementById("timelineList");
-                const todayList = document.getElementById("todayList");
+                const response = await fetch(CAL_API_URL);
+                const data = await response.json();
                 
-                const now = new Date();
-                const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+                // 「予定外の更新」のみを絞り込む
+                const updates = data.filter(item => item["予定外の更新"] === true || String(item["予定外の更新"]).toLowerCase() === "true");
                 
-                let timelineHtml = "";
-                let todayHtml = "";
+                const updateList = document.getElementById("updateList");
+                updateList.innerHTML = "";
 
-                data.forEach(item => {
-                    const matchText = (item["予定外の更新"] || "") + (item["タイトル"] || "") + (item["詳細"] || "");
-                    const borderCol = getBorderColor(matchText);
+                if (updates.length === 0) {
+                    updateList.innerHTML = "<p style='color:#777;'>最近の更新情報はありません</p>";
+                    return;
+                }
 
+                // 新しい更新順（下にあるものを上）にする場合は reverse() を使用
+                updates.reverse().forEach(item => {
+                    // スプレッドシート内の列（詳細、タイトル、リンク等）をチェック
+                    const titleText = item["タイトル"] || item["詳細"] || "SNS更新";
+                    const linkUrl = item["リンク"] || item["URL"] || "";
+                    const memberName = item["詳細"] || ""; // 小島、Aぇ! group等が入る列
+                    
                     let timeStr = "";
                     if (item["時間"] && String(item["時間"]).includes("T")) {
                         const td = new Date(item["時間"]);
-                        const h = String(td.getHours()).padStart(2, "0");
-                        const m = String(td.getMinutes()).padStart(2, "0");
-                        if (!(h === "00" && m === "00")) timeStr = `⏰ ${h}:${m} `;
-                    }
-
-                    const val = item["予定外の更新"] || item["予定外的更新"];
-                    if (val && item["タイムスタンプ"]) {
-                        const ts = new Date(item["タイムスタンプ"]);
-                        const tsStr = ts.getFullYear() + '-' + String(ts.getMonth()+1).padStart(2,'0') + '-' + String(ts.getDate()).padStart(2,'0');
-                        
-                        if (tsStr === todayStr) {
-                            const displayTime = String(ts.getHours()).padStart(2,'0') + ":" + String(ts.getMinutes()).padStart(2,'0');
-                            let linkStart = item["リンク"] ? `<a href="${item["リンク"]}" target="_blank" class="timeline-link">` : "";
-                            let linkEnd = item["リンク"] ? `</a>` : "";
-
-                            timelineHtml += `${linkStart}<div class="timeline-item" style="border-left-color: ${borderCol};"><span class="update-time" style="color: ${borderCol};">🔥 新着情報 (${displayTime} 更新)</span><strong style="color: #333;">${val}</strong><br><span style="font-size:0.8rem; color:#666;">${item["詳細"] || item["タイトル"] || ""}</span></div>${linkEnd}`;
-                        }
-                    }
-
-                    if (!val && item["日付"]) {
-                        const ed = new Date(item["日付"]);
-                        const eDateStr = ed.getFullYear() + '-' + String(ed.getMonth()+1).padStart(2,'0') + '-' + String(ed.getDate()).padStart(2,'0');
-                        if (eDateStr === todayStr) {
-                            todayHtml += `<div class="modal-item" style="border-left: 5px solid ${borderCol};"><strong>${timeStr}${item["タイトル"] || ""}</strong><br><span style="font-size:0.8rem; color:#666;">${item["詳細"] || ""}</span></div>`;
-                        }
-                    }
-                });
-
-                if(timelineHtml) timelineList.innerHTML = timelineHtml;
-                if(todayHtml) todayList.innerHTML = todayHtml;
-            } catch (e) {
-                console.error(e);
-            }
-        });
-    </script>
-</body>
-</html>
+                        timeStr = ` (${String(td.getHours
