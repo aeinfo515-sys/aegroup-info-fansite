@@ -17,7 +17,6 @@
         .cal-suezawa { background-color: #ff0000 !important; color: #fff !important; }
         .cal-sano { background-color: #008000 !important; color: #fff !important; }
         
-        /* ⬇️ PC・スマホ両方で、画面中央に綺麗にポップアップを表示する設定 */
         .modal { 
             display: none; 
             position: fixed; 
@@ -27,12 +26,10 @@
             width: 100%; 
             height: 100%; 
             background-color: rgba(0,0,0,0.4); 
-            display: none; /* JSで制御 */
             justify-content: center;
             align-items: center;
         }
         
-        /* ⬇️ PCでもスマホでも、はみ出た予定が100%スクロールできるようになる枠の設定 */
         .modal-content { 
             background-color: #fff; 
             width: 90%;
@@ -41,12 +38,9 @@
             border-radius: 12px; 
             box-shadow: 0 4px 20px rgba(0,0,0,0.15); 
             position: relative;
-            
-            /* 画面全体の高さの最大70%までに枠を制限 */
             max-height: 70vh; 
-            /* 縦に中身がはみ出したら、自動で枠内にスクロールバーを出す */
             overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; /* スマホ用 */
+            -webkit-overflow-scrolling: touch;
         }
         
         .close-btn { position: absolute; right: 15px; top: 10px; font-size: 24px; cursor: pointer; color: #aaa; }
@@ -107,24 +101,6 @@
             return "#ccc";
         }
 
-        async function fetchWithCache() {
-            const cacheKey = 'aegroup_cal_data';
-            const cacheTimeKey = 'aegroup_cal_time';
-            const cachedData = localStorage.getItem(cacheKey);
-            const cachedTime = localStorage.getItem(cacheTimeKey);
-            const now = Date.now();
-
-            if (cachedData && cachedTime && (now - cachedTime < 10 * 60 * 1000)) {
-                return JSON.parse(cachedData);
-            }
-
-            const response = await fetch(CAL_API_URL);
-            const data = await response.json();
-            localStorage.setItem(cacheKey, JSON.stringify(data));
-            localStorage.setItem(cacheTimeKey, now.toString());
-            return data;
-        }
-
         document.addEventListener('DOMContentLoaded', async function() {
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
@@ -136,7 +112,10 @@
                 dateClick: function(info) { showDayEvents(info.dateStr); },
                 events: async function(info, successCallback, failureCallback) {
                     try {
-                        const data = await fetchWithCache();
+                        // ⬇️ キャッシュを一切使わず、開くたびに必ず最新データを読み込むように修正
+                        const response = await fetch(CAL_API_URL);
+                        const data = await response.json();
+                        
                         rawEvents = data.filter(item => !item["予定外の更新"]);
 
                         const events = rawEvents.map(item => {
@@ -177,7 +156,6 @@
                 return itemDate === dateStr;
             });
 
-            // 1日の詳細だけ時間順に並べる
             dayItems.sort((a, b) => {
                 let timeA = "23:59";
                 let timeB = "23:59";
@@ -213,10 +191,7 @@
                     modalList.appendChild(div);
                 });
             }
-            // flexを使って表示
             modal.style.display = "flex";
-            
-            // モーダルを開いた時に一番上にスクロール位置をリセット
             document.querySelector('.modal-content').scrollTop = 0;
         }
         function closeModal() { document.getElementById("dayModal").style.display = "none"; }
