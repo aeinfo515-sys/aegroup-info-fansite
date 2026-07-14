@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* 新着情報・今日の予定の枠デザイン */
         .update-item, .today-item { 
             padding: 12px 15px; 
             margin-bottom: 12px; 
@@ -16,24 +15,6 @@
             font-size: 0.95rem;
             border-left: 5px solid #ccc;
         }
-        
-        /* 剥き出しの長いURLの代わりに表示する、タップできるピンクのボタン */
-        .update-link-btn {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 6px 12px;
-            background-color: #ff69b4; /* Aぇ! groupのピンク */
-            color: #fff !important;
-            text-decoration: none !important;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: bold;
-        }
-        .update-link-btn:hover {
-            opacity: 0.8;
-        }
-        
-        /* メンバーごとの左側の線の色を設定 */
         .border-group { border-left-color: #ff69b4 !important; }
         .border-kojima { border-left-color: #800080 !important; }
         .border-masakado { border-left-color: #0000ff !important; }
@@ -81,7 +62,6 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバーカラーの線を判定
         function getBorderClass(text) {
             if (!text) return "";
             if (text.includes("Aぇ! group")) return "border-group";
@@ -92,29 +72,18 @@
             return "";
         }
 
-        // URLからボタンの文字を変える設定
-        function getLinkButtonText(url) {
-            if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る";
-            if (url.includes("instagram.com")) return "📸 Instagramの投稿を見る";
-            if (url.includes("x.com") || url.includes("twitter.com")) return "🐦 X(旧Twitter)を見る";
-            if (url.includes("youtube.com")) return "📺 YouTubeを見る";
-            if (url.includes("familyclub.jp")) return "✍️ ブログを見る";
-            return "🔗 リンクを開く";
-        }
-
         async function loadHomeData() {
             try {
                 const response = await fetch(CAL_API_URL);
                 const data = await response.json();
                 
-                // 1. 【本日のスケジュール】の処理
+                // 1. 【本日のスケジュール】
                 const todayList = document.getElementById("todayList");
                 todayList.innerHTML = "";
                 
                 const now = new Date();
                 const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
                 
-                // 今日の通常予定（予定外の更新ではないもの）を絞り込み
                 const todayEvents = data.filter(item => {
                     if(!item["日付"] || item["予定外の更新"] === true || String(item["予定外の更新"]).toLowerCase() === "true") return false;
                     const d = new Date(item["日付"]);
@@ -126,9 +95,9 @@
                     todayList.innerHTML = "<p style='color:#777;'>今日の予定はありません</p>";
                 } else {
                     todayEvents.forEach(item => {
-                        const rawTitle = item["タイトル"] || "";
+                        const titleText = item["タイトル"] || "";
                         const detailText = item["詳細"] || "";
-                        const borderClass = getBorderClass(detailText + rawTitle);
+                        const borderClass = getBorderClass(detailText + titleText);
                         
                         let timeStr = "";
                         if (item["時間"] && String(item["時間"]).includes("T")) {
@@ -138,12 +107,12 @@
                         
                         const div = document.createElement("div");
                         div.className = `today-item ${borderClass}`;
-                        div.innerHTML = `<strong>${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText}</span>`;
+                        div.innerHTML = `<strong>${timeStr}${titleText}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText}</span>`;
                         todayList.appendChild(div);
                     });
                 }
 
-                // 2. 【更新情報】の処理
+                // 2. 【更新情報】（元のテキスト剥き出し表示に戻しました）
                 const updateList = document.getElementById("updateList");
                 updateList.innerHTML = "";
 
@@ -155,52 +124,20 @@
                 }
 
                 updates.reverse().forEach(item => {
-                    const rawTitle = item["タイトル"] || "";
+                    const titleText = item["タイトル"] || "";
                     const detailText = item["詳細"] || "";
                     
-                    let displayTitle = rawTitle;
-                    let targetUrl = "";
-
-                    // タイトル自体が長いURLだった場合のボタン化対策
-                    if (rawTitle.startsWith("http")) {
-                        displayTitle = "SNS更新情報";
-                        targetUrl = rawTitle;
-                    }
-
                     let timeStr = "";
                     if (item["時間"] && String(item["時間"]).includes("T")) {
                         const td = new Date(item["時間"]);
                         timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
                     }
 
-                    const borderClass = getBorderClass(detailText + displayTitle);
+                    const borderClass = getBorderClass(detailText + titleText);
                     const div = document.createElement("div");
                     div.className = `update-item ${borderClass}`;
                     
+                    // 元々のシンプルなテキスト表示形式
                     let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br>`;
-                    htmlContent += `<strong>${displayTitle}</strong>`;
-                    
-                    if (detailText && detailText !== rawTitle) {
-                        htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
-                    }
-
-                    if (targetUrl) {
-                        const btnText = getLinkButtonText(targetUrl);
-                        htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
-                    }
-
-                    div.innerHTML = htmlContent;
-                    updateList.appendChild(div);
-                });
-
-            } catch (e) {
-                document.getElementById("todayList").innerText = "データの読み込みに失敗しました。";
-                document.getElementById("updateList").innerText = "データの読み込みに失敗しました。";
-                console.error(e);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', loadHomeData);
-    </script>
-</body>
-</html>
+                    htmlContent += `<strong>${titleText}</strong>`;
+                    if (detailText && detailText
