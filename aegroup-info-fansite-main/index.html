@@ -33,7 +33,7 @@
             opacity: 0.8;
         }
         
-        /* メンバーごとの左側の線の色を設定 */
+        /* メンバーごとの左側の線の色を設定（グループも確実にピンクになります！） */
         .border-group { border-left-color: #ff69b4 !important; }
         .border-kojima { border-left-color: #800080 !important; }
         .border-masakado { border-left-color: #0000ff !important; }
@@ -58,22 +58,19 @@
     </nav>
 
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
-        <!-- 1. 🆕 更新情報 -->
         <section class="card" style="margin-bottom: 20px;">
             <h2>🆕 更新情報</h2>
             <div id="updateList">🔑 読み込み中...</div>
         </section>
 
-        <!-- 2. 📅 本日のスケジュール -->
         <section class="card" style="margin-bottom: 20px;">
             <h2>📅 本日のスケジュール</h2>
             <div id="todayList">🔑 読み込み中...</div>
         </section>
 
-        <!-- 3. 📢 サイト説明（メニューの使い方の文章に修正） -->
         <section class="card">
             <h2>📢 Welcome</h2>
-            <p>スマートフォンでご覧の方は、右上の三本線（メニューボタン）を押すと各メニュータブが表示されます。</p>
+            <p>スマートフォンでご覧の方は、右上の ≡ ボタンを押すと各メニュータブが表示されます。</p>
         </section>
     </main>
 
@@ -84,10 +81,10 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバーカラーの線を判定
+        // メンバーカラーの線を判定（大文字・小文字両方の「Aぇ! group」に対応）
         function getBorderClass(text) {
             if (!text) return "";
-            if (text.includes("Aぇ! group")) return "border-group";
+            if (text.includes("Aぇ! group") || text.includes("Aぇ!group")) return "border-group";
             if (text.includes("小島")) return "border-kojima";
             if (text.includes("正門")) return "border-masakado";
             if (text.includes("末澤")) return "border-suezawa";
