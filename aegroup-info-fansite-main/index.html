@@ -14,15 +14,15 @@
             background: #f9f9f9; 
             border-radius: 8px; 
             font-size: 0.95rem;
-            border-left: 5px solid #ff69b4; /* 基本（デフォルト）をAぇ! groupのピンクに設定 */
+            border-left: 5px solid #ff69b4; /* 基本をAぇ! groupのピンクに設定 */
         }
         
-        /* 長いURLの代わりに表示する、タップできるピンクのボタン */
+        /* タップできるピンクのボタン */
         .update-link-btn {
             display: inline-block;
             margin-top: 8px;
             padding: 6px 12px;
-            background-color: #ff69b4; /* Aぇ! groupのピンク */
+            background-color: #ff69b4;
             color: #fff !important;
             text-decoration: none !important;
             border-radius: 6px;
@@ -84,17 +84,17 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバーカラーの線を判定（個人名が入っていない場合はすべて「グループ予定＝ピンク」にする確実なロジック）
+        // メンバーカラー判定（個人名がなければ100%ピンク枠）
         function getBorderClass(text) {
             if (!text) return "border-group";
             if (text.includes("小島")) return "border-kojima";
             if (text.includes("正門")) return "border-masakado";
             if (text.includes("末澤")) return "border-suezawa";
             if (text.includes("佐野")) return "border-sano";
-            return "border-group"; /* 個人名がなければ100%ピンク枠 */
+            return "border-group";
         }
 
-        // URLからボタンの文字を変える設定
+        // URLからボタンテキストを設定
         function getLinkButtonText(url) {
             if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る";
             if (url.includes("instagram.com")) return "📸 Instagramの投稿を見る";
@@ -102,6 +102,16 @@
             if (url.includes("youtube.com")) return "📺 YouTubeを見る";
             if (url.includes("familyclub.jp")) return "✍️ ブログを見る";
             return "🔗 リンクを開く";
+        }
+
+        // 「予定外の更新」判定用関数（判定漏れを防止）
+        function isExtraUpdate(val) {
+            if (val === true || val === 1) return true;
+            if (typeof val === 'string') {
+                const s = val.trim().toLowerCase();
+                return s === 'true' || s === '1' || s === 'yes';
+            }
+            return false;
         }
 
         async function loadHomeData() {
@@ -113,7 +123,8 @@
                 const updateList = document.getElementById("updateList");
                 updateList.innerHTML = "";
 
-                const updates = data.filter(item => item["予定外の更新"] === true || String(item["予定外の更新"]).toLowerCase() === "true");
+                // 強化された判定関数を使用
+                const updates = data.filter(item => isExtraUpdate(item["予定外の更新"]));
 
                 if (updates.length === 0) {
                     updateList.innerHTML = "<p style='color:#777;'>最近の更新情報はありません</p>";
@@ -125,7 +136,6 @@
                         let displayTitle = rawTitle;
                         let targetUrl = "";
 
-                        // タイトル自体が長いURLだった場合のボタン化対策
                         if (rawTitle.startsWith("http")) {
                             displayTitle = "SNS更新情報";
                             targetUrl = rawTitle;
@@ -148,7 +158,6 @@
                             htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
                         }
 
-                        // URLが存在する場合は綺麗なボタンを出す
                         if (targetUrl) {
                             const btnText = getLinkButtonText(targetUrl);
                             htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
@@ -167,7 +176,7 @@
                 const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
                 
                 const todayEvents = data.filter(item => {
-                    if(!item["日付"] || item["予定外の更新"] === true || String(item["予定外の更新"]).toLowerCase() === "true") return false;
+                    if (!item["日付"] || isExtraUpdate(item["予定外の更新"])) return false;
                     const d = new Date(item["日付"]);
                     const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                     return itemDate === todayStr;
