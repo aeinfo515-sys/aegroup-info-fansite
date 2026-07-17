@@ -94,29 +94,48 @@
             return "border-group";
         }
 
-        // URLからボタンテキストを設定
+        // URLに応じたボタン文字を設定
         function getLinkButtonText(url) {
             if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る";
             if (url.includes("instagram.com")) return "📸 Instagramの投稿を見る";
             if (url.includes("x.com") || url.includes("twitter.com")) return "🐦 X(旧Twitter)を見る";
-            if (url.includes("youtube.com")) return "📺 YouTubeを見る";
+            if (url.includes("youtube.com") || url.includes("youtu.be")) return "📺 YouTubeを見る";
             if (url.includes("familyclub.jp")) return "✍️ ブログを見る";
+            if (url.includes("tiktok.com")) return "🎵 TikTokを見る";
             return "🔗 リンクを開く";
         }
 
-        // 更新情報（タイムスタンプ または 予定外の更新）かどうか判定する関数
-        function checkIsUpdateItem(item) {
-            // 1. タイムスタンプ列に値が入っていれば更新情報とする
-            const timestamp = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
-            if (timestamp) return true;
+        // 文字列の中からURLを検出して取り出す関数
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = text.match(/(https?:\/\/[^\s]+)/);
+            return match ? match[0] : null;
+        }
 
-            // 2. フラグ判定（従来の判定も残しておく）
+        // 「当日」のタイムスタンプ更新情報かどうか判定する関数
+        function checkIsTodayUpdate(item) {
+            const timestampVal = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
+            
+            if (timestampVal) {
+                try {
+                    const itemDate = new Date(timestampVal);
+                    if (!isNaN(itemDate.getTime())) {
+                        const now = new Date();
+                        return itemDate.getFullYear() === now.getFullYear() &&
+                               itemDate.getMonth() === now.getMonth() &&
+                               itemDate.getDate() === now.getDate();
+                    }
+                } catch(e){}
+            }
+
+            // 「予定外の更新」フラグ判定（手動設定時）
             const val = item["予定外の更新"] ?? item["予定外"] ?? item["更新"] ?? item["isExtra"];
             if (val === true || val === 1) return true;
             if (typeof val === 'string') {
                 const s = val.trim().toLowerCase();
                 return s === 'true' || s === '1' || s === 'yes';
             }
+            
             return false;
         }
 
@@ -129,28 +148,37 @@
                 const updateList = document.getElementById("updateList");
                 updateList.innerHTML = "";
 
-                // タイムスタンプ または 更新フラグのあるデータを抽出
-                const updates = data.filter(item => checkIsUpdateItem(item));
+                // 当日の更新データのみ抽出
+                const updates = data.filter(item => checkIsTodayUpdate(item));
 
                 if (updates.length === 0) {
-                    updateList.innerHTML = "<p style='color:#777;'>最近の更新情報はありません</p>";
+                    updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
                 } else {
-                    // 最新データ（下に追加されたもの）が一番上にくるように逆順で表示
                     updates.slice().reverse().forEach(item => {
                         const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
                         const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
-                        let displayTitle = rawTitle;
-                        let targetUrl = "";
+                        // タイトルや詳細、または専用URL項目からURLを探す
+                        const targetUrl = extractUrl(rawTitle) || 
+                                          extractUrl(detailText) || 
+                                          item["URL"] || item["url"] || item["link"] || "";
 
+                        // URLそのものがタイトルになっている場合はわかりやすい文字列に差し替え
+                        let displayTitle = rawTitle;
                         if (rawTitle.startsWith("http")) {
                             displayTitle = "SNS更新情報";
-                            targetUrl = rawTitle;
+                        } else if (targetUrl) {
+                            // URL部分を文字から除去して見た目を綺麗にする
+                            displayTitle = rawTitle.replace(targetUrl, '').trim() || "SNS更新情報";
                         }
 
-                        // タイムスタンプまたは時間から時刻を取得
+                        let cleanDetail = detailText;
+                        if (targetUrl && detailText) {
+                            cleanDetail = detailText.replace(targetUrl, '').trim();
+                        }
+
                         let timeStr = "";
-                        const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"] || item["date"];
+                        const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"];
                         if (timeVal) {
                             try {
                                 const td = new Date(timeVal);
@@ -160,7 +188,7 @@
                             } catch(e){}
                         }
 
-                        const borderClass = getBorderClass(detailText + displayTitle);
+                        const borderClass = getBorderClass(cleanDetail + displayTitle);
                         const div = document.createElement("div");
                         div.className = `update-item ${borderClass}`;
                         
@@ -169,10 +197,11 @@
                             htmlContent += `<strong>${displayTitle}</strong>`;
                         }
                         
-                        if (detailText && detailText !== rawTitle) {
-                            htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
+                        if (cleanDetail && cleanDetail !== displayTitle) {
+                            htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${cleanDetail}</span>`;
                         }
 
+                        // URLが見つかればボタンを生成
                         if (targetUrl) {
                             const btnText = getLinkButtonText(targetUrl);
                             htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
@@ -191,7 +220,6 @@
                 const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
                 
                 const todayEvents = data.filter(item => {
-                    // タイムスタンプのみのデータは「本日のスケジュール」には出さず「更新情報」専用にする
                     const dateVal = item["日付"] || item["date"];
                     if (!dateVal || item["タイムスタンプ"]) return false;
 
