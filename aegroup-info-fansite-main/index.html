@@ -104,7 +104,7 @@
             return "🔗 リンクを開く";
         }
 
-        // 「予定外の更新」判定用関数（判定漏れを防止）
+        // 「予定外の更新」判定用関数
         function isExtraUpdate(val) {
             if (val === true || val === 1) return true;
             if (typeof val === 'string') {
@@ -119,17 +119,17 @@
                 const response = await fetch(CAL_API_URL);
                 const data = await response.json();
                 
-                // 【更新情報】の処理
+                // 1. 【更新情報】の処理
                 const updateList = document.getElementById("updateList");
                 updateList.innerHTML = "";
 
-                // 強化された判定関数を使用
                 const updates = data.filter(item => isExtraUpdate(item["予定外の更新"]));
 
                 if (updates.length === 0) {
                     updateList.innerHTML = "<p style='color:#777;'>最近の更新情報はありません</p>";
                 } else {
-                    updates.reverse().forEach(item => {
+                    // 最新のものが上にくるよう逆順で処理
+                    updates.slice().reverse().forEach(item => {
                         const rawTitle = item["タイトル"] || "";
                         const detailText = item["詳細"] || "";
                         
@@ -142,9 +142,13 @@
                         }
 
                         let timeStr = "";
-                        if (item["時間"] && String(item["時間"]).includes("T")) {
-                            const td = new Date(item["時間"]);
-                            timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
+                        if (item["時間"]) {
+                            try {
+                                const td = new Date(item["時間"]);
+                                if (!isNaN(td.getTime())) {
+                                    timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
+                                }
+                            } catch(e){}
                         }
 
                         const borderClass = getBorderClass(detailText + displayTitle);
@@ -168,7 +172,7 @@
                     });
                 }
 
-                // 【本日のスケジュール】の処理
+                // 2. 【本日のスケジュール】の処理
                 const todayList = document.getElementById("todayList");
                 todayList.innerHTML = "";
                 
@@ -177,9 +181,14 @@
                 
                 const todayEvents = data.filter(item => {
                     if (!item["日付"] || isExtraUpdate(item["予定外の更新"])) return false;
-                    const d = new Date(item["日付"]);
-                    const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-                    return itemDate === todayStr;
+                    try {
+                        const d = new Date(item["日付"]);
+                        if (isNaN(d.getTime())) return false;
+                        const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                        return itemDate === todayStr;
+                    } catch(e) {
+                        return false;
+                    }
                 });
 
                 if (todayEvents.length === 0) {
@@ -191,9 +200,13 @@
                         const borderClass = getBorderClass(detailText + rawTitle);
                         
                         let timeStr = "";
-                        if (item["時間"] && String(item["時間"]).includes("T")) {
-                            const td = new Date(item["時間"]);
-                            timeStr = `⏰ ${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} `;
+                        if (item["時間"]) {
+                            try {
+                                const td = new Date(item["時間"]);
+                                if (!isNaN(td.getTime())) {
+                                    timeStr = `⏰ ${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} `;
+                                }
+                            } catch(e){}
                         }
                         
                         const div = document.createElement("div");
