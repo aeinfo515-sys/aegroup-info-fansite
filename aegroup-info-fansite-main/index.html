@@ -104,15 +104,18 @@
             return "🔗 リンクを開く";
         }
 
-        // 「予定外の更新」をあらゆる項目名・型に対応してチェックする超強力判定関数
-        function checkIsExtraUpdate(item) {
-            // スプレッドシート側のヘッダー表記の揺れ（予定外の更新 / 予定外 / 更新）をカバー
+        // 更新情報（タイムスタンプ または 予定外の更新）かどうか判定する関数
+        function checkIsUpdateItem(item) {
+            // 1. タイムスタンプ列に値が入っていれば更新情報とする
+            const timestamp = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
+            if (timestamp) return true;
+
+            // 2. フラグ判定（従来の判定も残しておく）
             const val = item["予定外の更新"] ?? item["予定外"] ?? item["更新"] ?? item["isExtra"];
-            
             if (val === true || val === 1) return true;
             if (typeof val === 'string') {
                 const s = val.trim().toLowerCase();
-                return s === 'true' || s === '1' || s === 'yes' || s === 'true';
+                return s === 'true' || s === '1' || s === 'yes';
             }
             return false;
         }
@@ -126,14 +129,16 @@
                 const updateList = document.getElementById("updateList");
                 updateList.innerHTML = "";
 
-                const updates = data.filter(item => checkIsExtraUpdate(item));
+                // タイムスタンプ または 更新フラグのあるデータを抽出
+                const updates = data.filter(item => checkIsUpdateItem(item));
 
                 if (updates.length === 0) {
                     updateList.innerHTML = "<p style='color:#777;'>最近の更新情報はありません</p>";
                 } else {
+                    // 最新データ（下に追加されたもの）が一番上にくるように逆順で表示
                     updates.slice().reverse().forEach(item => {
-                        const rawTitle = item["タイトル"] || item["title"] || "";
-                        const detailText = item["詳細"] || item["detail"] || "";
+                        const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
+                        const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
                         let displayTitle = rawTitle;
                         let targetUrl = "";
@@ -143,10 +148,12 @@
                             targetUrl = rawTitle;
                         }
 
+                        // タイムスタンプまたは時間から時刻を取得
                         let timeStr = "";
-                        if (item["時間"] || item["time"]) {
+                        const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"] || item["date"];
+                        if (timeVal) {
                             try {
-                                const td = new Date(item["時間"] || item["time"]);
+                                const td = new Date(timeVal);
                                 if (!isNaN(td.getTime())) {
                                     timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
                                 }
@@ -158,7 +165,9 @@
                         div.className = `update-item ${borderClass}`;
                         
                         let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br>`;
-                        htmlContent += `<strong>${displayTitle}</strong>`;
+                        if (displayTitle) {
+                            htmlContent += `<strong>${displayTitle}</strong>`;
+                        }
                         
                         if (detailText && detailText !== rawTitle) {
                             htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
@@ -182,8 +191,10 @@
                 const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
                 
                 const todayEvents = data.filter(item => {
+                    // タイムスタンプのみのデータは「本日のスケジュール」には出さず「更新情報」専用にする
                     const dateVal = item["日付"] || item["date"];
-                    if (!dateVal || checkIsExtraUpdate(item)) return false;
+                    if (!dateVal || item["タイムスタンプ"]) return false;
+
                     try {
                         const d = new Date(dateVal);
                         if (isNaN(d.getTime())) return false;
