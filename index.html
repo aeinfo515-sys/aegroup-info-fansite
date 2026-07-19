@@ -49,7 +49,7 @@
             opacity: 0.9;
         }
         
-        /* 各カラーバーの色 */
+        /* 各メンバーのカラーバーの色 */
         .bg-group::before { background-color: #ff69b4 !important; }     
         .bg-kojima::before { background-color: #800080 !important; }    
         .bg-masakado::before { background-color: #0000ff !important; }  
@@ -94,7 +94,8 @@
     </main>
 
     <script>
-        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
+        // いただいた最新のGASのURLに変更しました！
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
@@ -110,7 +111,7 @@
             return "bg-group";
         }
 
-        // URLに応じたボタン文字を設定
+        // URLの文字列から見やすいボタン用のテキストを生成
         function getLinkButtonText(url) {
             if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る 🔗";
             if (url.includes("instagram.com")) return "📸 Instagramを見る 🔗";
@@ -121,14 +122,14 @@
             return "🔗 リンクを開く";
         }
 
-        // 文字列の中からURLを取り出す関数
+        // 文字列からURLを引っこ抜く関数
         function extractUrl(text) {
             if (!text) return null;
             const match = String(text).match(/(https?:\/\/[^\s]+)/);
             return match ? match[0] : null;
         }
 
-        // 「当日」のタイムスタンプ更新情報かどうか判定する関数
+        // 「当日」のタイムスタンプデータ（更新情報）かどうか判定する関数
         function checkIsTodayUpdate(item) {
             const timestampVal = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
             
@@ -144,7 +145,7 @@
                 } catch(e){}
             }
 
-            // 「予定外の更新」フラグ判定
+            // 「予定外の更新」フラグ判定（手動対応用のバックアップ）
             const val = item["予定外の更新"] ?? item["予定外"] ?? item["更新"] ?? item["isExtra"];
             if (val === true || val === 1) return true;
             if (typeof val === 'string') {
@@ -170,14 +171,11 @@
                     updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
                 } else {
                     updates.slice().reverse().forEach(item => {
-                        // スプレッドシートの各列のデータを取得
                         const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
                         const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
-                        // APIから渡ってくる可能性のある「G列」用の様々なキー名でURLをキャッチ
+                        // 新しいGASコードによってG列から送られてくる「リンク」などのURLデータをキャッチ
                         const gUrl = item["リンク"] || item["link"] || item["URL"] || item["url"] || item["G列"] || item["g"];
-                        
-                        // G列のURLを最優先にしつつ、バックアップとしてタイトルや詳細の文字列内からも検索
                         const targetUrl = extractUrl(gUrl) || extractUrl(rawTitle) || extractUrl(detailText) || "";
 
                         let displayTitle = rawTitle;
@@ -203,7 +201,6 @@
                             } catch(e){}
                         }
 
-                        // カラー判定には「詳細」や「タイトル」に加えて、送信元のメンバー名が入る「担当」や「メンバー」列などのデータも念のため結合
                         const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
                         const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
                         
@@ -221,7 +218,7 @@
                             htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${memberText}</span>`;
                         }
 
-                        // G列などのURLが存在していればボタンをしっかり表示
+                        // G列のURLが無事に取得できていれば、ここにピンクのボタンを配置します！
                         if (targetUrl) {
                             const btnText = getLinkButtonText(targetUrl);
                             htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
