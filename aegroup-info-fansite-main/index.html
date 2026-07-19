@@ -7,14 +7,28 @@
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* 新着情報・今日の予定の枠デザイン */
+        /* 新着情報・今日の予定の枠デザイン（構造を根本から強化） */
         .update-item, .today-item { 
-            padding: 12px 15px; 
+            position: relative; /* 左線を絶対に潰さないための基準設定 */
+            padding: 12px 15px 12px 22px; /* 左側に少し広めの余白を確保 */
             margin-bottom: 12px; 
             background: #f9f9f9; 
             border-radius: 8px; 
             font-size: 0.95rem;
-            border-left: 5px solid #ff69b4; /* 基本をAぇ! groupのピンクに設定 */
+            overflow: hidden; /* 角丸からはみ出さないように */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        
+        /* 左端のカラーバーを絶対に発色させる設定 */
+        .update-item::before, .today-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px; /* 線の太さを8pxに強化して目立たせます */
+            background-color: #ff69b4; /* 基本はAぇ! groupのピンク */
         }
         
         /* タップしてワンクリックで飛べるピンクのボタン */
@@ -29,19 +43,18 @@
             font-size: 0.85rem;
             font-weight: bold;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: background-color 0.2s;
         }
         .update-link-btn:hover {
             background-color: #ff1493;
             opacity: 0.9;
         }
         
-        /* メンバーごとの左側の線の色を設定 */
-        .border-group { border-left-color: #ff69b4 !important; }
-        .border-kojima { border-left-color: #800080 !important; }
-        .border-masakado { border-left-color: #0000ff !important; }
-        .border-suezawa { border-left-color: #ff0000 !important; }
-        .border-sano { border-left-color: #008000 !important; }
+        /* 各カラーバーの色（背景色として確実に上書き） */
+        .bg-group::before { background-color: #ff69b4 !important; }     /* グループ：ピンク */
+        .bg-kojima::before { background-color: #800080 !important; }    /* 小島：紫 */
+        .bg-masakado::before { background-color: #0000ff !important; }  /* 正門：青 */
+        .bg-suezawa::before { background-color: #ff0000 !important; }   /* 末澤：赤 */
+        .bg-sano::before { background-color: #008000 !important; }      /* 佐野：緑 */
     </style>
 </head>
 <body>
@@ -87,14 +100,14 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバーカラー判定
-        function getBorderClass(text) {
-            if (!text) return "border-group";
-            if (text.includes("小島")) return "border-kojima";
-            if (text.includes("正門")) return "border-masakado";
-            if (text.includes("末澤")) return "border-suezawa";
-            if (text.includes("佐野")) return "border-sano";
-            return "border-group";
+        // メンバーカラー判定クラス名（bg- に変更）
+        function getColorClass(text) {
+            if (!text) return "bg-group";
+            if (text.includes("小島")) return "bg-kojima";
+            if (text.includes("正門")) return "bg-masakado";
+            if (text.includes("末澤")) return "bg-suezawa";
+            if (text.includes("佐野")) return "bg-sano";
+            return "bg-group";
         }
 
         // URLに応じたボタン文字を設定
@@ -160,10 +173,7 @@
                         const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
                         const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
-                        // H列や各種キーからURLを取得（H列に設定されやすい名前を網羅）
-                        const hUrl = item["URL"] || item["url"] || item["リンク"] || item["link"] || item["H列"] || item["h"] || item["URL(H列)"];
-                        
-                        // H列のURLを最優先、なければテキスト内からURLを自動取得
+                        const hUrl = item["URL"] || item["url"] || item["リンク"] || item["link"] || item["H列"];
                         const targetUrl = extractUrl(hUrl) || extractUrl(rawTitle) || extractUrl(detailText) || "";
 
                         let displayTitle = rawTitle;
@@ -189,9 +199,9 @@
                             } catch(e){}
                         }
 
-                        const borderClass = getBorderClass(cleanDetail + displayTitle);
+                        const colorClass = getColorClass(cleanDetail + displayTitle);
                         const div = document.createElement("div");
-                        div.className = `update-item ${borderClass}`;
+                        div.className = `update-item ${colorClass}`;
                         
                         let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br>`;
                         if (displayTitle) {
@@ -202,7 +212,6 @@
                             htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${cleanDetail}</span>`;
                         }
 
-                        // URLが存在していればワンクリックで飛べるボタンを表示
                         if (targetUrl) {
                             const btnText = getLinkButtonText(targetUrl);
                             htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
@@ -240,7 +249,7 @@
                     todayEvents.forEach(item => {
                         const rawTitle = item["タイトル"] || item["title"] || "";
                         const detailText = item["詳細"] || item["detail"] || "";
-                        const borderClass = getBorderClass(detailText + rawTitle);
+                        const colorClass = getColorClass(detailText + rawTitle);
                         
                         let timeStr = "";
                         const timeVal = item["時間"] || item["time"];
@@ -254,7 +263,7 @@
                         }
                         
                         const div = document.createElement("div");
-                        div.className = `today-item ${borderClass}`;
+                        div.className = `today-item ${colorClass}`;
                         div.innerHTML = `<strong>${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText}</span>`;
                         todayList.appendChild(div);
                     });
