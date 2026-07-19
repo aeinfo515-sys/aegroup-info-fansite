@@ -7,15 +7,15 @@
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* 新着情報・今日の予定の枠デザイン（構造を根本から強化） */
+        /* 新着情報・今日の予定の枠デザイン */
         .update-item, .today-item { 
-            position: relative; /* 左線を絶対に潰さないための基準設定 */
-            padding: 12px 15px 12px 22px; /* 左側に少し広めの余白を確保 */
+            position: relative; 
+            padding: 12px 15px 12px 22px; 
             margin-bottom: 12px; 
             background: #f9f9f9; 
             border-radius: 8px; 
             font-size: 0.95rem;
-            overflow: hidden; /* 角丸からはみ出さないように */
+            overflow: hidden; 
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             border: 1px solid #eee;
         }
@@ -27,8 +27,8 @@
             left: 0;
             top: 0;
             bottom: 0;
-            width: 8px; /* 線の太さを8pxに強化して目立たせます */
-            background-color: #ff69b4; /* 基本はAぇ! groupのピンク */
+            width: 8px; 
+            background-color: #ff69b4; 
         }
         
         /* タップしてワンクリックで飛べるピンクのボタン */
@@ -49,12 +49,12 @@
             opacity: 0.9;
         }
         
-        /* 各カラーバーの色（背景色として確実に上書き） */
-        .bg-group::before { background-color: #ff69b4 !important; }     /* グループ：ピンク */
-        .bg-kojima::before { background-color: #800080 !important; }    /* 小島：紫 */
-        .bg-masakado::before { background-color: #0000ff !important; }  /* 正門：青 */
-        .bg-suezawa::before { background-color: #ff0000 !important; }   /* 末澤：赤 */
-        .bg-sano::before { background-color: #008000 !important; }      /* 佐野：緑 */
+        /* 各カラーバーの色 */
+        .bg-group::before { background-color: #ff69b4 !important; }     
+        .bg-kojima::before { background-color: #800080 !important; }    
+        .bg-masakado::before { background-color: #0000ff !important; }  
+        .bg-suezawa::before { background-color: #ff0000 !important; }   
+        .bg-sano::before { background-color: #008000 !important; }      
     </style>
 </head>
 <body>
@@ -100,7 +100,7 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバーカラー判定クラス名（bg- に変更）
+        // メンバーカラー判定クラス名
         function getColorClass(text) {
             if (!text) return "bg-group";
             if (text.includes("小島")) return "bg-kojima";
@@ -113,7 +113,7 @@
         // URLに応じたボタン文字を設定
         function getLinkButtonText(url) {
             if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る 🔗";
-            if (url.includes("instagram.com")) return "📸 Instagramの投稿を見る 🔗";
+            if (url.includes("instagram.com")) return "📸 Instagramを見る 🔗";
             if (url.includes("x.com") || url.includes("twitter.com")) return "🐦 X(旧Twitter)を見る 🔗";
             if (url.includes("youtube.com") || url.includes("youtu.be")) return "📺 YouTubeを見る 🔗";
             if (url.includes("familyclub.jp")) return "✍️ ブログを見る 🔗";
@@ -170,11 +170,15 @@
                     updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
                 } else {
                     updates.slice().reverse().forEach(item => {
+                        // スプレッドシートの各列のデータを取得
                         const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
                         const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
-                        const hUrl = item["URL"] || item["url"] || item["リンク"] || item["link"] || item["H列"];
-                        const targetUrl = extractUrl(hUrl) || extractUrl(rawTitle) || extractUrl(detailText) || "";
+                        // APIから渡ってくる可能性のある「G列」用の様々なキー名でURLをキャッチ
+                        const gUrl = item["リンク"] || item["link"] || item["URL"] || item["url"] || item["G列"] || item["g"];
+                        
+                        // G列のURLを最優先にしつつ、バックアップとしてタイトルや詳細の文字列内からも検索
+                        const targetUrl = extractUrl(gUrl) || extractUrl(rawTitle) || extractUrl(detailText) || "";
 
                         let displayTitle = rawTitle;
                         if (rawTitle.startsWith("http")) {
@@ -199,7 +203,10 @@
                             } catch(e){}
                         }
 
-                        const colorClass = getColorClass(cleanDetail + displayTitle);
+                        // カラー判定には「詳細」や「タイトル」に加えて、送信元のメンバー名が入る「担当」や「メンバー」列などのデータも念のため結合
+                        const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
+                        const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
+                        
                         const div = document.createElement("div");
                         div.className = `update-item ${colorClass}`;
                         
@@ -210,8 +217,11 @@
                         
                         if (cleanDetail && cleanDetail !== displayTitle) {
                             htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${cleanDetail}</span>`;
+                        } else if (memberText && memberText !== displayTitle) {
+                            htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${memberText}</span>`;
                         }
 
+                        // G列などのURLが存在していればボタンをしっかり表示
                         if (targetUrl) {
                             const btnText = getLinkButtonText(targetUrl);
                             htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
@@ -249,7 +259,8 @@
                     todayEvents.forEach(item => {
                         const rawTitle = item["タイトル"] || item["title"] || "";
                         const detailText = item["詳細"] || item["detail"] || "";
-                        const colorClass = getColorClass(detailText + rawTitle);
+                        const memberText = item["担当"] || item["メンバー"] || "";
+                        const colorClass = getColorClass(detailText + rawTitle + memberText);
                         
                         let timeStr = "";
                         const timeVal = item["時間"] || item["time"];
@@ -264,7 +275,7 @@
                         
                         const div = document.createElement("div");
                         div.className = `today-item ${colorClass}`;
-                        div.innerHTML = `<strong>${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText}</span>`;
+                        div.innerHTML = `<strong>${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText || memberText}</span>`;
                         todayList.appendChild(div);
                     });
                 }
