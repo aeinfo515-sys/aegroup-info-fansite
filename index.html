@@ -20,7 +20,7 @@
             border: 1px solid #eee;
         }
         
-        /* 左端のカラーバーを絶対に発色させる設定 */
+        /* 左端のカラーバー設定 */
         .update-item::before, .today-item::before {
             content: "";
             position: absolute;
@@ -94,14 +94,12 @@
     </main>
 
     <script>
-        // いただいた最新のGASのURLに変更しました！
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバーカラー判定クラス名
         function getColorClass(text) {
             if (!text) return "bg-group";
             if (text.includes("小島")) return "bg-kojima";
@@ -111,7 +109,6 @@
             return "bg-group";
         }
 
-        // URLの文字列から見やすいボタン用のテキストを生成
         function getLinkButtonText(url) {
             if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る 🔗";
             if (url.includes("instagram.com")) return "📸 Instagramを見る 🔗";
@@ -122,14 +119,12 @@
             return "🔗 リンクを開く";
         }
 
-        // 文字列からURLを引っこ抜く関数
         function extractUrl(text) {
             if (!text) return null;
             const match = String(text).match(/(https?:\/\/[^\s]+)/);
             return match ? match[0] : null;
         }
 
-        // 「当日」のタイムスタンプデータ（更新情報）かどうか判定する関数
         function checkIsTodayUpdate(item) {
             const timestampVal = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
             
@@ -145,7 +140,6 @@
                 } catch(e){}
             }
 
-            // 「予定外の更新」フラグ判定（手動対応用のバックアップ）
             const val = item["予定外の更新"] ?? item["予定外"] ?? item["更新"] ?? item["isExtra"];
             if (val === true || val === 1) return true;
             if (typeof val === 'string') {
@@ -174,9 +168,17 @@
                         const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
                         const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
-                        // 新しいGASコードによってG列から送られてくる「リンク」などのURLデータをキャッチ
-                        const gUrl = item["リンク"] || item["link"] || item["URL"] || item["url"] || item["G列"] || item["g"];
-                        const targetUrl = extractUrl(gUrl) || extractUrl(rawTitle) || extractUrl(detailText) || "";
+                        // 【超強力修正】項目名に関係なく、データ内にある「http」から始まる文字列をすべて自動探索してURLとして扱う
+                        let targetUrl = "";
+                        for (let key in item) {
+                            if (item.hasOwnProperty(key)) {
+                                const urlCheck = extractUrl(item[key]);
+                                if (urlCheck) {
+                                    targetUrl = urlCheck;
+                                    break; // 見つかったらループ終了
+                                }
+                            }
+                        }
 
                         let displayTitle = rawTitle;
                         if (rawTitle.startsWith("http")) {
@@ -218,7 +220,7 @@
                             htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${memberText}</span>`;
                         }
 
-                        // G列のURLが無事に取得できていれば、ここにピンクのボタンを配置します！
+                        // 自動探索で見つかったURLがあればボタンを100%表示
                         if (targetUrl) {
                             const btnText = getLinkButtonText(targetUrl);
                             htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
