@@ -109,14 +109,9 @@
             return "bg-group";
         }
 
+        // ボタンの文言を「📸 投稿を見る 🔗」に統一しました
         function getLinkButtonText(url) {
-            if (url.includes("instagram.com/stories")) return "📸 インスタストーリーを見る 🔗";
-            if (url.includes("instagram.com")) return "📸 Instagramを見る 🔗";
-            if (url.includes("x.com") || url.includes("twitter.com")) return "🐦 X(旧Twitter)を見る 🔗";
-            if (url.includes("youtube.com") || url.includes("youtu.be")) return "📺 YouTubeを見る 🔗";
-            if (url.includes("familyclub.jp")) return "✍️ ブログを見る 🔗";
-            if (url.includes("tiktok.com")) return "🎵 TikTokを見る 🔗";
-            return "🔗 リンクを開く";
+            return "📸 投稿を見る 🔗";
         }
 
         function extractUrl(text) {
@@ -168,14 +163,13 @@
                         const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
                         const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
-                        // 【超強力修正】項目名に関係なく、データ内にある「http」から始まる文字列をすべて自動探索してURLとして扱う
                         let targetUrl = "";
                         for (let key in item) {
                             if (item.hasOwnProperty(key)) {
                                 const urlCheck = extractUrl(item[key]);
                                 if (urlCheck) {
                                     targetUrl = urlCheck;
-                                    break; // 見つかったらループ終了
+                                    break; 
                                 }
                             }
                         }
@@ -220,7 +214,6 @@
                             htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${memberText}</span>`;
                         }
 
-                        // 自動探索で見つかったURLがあればボタンを100%表示
                         if (targetUrl) {
                             const btnText = getLinkButtonText(targetUrl);
                             htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
