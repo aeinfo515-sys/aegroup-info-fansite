@@ -109,7 +109,6 @@
             return "bg-group";
         }
 
-        // ボタンの文言を「📸 投稿を見る 🔗」に統一しました
         function getLinkButtonText(url) {
             return "📸 投稿を見る 🔗";
         }
@@ -145,6 +144,14 @@
             return false;
         }
 
+        // 日時・時間の値を取得してミリ秒で返すヘルパー関数
+        function getTimeMillis(item) {
+            const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"];
+            if (!timeVal) return 0;
+            const d = new Date(timeVal);
+            return isNaN(d.getTime()) ? 0 : d.getTime();
+        }
+
         async function loadHomeData() {
             try {
                 const response = await fetch(CAL_API_URL);
@@ -156,10 +163,13 @@
 
                 const updates = data.filter(item => checkIsTodayUpdate(item));
 
+                // 💡 更新情報を【新しい時間順（降順：最新が一番上）】にソート
+                updates.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
+
                 if (updates.length === 0) {
                     updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
                 } else {
-                    updates.slice().reverse().forEach(item => {
+                    updates.forEach(item => {
                         const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
                         const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
                         
@@ -244,6 +254,9 @@
                         return false;
                     }
                 });
+
+                // 💡 今日の予定を【早い時間順（昇順：朝〜夜）】にソート
+                todayEvents.sort((a, b) => getTimeMillis(a) - getTimeMillis(b));
 
                 if (todayEvents.length === 0) {
                     todayList.innerHTML = "<p style='color:#777;'>今日の予定はありません</p>";
