@@ -1,133 +1,319 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <title>Schedule - Aぇ! group Info</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css?v=100">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<meta charset="UTF-8">
+<title>スケジュール - Aぇ! group info</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+<style>
+.fc-event { border: none !important; padding: 2px 4px !important; font-size: 0.75rem !important; font-weight: bold !important; border-radius: 3px !important; cursor: pointer; }
+.cal-group { background-color: #ff69b4 !important; color: #fff !important; }
+.cal-kojima { background-color: #800080 !important; color: #fff !important; }
+.cal-masakado { background-color: #0000ff !important; color: #fff !important; }
+.cal-suezawa { background-color: #ff0000 !important; color: #fff !important; }
+.cal-sano { background-color: #008000 !important; color: #fff !important; }
+
+/* ⬇️ 追加した検索エリアのスタイル */
+.search-container {
+    max-width: 900px;
+    margin: 15px auto 5px;
+    padding: 0 10px;
+    display: flex;
+    justify-content: center;
+}
+.search-box {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+}
+.search-box i.fa-magnifying-glass {
+    position: absolute;
+    left: 12px;
+    color: #888;
+    font-size: 0.9rem;
+}
+.search-input {
+    width: 100%;
+    padding: 8px 35px 8px 35px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.search-input:focus {
+    border-color: #ff69b4;
+    box-shadow: 0 0 5px rgba(255, 105, 180, 0.4);
+}
+.clear-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: none;
+}
+.clear-btn:hover {
+    color: #555;
+}
+
+/* ⬇️ PC・スマホ両方で、画面中央に綺麗にポップアップを表示する設定 */
+.modal {display: none;position: fixed;z-index: 1000;left: 0;top: 0;width: 100%;height: 100%;background-color: rgba(0,0,0,0.4);
+display: none; /* JSで制御 */
+justify-content: center;
+align-items: center;
+}
+/* ⬇️ PCでもスマホでも、はみ出た予定が100%スクロールできるようになる枠の設定 */
+.modal-content {background-color: #fff;
+width: 90%;max-width: 350px;
+padding: 20px;border-radius: 12px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+position: relative;
+/* 画面全体の高さの最大70%までに枠を制限 */
+max-height: 70vh;
+/* 縦に中身がはみ出したら、自動で枠内にスクロールバーを出す */
+overflow-y: auto;-webkit-overflow-scrolling: touch; /* スマホ用 */
+}
+.close-btn { position: absolute; right: 15px; top: 10px; font-size: 24px; cursor: pointer; color: #aaa; }
+.modal-item { padding: 8px 10px; margin-bottom: 8px; border-left: 5px solid #ccc; background: #f9f9f9; border-radius: 4px; font-size: 0.9rem; }
+</style>
 </head>
 <body>
 
-    <header class="hero">
-        <h1>Aぇ! group Info</h1>
-        <p>インフォメーションサイト(非公式)</p>
-        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-    </header>
+<header class="hero">
+<h1>Aぇ! group Info</h1>
+<p>インフォメーションサイト(非公式)</p>
+<button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+</header>
 
-    <nav class="tabs" id="navTabs">
-        <a href="index.html">🏠 Home</a>
-        <a href="updates.html">🆕 更新情報の振り返り</a>
-        <a href="schedule.html" class="active">📅 Schedule</a>
+<nav class="tabs" id="navTabs">
+        <a href="index.html" class="active">🏠 Home</a>
+        <a href="updates.html">🆕 過去更新情報</a>
+        <a href="schedule.html">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
-        <a href="works.html">🎬 出演作品・SNS</a>
-        <a href="sns.html">📱 SNS</a>
+        <a href="works.html">🎬 出演作品</a>
+        <a href="sns.html">📱 公式SNS</a>
         <a href="tickets.html">🎫 Tickets</a>
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
-        <!-- 🔍 絞り込み検索欄 -->
-        <section class="search-container">
-            <div class="search-title"><i class="fa-solid fa-filter"></i> スケジュール絞り込み</div>
-            <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" value="Aぇ! group" onchange="renderCalendar()"> Aぇ! group</label>
-                <label class="checkbox-label"><input type="checkbox" value="正門" onchange="renderCalendar()"> 正門</label>
-                <label class="checkbox-label"><input type="checkbox" value="末澤" onchange="renderCalendar()"> 末澤</label>
-                <label class="checkbox-label"><input type="checkbox" value="小島" onchange="renderCalendar()"> 小島</label>
-                <label class="checkbox-label"><input type="checkbox" value="佐野" onchange="renderCalendar()"> 佐野</label>
-            </div>
-            <div class="filter-inputs">
-                <input type="text" id="keywordInput" class="search-input-text" onkeyup="renderCalendar()" placeholder="キーワードを入力...">
-                <input type="month" id="monthInput" class="search-input-month" onchange="renderCalendar()">
-            </div>
-        </section>
+<!-- ⬇️ 検索エリアの追加 -->
+<div class="search-container">
+  <div class="search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="searchInput" class="search-input" placeholder="予定・メンバー名などで検索..." oninput="handleSearchInput()">
+    <button id="clearBtn" class="clear-btn" onclick="clearSearch()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+</div>
 
-        <section class="card">
-            <h2>📅 スケジュール カレンダー</h2>
-            <div id="calendarArea">🔑 読み込み中...</div>
-        </section>
-    </main>
+<main class="calendar-container">
+<div id="calendar"></div>
+</main>
 
-    <script>
-        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
-        let rawEvents = [];
+<div id="dayModal" class="modal" onclick="if(event.target == this) closeModal()">
+<div class="modal-content">
+<span class="close-btn" onclick="closeModal()">&times;</span>
+<h3 id="modalDate" style="margin-top:0; border-bottom:2px solid #ff69b4; padding-bottom:5px; color:#ff69b4;"></h3>
+<div id="modalList"></div>
+</div>
+</div>
 
-        function toggleMenu() { document.getElementById("navTabs").classList.toggle("show"); }
+<script>
+const CAL_API_URL = "https://script.google.com/macros/s/AKfycbzh2IgijNSLHz9nx4D9iXfwnC4F0EhboOY8NaDJubK0btcUq9oTi193NXz2Aome2Io5iA/exec";
+let rawEvents = [];
+let calendar = null; // カレンダーインスタンスをグローバル保持
 
-        function renderCalendar() {
-            const monthVal = document.getElementById("monthInput").value;
-            let targetDate = monthVal ? new Date(monthVal + "-01") : new Date();
-            
-            const year = targetDate.getFullYear();
-            const month = targetDate.getMonth();
+function toggleMenu() {
+    document.getElementById("navTabs").classList.toggle("show");
+}
 
-            const firstDay = new Date(year, month, 1).getDay();
-            const lastDate = new Date(year, month + 1, 0).getDate();
+function getCalClass(text) {
+    if (text.includes("Aぇ! group")) return "cal-group";
+    if (text.includes("小島")) return "cal-kojima";
+    if (text.includes("正門")) return "cal-masakado";
+    if (text.includes("末澤")) return "cal-suezawa";
+    if (text.includes("佐野")) return "cal-sano";
+    return "";
+}
 
-            const checkedMembers = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
-            const keyword = document.getElementById("keywordInput").value.toLowerCase();
+function getBorderColor(text) {
+    if (text.includes("Aぇ! group")) return "#ff69b4";
+    if (text.includes("小島")) return "#800080";
+    if (text.includes("正門")) return "#0000ff";
+    if (text.includes("末澤")) return "#ff0000";
+    if (text.includes("佐野")) return "#008000";
+    return "#ccc";
+}
 
-            let html = `<h3 style="text-align:center; color:#ff69b4; margin-top:0;">${year}年${month + 1}月</h3>`;
-            html += `<table class="calendar-table"><thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead><tbody><tr>`;
+async function fetchWithCache() {
+    const cacheKey = 'aegroup_cal_data';
+    const cacheTimeKey = 'aegroup_cal_time';
+    const cachedData = localStorage.getItem(cacheKey);
+    const cachedTime = localStorage.getItem(cacheTimeKey);
+    const now = Date.now();
+    if (cachedData && cachedTime && (now - cachedTime < 10 * 60 * 1000)) {
+        return JSON.parse(cachedData);
+    }
+    const response = await fetch(CAL_API_URL);
+    const data = await response.json();
+    localStorage.setItem(cacheKey, JSON.stringify(data));
+    localStorage.setItem(cacheTimeKey, now.toString());
+    return data;
+}
 
-            for (let i = 0; i < firstDay; i++) { html += `<td></td>`; }
-
-            let currentDay = 1;
-            let dayOfWeek = firstDay;
-
-            while (currentDay <= lastDate) {
-                if (dayOfWeek === 0 && currentDay !== 1) { html += `<tr>`; }
-
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
-                
-                // 該当日のイベント抽出
-                const dayEvents = rawEvents.filter(e => {
-                    const d = new Date(e["日付"] || e["date"]);
-                    if (isNaN(d.getTime())) return false;
-                    const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-                    if (itemDate !== dateStr) return false;
-
-                    const str = JSON.stringify(e).toLowerCase();
-                    if (checkedMembers.length > 0 && !checkedMembers.some(m => str.includes(m.toLowerCase()))) return false;
-                    if (keyword && !str.includes(keyword)) return false;
-                    return true;
-                });
-
-                html += `<td><div class="calendar-day-num">${currentDay}</div>`;
-                dayEvents.forEach(e => {
-                    const title = e["タイトル"] || e["title"] || "";
-                    let bg = "#ff69b4";
-                    if (title.includes("正門")) bg = "#0000ff";
-                    if (title.includes("末澤")) bg = "#ff0000";
-                    if (title.includes("小島")) bg = "#800080";
-                    if (title.includes("佐野")) bg = "#008000";
-                    html += `<span class="calendar-event-tag" style="background:${bg};">${title}</span>`;
-                });
-                html += `</td>`;
-
-                dayOfWeek++;
-                if (dayOfWeek === 7) { html += `</tr>`; dayOfWeek = 0; }
-                currentDay++;
-            }
-
-            while (dayOfWeek > 0 && dayOfWeek < 7) { html += `<td></td>`; dayOfWeek++; }
-            if (dayOfWeek === 0) html += `</tr>`;
-
-            html += `</tbody></table>`;
-            document.getElementById("calendarArea").innerHTML = html;
-        }
-
-        async function loadCalendarData() {
+document.addEventListener('DOMContentLoaded', async function() {
+    const calendarEl = document.getElementById('calendar');
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ja',
+        headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+        displayEventTime: false,
+        height: 'auto',
+        dateClick: function(info) { showDayEvents(info.dateStr); },
+        events: async function(info, successCallback, failureCallback) {
             try {
-                const response = await fetch(CAL_API_URL);
-                rawEvents = await response.json();
-                const now = new Date();
-                document.getElementById("monthInput").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-                renderCalendar();
-            } catch(e) { console.error(e); }
+                if (rawEvents.length === 0) {
+                    const data = await fetchWithCache();
+                    rawEvents = data.filter(item => !item["予定外の更新"]);
+                }
+                
+                // 検索キーワードの取得
+                const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+                const events = rawEvents.map(item => {
+                    if(!item["日付"] || String(item["日付"]).includes("1899")) return null;
+                    
+                    const title = item["タイトル"] || "";
+                    const detail = item["詳細"] || "";
+                    const matchText = detail + title;
+
+                    // 検索キーワードが含まれているか判定
+                    if (keyword !== "") {
+                        const fullContent = (title + " " + detail).toLowerCase();
+                        if (!fullContent.includes(keyword)) {
+                            return null;
+                        }
+                    }
+
+                    const d = new Date(item["日付"]);
+                    const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                    return {
+                        title: title,
+                        start: dateStr,
+                        className: getCalClass(matchText)
+                    };
+                }).filter(e => e !== null);
+
+                successCallback(events);
+            } catch (e) {
+                failureCallback(e);
+            }
         }
-        document.addEventListener('DOMContentLoaded', loadCalendarData);
-    </script>
+    });
+    calendar.render();
+});
+
+// ⬇️ 検索入力時の処理
+function handleSearchInput() {
+    const input = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('clearBtn');
+    
+    // クリアボタンの表示切替
+    clearBtn.style.display = input.value.length > 0 ? 'block' : 'none';
+    
+    // カレンダーのイベントを再取得・再描画
+    if (calendar) {
+        calendar.refetchEvents();
+    }
+}
+
+// ⬇️ 検索クリア処理
+function clearSearch() {
+    const input = document.getElementById('searchInput');
+    input.value = '';
+    handleSearchInput();
+}
+
+function showDayEvents(dateStr) {
+    const modal = document.getElementById("dayModal");
+    const modalDate = document.getElementById("modalDate");
+    const modalList = document.getElementById("modalList");
+    const parts = dateStr.split("-");
+    modalDate.innerText = `${parseInt(parts[1])}月${parseInt(parts[2])}日の予定`;
+    modalList.innerHTML = "";
+
+    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+    let dayItems = rawEvents.filter(item => {
+        if(!item["日付"]) return false;
+        const d = new Date(item["日付"]);
+        const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        
+        // 日付の一致判定
+        if (itemDate !== dateStr) return false;
+
+        // 検索キーワードの判定（モーダル内にも反映）
+        if (keyword !== "") {
+            const title = item["タイトル"] || "";
+            const detail = item["詳細"] || "";
+            const fullContent = (title + " " + detail).toLowerCase();
+            return fullContent.includes(keyword);
+        }
+
+        return true;
+    });
+
+    // 1日の詳細だけ時間順に並べる
+    dayItems.sort((a, b) => {
+        let timeA = "23:59";
+        let timeB = "23:59";
+        if (a["時間"] && String(a["時間"]).includes("T")) {
+            const tdA = new Date(a["時間"]);
+            timeA = String(tdA.getHours()).padStart(2, "0") + ":" + String(tdA.getMinutes()).padStart(2, "0");
+        }
+        if (b["時間"] && String(b["時間"]).includes("T")) {
+            const tdB = new Date(b["時間"]);
+            timeB = String(tdB.getHours()).padStart(2, "0") + ":" + String(tdB.getMinutes()).padStart(2, "0");
+        }
+        return timeA.localeCompare(timeB);
+    });
+
+    if (dayItems.length === 0) {
+        modalList.innerHTML = "<p style='color:#777;'>該当する予定はありません</p>";
+    } else {
+        dayItems.forEach(item => {
+            let timeStr = "";
+            if (item["時間"] && String(item["時間"]).includes("T")) {
+                const td = new Date(item["時間"]);
+                const h = String(td.getHours()).padStart(2, "0");
+                const m = String(td.getMinutes()).padStart(2, "0");
+                if (!(h === "00" && m === "00")) timeStr = `⏰ ${h}:${m} `;
+            }
+            const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
+            const borderCol = getBorderColor(matchText);
+            const div = document.createElement("div");
+            div.className = "modal-item";
+            div.style.borderLeftColor = borderCol;
+            div.innerHTML = `<strong>${timeStr}${item["タイトル"]}</strong><br><span style='font-size:0.8rem;color:#666;'>${item["詳細"] || ""}</span>`;
+            modalList.appendChild(div);
+        });
+    }
+
+    // flexを使って表示
+    modal.style.display = "flex";
+    // モーダルを開いた時に一番上にスクロール位置をリセット
+    document.querySelector('.modal-content').scrollTop = 0;
+}
+
+function closeModal() { document.getElementById("dayModal").style.display = "none"; }
+</script>
 </body>
 </html>
