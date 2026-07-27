@@ -1,31 +1,241 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NPHVYVNK6L');
+    </script>
+
     <meta charset="UTF-8">
-    <title>リクエスト・募集 - Aぇ! group Info</title>
+    <title>リクエスト・募集 - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css?v=100">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .request-section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin: 25px 0 12px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #ff69b4;
+        }
+
+        .request-item { 
+            position: relative; 
+            padding: 14px 16px; 
+            padding-left: 22px;
+            margin-bottom: 12px; 
+            background: #f9f9f9; 
+            border-radius: 8px; 
+            font-size: 0.95rem;
+            overflow: hidden; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        
+        .request-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px; 
+            background-color: #ff69b4; 
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #eee;
+            color: #555;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .req-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 14px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+        .req-link-btn:hover {
+            background-color: #ff1493;
+            opacity: 0.9;
+        }
+        .req-link-btn.btn-mail { background-color: #4a5568; }
+        .req-link-btn.btn-mail:hover { background-color: #2d3748; }
+        .req-link-btn.btn-usen { background-color: #1ba1e2; }
+        .req-link-btn.btn-usen:hover { background-color: #0088cc; }
+
+        .theme-list {
+            margin: 8px 0;
+            padding-left: 20px;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        .theme-list li {
+            margin-bottom: 4px;
+        }
+
+        /* メンバーカラーバー */
+        .bg-group::before { background-color: #ff69b4 !important; }     
+        .bg-kojima::before { background-color: #800080 !important; }    
+    </style>
 </head>
 <body>
-    <header class="hero"><h1>Aぇ! group Info</h1><p>インフォメーションサイト(非公式)</p><button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button></header>
-   <nav class="tabs" id="navTabs">
-        <a href="index.html" class="active">🏠 Home</a>
+
+    <header class="hero">
+        <h1>Aぇ! group Info</h1>
+        <p>インフォメーションサイト(非公式)</p>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <nav class="tabs" id="navTabs">
+        <a href="index.html">🏠 Home</a>
         <a href="updates.html">🆕 過去更新情報</a>
         <a href="schedule.html">📅 Schedule</a>
-        <a href="requests.html">✉️ リクエスト・募集</a>
+        <a href="requests.html" class="active">✉️ リクエスト・募集</a>
         <a href="works.html">🎬 出演作品</a>
         <a href="sns.html">📱 公式SNS</a>
         <a href="tickets.html">🎫 Tickets</a>
         <a href="members.html">👤 Members</a>
     </nav>
-    
-    <main style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         <section class="card">
-            <h2>✉️ リクエスト・情報提供募集</h2>
-            <p style="line-height:1.6; color:#444;">掲載情報の不備や追加情報のリクエストはこちらから受け付けております。</p>
+            <h2>✉️ メッセージ・楽曲リクエスト集</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">
+                レギュラー番組へのメッセージ募集や、音楽番組・楽曲リクエストの公式フォーム一覧です。
+            </p>
+
+            <!-- 📻 ラジオ・レギュラー番組 -->
+            <div class="request-section-title">📻 ラジオ & 📺 レギュラー番組 募集</div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">📻 MBSラジオ</span><br>
+                <strong>MBSヤングタウン（ヤンタン）</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! group（水曜日担当）</span>
+                <div class="btn-group">
+                    <a href="mailto:ys@mbs1179.com" class="req-link-btn btn-mail"><i class="fa-solid fa-envelope"></i> メールを送る (ys@mbs1179.com)</a>
+                </div>
+            </div>
+
+            <div class="request-item bg-kojima">
+                <span class="category-badge">📻 FM大阪</span><br>
+                <strong>ラジキング</strong><br>
+                <span style="font-size:0.85rem; color:#666;">小島健</span>
+                <ul class="theme-list">
+                    <li>8/19 面接で答える長所🧑‍💼😏</li>
+                    <li>8/26 妄想❤️恋愛( ᵕ̤ ‧̫̮ ᵕ̤ )✧*.💭</li>
+                    <li>9/2 最近、笑ったこと😆</li>
+                </ul>
+                <div class="btn-group">
+                    <a href="https://fmosaka.futureartist.net/enquete/355621" target="_blank" rel="noopener noreferrer" class="req-link-btn">✉️ メッセージフォーム</a>
+                </div>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">📺 フジテレビ</span><br>
+                <strong>Q&Aぇ!</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! group</span>
+                <div class="btn-group">
+                    <a href="https://s1.fujitv.co.jp/safe/qandae/examine/form.html?_ga=2.221898264.1665782951.1785169749-100090431.1778572249" target="_blank" rel="noopener noreferrer" class="req-link-btn">❓ 「Q」大募集フォーム</a>
+                    <a href="https://s1.fujitv.co.jp/safe/qandae/wanganfes/form.html?_ga=2.210488725.1665782951.1785169749-100090431.1778572249" target="_blank" rel="noopener noreferrer" class="req-link-btn">🎪 WANGANフェス 質問フォーム</a>
+                </div>
+            </div>
+
+            <!-- 🎧 推し活・楽曲リクエスト -->
+            <div class="request-section-title">🎧 USEN 推し活リクエスト</div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">🎵 USEN</span><br>
+                <strong>USEN 推し活リクエスト（Aぇ! group）</strong>
+                <div class="btn-group">
+                    <a href="https://usen.oshireq.com/artist/983216" target="_blank" rel="noopener noreferrer" class="req-link-btn btn-usen"><i class="fa-solid fa-music"></i> Aぇ! group ページへ</a>
+                </div>
+            </div>
+
+            <!-- 🎵 音楽番組 リクエスト -->
+            <div class="request-section-title">🎵 音楽番組 出演・楽曲リクエスト</div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">テレビ朝日</span><br>
+                <strong>ミュージックステーション (Mステ)</strong>
+                <div class="btn-group">
+                    <a href="https://form.tv-asahi.co.jp/apps/apply/post.php?fid=8139" target="_blank" rel="noopener noreferrer" class="req-link-btn">✉️ ご意見・リクエスト</a>
+                </div>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">TBS</span><br>
+                <strong>CDTVライブ！ライブ！</strong>
+                <div class="btn-group">
+                    <a href="https://cgi.tbs.co.jp/ppshw/pc/contact/4945/enquete.do" target="_blank" rel="noopener noreferrer" class="req-link-btn">✉️ リクエストフォーム</a>
+                </div>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">フジテレビ</span><br>
+                <strong>MUSIC FAIR</strong>
+                <div class="btn-group">
+                    <a href="https://wwws.fujitv.co.jp/ap2/safe/resp/PcWrite?bancode=198000031&type=resprg" target="_blank" rel="noopener noreferrer" class="req-link-btn">✉️ メッセージ・リクエスト</a>
+                </div>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">NHK</span><br>
+                <strong>うたであえたら</strong>
+                <div class="btn-group">
+                    <a href="https://forms.nhk.jp/jfe/form/SV_bao8VqfJBTm2itE" target="_blank" rel="noopener noreferrer" class="req-link-btn">✉️ メッセージフォーム</a>
+                </div>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">NHK</span><br>
+                <strong>Venue101</strong>
+                <div class="btn-group">
+                    <a href="https://www.nhk.or.jp/css/form/" target="_blank" rel="noopener noreferrer" class="req-link-btn">✉️ ご意見・お問い合わせ</a>
+                </div>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">フジテレビ</span><br>
+                <strong>週刊ナイナイミュージック</strong>
+                <div class="btn-group">
+                    <a href="https://wwws.fujitv.co.jp/ap2/safe/resp/PcWrite?bancode=423000009&type=resprg" target="_blank" rel="noopener noreferrer" class="req-link-btn">✉️ メッセージ・リクエスト</a>
+                </div>
+            </div>
+
         </section>
     </main>
-    <script>function toggleMenu() { document.getElementById("navTabs").classList.toggle("show"); }</script>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
+        }
+    </script>
 </body>
 </html>
