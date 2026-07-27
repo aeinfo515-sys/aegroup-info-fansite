@@ -56,33 +56,74 @@
             opacity: 0.9;
         }
         
-        /* 日付検索フィルターの枠 */
-        .filter-card {
+        /* 🔍 多機能検索フィルターエリア */
+        .search-card {
             background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             margin-bottom: 20px;
-            border: 1px solid #eee;
+            border: 1px solid #eaeaea;
         }
-        .filter-group {
+
+        .filter-row {
+            margin-bottom: 12px;
+        }
+
+        .filter-label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        /* メンバーチェックボックス */
+        .member-checkboxes {
             display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .member-checkboxes label {
+            display: inline-flex;
             align-items: center;
+            gap: 4px;
+            font-size: 0.85rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background: #f8f8f8;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+        }
+
+        .member-checkboxes input[type="checkbox"] {
+            accent-color: #ff69b4;
+        }
+
+        /* 検索入力欄・日付 */
+        .input-group {
+            display: flex;
             gap: 10px;
             flex-wrap: wrap;
         }
-        .filter-group label {
-            font-size: 0.9rem;
-            font-weight: bold;
-            color: #555;
-        }
-        .filter-group input[type="date"] {
+
+        .search-input, .date-input {
             padding: 8px 12px;
             border: 1px solid #ccc;
             border-radius: 6px;
             font-size: 0.9rem;
             outline: none;
+            flex: 1;
+            min-width: 150px;
         }
+
+        .search-input:focus, .date-input:focus {
+            border-color: #ff69b4;
+        }
+
         .reset-btn {
             padding: 8px 14px;
             background-color: #888;
@@ -90,10 +131,13 @@
             border: none;
             border-radius: 6px;
             font-size: 0.85rem;
+            font-weight: bold;
             cursor: pointer;
+            transition: background 0.2s;
         }
         .reset-btn:hover { background-color: #666; }
 
+        /* カラーバー */
         .bg-group::before { background-color: #ff69b4 !important; }     
         .bg-kojima::before { background-color: #800080 !important; }    
         .bg-masakado::before { background-color: #0000ff !important; }  
@@ -121,18 +165,34 @@
     </nav>
 
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
-        <!-- 日付絞り込みエリア -->
-        <section class="filter-card">
-            <div class="filter-group">
-                <label for="datePicker">📅 日付で絞り込み：</label>
-                <input type="date" id="datePicker" onchange="filterByDate()">
-                <button class="reset-btn" onclick="resetFilter()">全期間表示</button>
+        <!-- 🔍 絞り込み検索エリア -->
+        <section class="search-card">
+            <!-- メンバーフィルター -->
+            <div class="filter-row">
+                <span class="filter-label">👤 メンバー絞り込み：</span>
+                <div class="member-checkboxes">
+                    <label><input type="checkbox" value="グループ" class="member-filter" onchange="applyFilters()"> 💖 全員/グループ</label>
+                    <label><input type="checkbox" value="正門" class="member-filter" onchange="applyFilters()"> 💙 正門良規</label>
+                    <label><input type="checkbox" value="末澤" class="member-filter" onchange="applyFilters()"> ❤️ 末澤誠也</label>
+                    <label><input type="checkbox" value="小島" class="member-filter" onchange="applyFilters()"> 💜 小島健</label>
+                    <label><input type="checkbox" value="佐野" class="member-filter" onchange="applyFilters()"> 💚 佐野晶哉</label>
+                </div>
+            </div>
+
+            <!-- キーワード & 日付入力 -->
+            <div class="filter-row" style="margin-bottom:0;">
+                <span class="filter-label">🔍 キーワード & 📅 日付検索：</span>
+                <div class="input-group">
+                    <input type="text" id="keywordInput" class="search-input" placeholder="キーワード（番組名・TV・雑誌など）" oninput="applyFilters()">
+                    <input type="date" id="dateInput" class="date-input" onchange="applyFilters()">
+                    <button class="reset-btn" onclick="resetFilters()">リセット</button>
+                </div>
             </div>
         </section>
 
         <!-- 更新情報一覧 -->
         <section class="card">
-            <h2 id="pageTitle">🆕 過去の更新情報</h2>
+            <h2>🆕 過去の更新情報</h2>
             <div id="updateList">🔑 読み込み中...</div>
         </section>
     </main>
@@ -167,7 +227,6 @@
             return isNaN(d.getTime()) ? 0 : d.getTime();
         }
 
-        // 日付形式 YYYY-MM-DD を判定・取得
         function getItemDateStr(item) {
             const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["日付"];
             if (!timeVal) return null;
@@ -181,12 +240,10 @@
                 const response = await fetch(CAL_API_URL);
                 const data = await response.json();
 
-                // タイムスタンプや更新フラグがあるもの（更新データ）を抽出
                 allUpdatesData = data.filter(item => {
                     return item["タイムスタンプ"] || item["Timestamp"] || item["予定外の更新"] || item["予定外"] || item["更新"];
                 });
 
-                // 最新順（降順）に並び替え
                 allUpdatesData.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
 
                 renderUpdates(allUpdatesData);
@@ -271,24 +328,50 @@
             });
         }
 
-        // 日付で絞り込み
-        function filterByDate() {
-            const selectedDate = document.getElementById("datePicker").value; // YYYY-MM-DD
-            if (!selectedDate) {
-                renderUpdates(allUpdatesData);
-                return;
-            }
+        // 🔍 多機能絞り込み処理（メンバー・キーワード・日付）
+        function applyFilters() {
+            // 1. チェックされたメンバーを取得
+            const checkedMembers = Array.from(document.querySelectorAll('.member-filter:checked')).map(cb => cb.value);
+            
+            // 2. 入力されたキーワード
+            const keyword = document.getElementById("keywordInput").value.trim().toLowerCase();
+            
+            // 3. 選択された日付
+            const selectedDate = document.getElementById("dateInput").value;
 
             const filtered = allUpdatesData.filter(item => {
-                return getItemDateStr(item) === selectedDate;
+                const title = String(item["タイトル"] || item["title"] || "").toLowerCase();
+                const detail = String(item["詳細"] || item["detail"] || "").toLowerCase();
+                const member = String(item["担当"] || item["メンバー"] || item["出演者"] || "").toLowerCase();
+                const fullText = title + detail + member;
+
+                // メンバー判定（チェックがある場合のみ絞り込み）
+                if (checkedMembers.length > 0) {
+                    const matchMember = checkedMembers.some(m => fullText.includes(m.toLowerCase()));
+                    if (!matchMember) return false;
+                }
+
+                // キーワード判定
+                if (keyword && !fullText.includes(keyword)) {
+                    return false;
+                }
+
+                // 日付判定
+                if (selectedDate && getItemDateStr(item) !== selectedDate) {
+                    return false;
+                }
+
+                return true;
             });
 
             renderUpdates(filtered);
         }
 
-        // フィルター解除
-        function resetFilter() {
-            document.getElementById("datePicker").value = "";
+        // 🔄 フィルターリセット
+        function resetFilters() {
+            document.querySelectorAll('.member-filter').forEach(cb => cb.checked = false);
+            document.getElementById("keywordInput").value = "";
+            document.getElementById("dateInput").value = "";
             renderUpdates(allUpdatesData);
         }
 
