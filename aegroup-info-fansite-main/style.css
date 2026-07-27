@@ -1,138 +1,163 @@
-/* ==========================================
-   🌈 ヘッダー：共通の鮮やかな4人グラデーション
-   ========================================== */
-.hero {
-    background: linear-gradient(90deg, #800080 0%, #0000ff 33%, #ff0000 66%, #008000 100%) !important;
-    color: white !important;
-    text-align: center !important;
-    padding: 30px 20px !important;
-    text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
-    position: relative !important;
+/* --- 全体設定 --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
-    background-color: #fff0f5 !important; 
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow-x: hidden; /* メニューが右から出るときの横スクロールを防ぐ */
+    font-family: "Helvetica Neue", Arial, "平和角ゴ Pro W3", "Hiragino Kaku Gothic Pro", Osaka, メイリオ, Meiryo, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f9f9f9;
 }
 
-/* 🎫 パソコン版のタブボタン（横並び） */
-.tabs {
-    display: flex !important;
-    justify-content: center !important;
-    background: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-    padding: 10px !important;
-    gap: 8px !important;
-}
-.tabs a {
-    display: inline-block !important;
-    padding: 10px 20px !important;
-    text-decoration: none !important;
-    color: #555 !important;
-    border-radius: 20px !important;
-    font-size: 0.9rem !important;
-    font-weight: bold !important;
-    background: #fff0f5 !important;
-    border: 1px solid #ffb6c1 !important;
-}
-.tabs a.active, .tabs a:hover {
-    background: #ff69b4 !important;
-    color: #ffffff !important;
-    border-color: #ff69b4 !important;
+/* --- ヘッダー・ナビゲーション --- */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #111;
+    color: #fff;
+    padding: 15px 5%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
-/* 📱 スマホ用メニューボタン（ハンバーガー） */
-.menu-trigger {
+.logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+nav ul {
+    display: flex;
+    list-style: none;
+    gap: 20px;
+}
+
+nav a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: opacity 0.3s;
+}
+
+nav a:hover {
+    opacity: 0.7;
+}
+
+/* スマホ用ハンバーガーボタン */
+.hamburger {
     display: none;
-    position: absolute;
-    top: 25px;
-    right: 20px;
-    font-size: 1.5rem;
-    color: white;
-    background: rgba(0,0,0,0.3);
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
+    flex-direction: column;
     cursor: pointer;
-    z-index: 1001;
+    gap: 5px;
 }
 
-/* ==========================================
-   📱 スマホ版：右からヌッと出てくるメニュー（ドロワー）
-   ========================================== */
-@media (max-width: 600px) {
-    .menu-trigger { display: block !important; }
-    
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+/* --- メインコンテンツ --- */
+main {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.hero {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    color: #111;
+}
+
+/* タブ・ボタン関連 */
+.tabs-container {
+    text-align: center;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.tabs a.tab-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #e60012; /* テーマカラー */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.tabs a.tab-btn:hover {
+    background-color: #cc0010;
+    transform: translateY(-2px);
+}
+
+/* --- フッター --- */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #222;
+    color: #888;
+    margin-top: 50px;
+    font-size: 0.85rem;
+}
+
+/* --- スマホ表示用メディアクエリ (幅768px以下) --- */
+@media screen and (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+
+    nav {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #111;
+        display: none; /* JSで開閉切り替え */
+        padding: 20px 0;
+    }
+
+    nav.active {
+        display: block;
+    }
+
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
     .tabs {
-        display: flex !important;
-        flex-direction: column !important;
-        position: fixed !important;
-        top: 0 !important;
-        right: -250px !important; /* 最初は画面の右外側に隠す */
-        width: 250px !important;
-        height: 100vh !important;
-        box-sizing: border-box !important;
-        background: #ffffff !important;
-        padding: 70px 20px 20px 20px !important;
-        box-shadow: -4px 0 12px rgba(0,0,0,0.1) !important;
-        z-index: 1000 !important;
-        transition: right 0.3s ease !important; /* なめらかに動かす */
-        gap: 12px !important;
-        justify-content: flex-start !important;
+        flex-direction: column;
     }
-    
-    .tabs.show {
-        right: 0 !important;
-    }
-    
-    .tabs a {
+
+    .tabs a.tab-btn {
         width: 100% !important;
         box-sizing: border-box !important;
         padding: 12px !important;
         border-radius: 10px !important;
-        text-align: left !important;
+        text-align: center !important;
     }
 }
-
-/* ✨ 共通カードデザイン */
-main, .calendar-container { max-width: 800px !important; margin: 20px auto !important; padding: 0 15px !important; }
-.card, .member-card, .sns-card, .ticket-card, #calendar, .schedule-section {
-    background: #ffffff !important;
-    border-radius: 12px !important;
-    padding: 20px !important;
-    margin-bottom: 20px !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
-    border: 1px solid #ffb6c1 !important;
-}
-
-h2, .section-title {
-    font-size: 1.2rem !important;
-    border-bottom: 2px solid #ff69b4 !important;
-    padding-bottom: 6px !important;
-    margin-top: 0 !important;
-    margin-bottom: 15px !important;
-    color: #ff69b4 !important;
-}
-
-/* ⏱️ 更新情報のカードデザイン（気になる線と点を完全に消しました！） */
-.timeline-container { margin-top: 15px; }
-.timeline-item { position: relative; margin-bottom: 15px; background: #fff5f7; padding: 15px; border-radius: 8px; border-left: 6px solid #ff69b4; }
-.update-time { font-size: 0.75rem; font-weight: bold; display: block; margin-bottom: 5px; }
-
-/* メンカラ設定（Membersページ・ポップアップ用） */
-.border-masakado { border: 2px solid #0000ff !important; border-left: 8px solid #0000ff !important; }
-.text-masakado { color: #0000ff !important; }
-.border-suezawa { border: 2px solid #ff0000 !important; border-left: 8px solid #ff0000 !important; }
-.text-suezawa { color: #ff0000 !important; }
-.border-kojima { border: 2px solid #800080 !important; border-left: 8px solid #800080 !important; }
-.text-kojima { color: #800080 !important; }
-.border-sano { border: 2px solid #008000 !important; border-left: 8px solid #008000 !important; }
-.text-sano { color: #008000 !important; }
-
-/* メンバーSNSリンクボタン */
-.member-links { margin-top: 10px; display: flex; gap: 12px; }
-.member-links a { text-decoration: none; font-size: 1.2rem; padding: 5px 10px; border-radius: 5px; background: #f0f0f0; color: #333; font-weight: bold; }
-.member-links a:hover { background: #e0e0e0; }
