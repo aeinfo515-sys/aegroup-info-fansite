@@ -1,11 +1,93 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NPHVYVNK6L');
+    </script>
+
     <meta charset="UTF-8">
-    <title>更新情報の振り返り - Aぇ! group Info</title>
+    <title>過去更新情報 - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css?v=100">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .update-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .update-card {
+            position: relative;
+            padding: 14px 16px;
+            padding-left: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border-left: 5px solid #ff69b4;
+            transition: transform 0.2s;
+        }
+
+        .update-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .update-date {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .update-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .update-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background-color 0.2s;
+        }
+
+        .update-link-btn:hover {
+            background-color: #ff1493;
+        }
+
+        /* ローディング・エラー表示 */
+        #loading, #error-message {
+            text-align: center;
+            padding: 30px 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .spinner {
+            font-size: 1.5rem;
+            color: #ff69b4;
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
 
@@ -16,8 +98,8 @@
     </header>
 
     <nav class="tabs" id="navTabs">
-        <a href="index.html" class="active">🏠 Home</a>
-        <a href="updates.html">🆕 過去更新情報</a>
+        <a href="index.html">🏠 Home</a>
+        <a href="updates.html" class="active">🆕 過去更新情報</a>
         <a href="schedule.html">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
         <a href="works.html">🎬 出演作品</a>
@@ -26,97 +108,103 @@
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
-        <!-- 🔍 絞り込み検索欄 -->
-        <section class="search-container">
-            <div class="search-title"><i class="fa-solid fa-filter"></i> 絞り込み検索</div>
-            <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" value="Aぇ! group" onchange="applyFilters()"> Aぇ! group</label>
-                <label class="checkbox-label"><input type="checkbox" value="正門" onchange="applyFilters()"> 正門</label>
-                <label class="checkbox-label"><input type="checkbox" value="末澤" onchange="applyFilters()"> 末澤</label>
-                <label class="checkbox-label"><input type="checkbox" value="小島" onchange="applyFilters()"> 小島</label>
-                <label class="checkbox-label"><input type="checkbox" value="佐野" onchange="applyFilters()"> 佐野</label>
-            </div>
-            <div class="filter-inputs">
-                <input type="text" id="keywordInput" class="search-input-text" onkeyup="applyFilters()" placeholder="キーワードを入力...">
-                <input type="month" id="monthInput" class="search-input-month" onchange="applyFilters()">
-            </div>
-        </section>
-
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         <section class="card">
-            <h2>🆕 過去の更新情報</h2>
-            <div id="allUpdateList">🔑 読み込み中...</div>
+            <h2>🆕 過去更新情報</h2>
+            <p style="font-size: 0.85rem; color: #666;">
+                サイトの更新履歴・お知らせ一覧です。
+            </p>
+
+            <!-- ローディング表示 -->
+            <div id="loading">
+                <div class="spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                データを読み込み中...
+            </div>
+
+            <!-- エラー表示（非表示） -->
+            <div id="error-message" style="display: none; color: #e53e3e;">
+                データの取得に失敗しました。<br>時間をおいて再度お試しください。
+            </div>
+
+            <!-- 更新情報リスト挿入先 -->
+            <div class="update-list" id="updateList"></div>
         </section>
     </main>
 
     <script>
-        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
-        let rawData = [];
-
-        function toggleMenu() { document.getElementById("navTabs").classList.toggle("show"); }
-
-        function getColorClass(text) {
-            if (!text) return "bg-group";
-            if (text.includes("小島")) return "bg-kojima";
-            if (text.includes("正門")) return "bg-masakado";
-            if (text.includes("末澤")) return "bg-suezawa";
-            if (text.includes("佐野")) return "bg-sano";
-            return "bg-group";
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
         }
 
-        function extractUrl(text) {
-            if (!text) return null;
-            const match = String(text).match(/(https?:\/\/[^\s]+)/);
-            return match ? match[0] : null;
-        }
+        // GAS APIからデータ取得
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
 
-        function applyFilters() {
-            const checkedMembers = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
-            const keyword = document.getElementById("keywordInput").value.toLowerCase();
-            const month = document.getElementById("monthInput").value;
+        async function fetchUpdates() {
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('error-message');
+            const updateList = document.getElementById('updateList');
 
-            const container = document.getElementById("allUpdateList");
-            container.innerHTML = "";
+            try {
+                const response = await fetch(GAS_API_URL);
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                
+                loading.style.display = 'none';
 
-            const filtered = rawData.filter(item => {
-                const str = JSON.stringify(item).toLowerCase();
-                if (members.length > 0 && !members.some(m => str.includes(m.toLowerCase()))) return false;
-                if (keyword && !str.includes(keyword)) return false;
-                if (month) {
-                    const ts = item["タイムスタンプ"] || item["Timestamp"] || item["日付"];
-                    if (ts) {
-                        const d = new Date(ts);
-                        const itemMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                        if (itemMonth !== month) return false;
-                    }
+                if (!data || data.length === 0) {
+                    updateList.innerHTML = '<p style="text-align:center; color:#888;">更新情報はまだありません。</p>';
+                    return;
                 }
-                return true;
-            });
 
-            if (filtered.length === 0) container.innerHTML = "<p style='color:#777;'>該当する更新情報はありません</p>";
-            else {
-                filtered.forEach(item => {
-                    const title = item["タイトル"] || item["内容"] || "";
-                    const detail = item["詳細"] || item["メモ"] || "";
-                    const url = extractUrl(title + detail);
-                    const colorClass = getColorClass(title + detail);
+                // 取得したデータを一覧描画
+                data.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'update-card';
 
-                    const div = document.createElement("div");
-                    div.className = `update-item ${colorClass}`;
-                    div.innerHTML = `<strong>${title}</strong><br><span style="font-size:0.85rem; color:#666;">${detail}</span>${url ? `<br><a href="${url}" target="_blank" class="update-link-btn">📸 投稿を見る 🔗</a>` : ''}`;
-                    container.appendChild(div);
+                    const dateText = item.date || item.datetime || item.timestamp || '';
+                    const titleText = item.title || item.content || '更新情報';
+                    const linkUrl = item.url || item.link || '';
+
+                    let html = '';
+                    if (dateText) {
+                        html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(dateText)}</div>`;
+                    }
+                    html += `<div class="update-title">${escapeHtml(titleText)}</div>`;
+
+                    if (linkUrl) {
+                        html += `
+                            <div style="margin-top: 8px;">
+                                <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener noreferrer" class="update-link-btn">
+                                    📸 投稿を見る 🔗
+                                </a>
+                            </div>
+                        `;
+                    }
+
+                    card.innerHTML = html;
+                    updateList.appendChild(card);
                 });
+
+            } catch (error) {
+                console.error('Error fetching updates:', error);
+                loading.style.display = 'none';
+                errorMessage.style.display = 'block';
             }
         }
 
-        async function loadUpdatesData() {
-            try {
-                const response = await fetch(CAL_API_URL);
-                rawData = await response.json();
-                applyFilters();
-            } catch(e) { console.error(e); }
+        // HTMLエスケープ関数
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
-        document.addEventListener('DOMContentLoaded', loadUpdatesData);
+
+        // ページ読み込み時に実行
+        document.addEventListener('DOMContentLoaded', fetchUpdates);
     </script>
 </body>
 </html>
