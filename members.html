@@ -2,22 +2,10 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>メンバー紹介 - Aぇ! group info</title>
+    <title>Members - Aぇ! group Info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 末尾に ?v=2 を付けて古い記憶を強制削除 -->
-    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=60">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        .bg-masakado { background-color: #e6f0ff !important; }
-        .bg-suezawa { background-color: #ffe6e6 !important; }
-        .bg-kojima { background-color: #f3e6f5 !important; }
-        .bg-sano { background-color: #e8f5e9 !important; }
-        
-        .member-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-bottom: 10px; }
-        .member-name { margin: 0; font-size: 1.4rem; font-weight: bold; }
-        .member-links { display: flex; gap: 12px; }
-        .member-links a { font-size: 1.4rem; text-decoration: none; }
-    </style>
 </head>
 <body>
 
@@ -27,88 +15,79 @@
         <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     </header>
 
-  <!-- 元通りの7つのタブメニュー -->
     <nav class="tabs" id="navTabs">
-        <a href="index.html" class="active">🏠 Home</a>
+        <a href="index.html">🏠 Home</a>
         <a href="schedule.html">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
         <a href="works.html">🎬 出演作品・SNS</a>
         <a href="sns.html">📱 SNS</a>
         <a href="tickets.html">🎫 Tickets</a>
-        <a href="members.html">👤 Members</a>
+        <a href="members.html" class="active">👤 Members</a>
     </nav>
-    
+
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
-        <h2 class="section-title">👤 Members</h2>
-        
+        <h2 style="color:#ff69b4; margin-bottom: 15px;"><i class="fa-solid fa-user"></i> Members</h2>
+
         <!-- 正門良規 -->
-        <section class="member-card border-masakado bg-masakado">
-            <div class="member-header">
-                <span class="member-name text-masakado">正門良規</span>
-                <div class="member-links">
-                    <a href="https://www.instagram.com/kadostagram_official/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2079?ima=3121" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
-                </div>
+        <div class="member-card member-masakado">
+            <div class="member-socials">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-solid fa-pen"></i></a>
             </div>
-            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
-                生年月日：1996年11月28日（29歳）<br>
-                出身：大阪府<br>
-                血液型：AB型<br>
-                担当：ギター
-            </p>
-        </section>
+            <h3>正門良規</h3>
+            <div class="member-info">
+                <p>生年月日：1996年11月28日（29歳）</p>
+                <p>出身：大阪府</p>
+                <p>血液型：AB型</p>
+                <p>担当：ギター</p>
+            </div>
+        </div>
 
         <!-- 末澤誠也 -->
-        <section class="member-card border-suezawa bg-suezawa">
-            <div class="member-header">
-                <span class="member-name text-suezawa">末澤誠也</span>
-                <div class="member-links">
-                    <a href="https://www.instagram.com/suezawa.seiya.0824/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2080?ima=3225" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
-                </div>
+        <div class="member-card member-suezawa">
+            <div class="member-socials">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-solid fa-pen"></i></a>
             </div>
-            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
-                生年月日：1994年8月24日（31歳）<br>
-                出身：兵庫県<br>
-                血液型：O型<br>
-                担当：ボーカル
-            </p>
-        </section>
+            <h3>末澤誠也</h3>
+            <div class="member-info">
+                <p>生年月日：1994年8月24日（31歳）</p>
+                <p>出身：兵庫県</p>
+                <p>血液型：O型</p>
+                <p>担当：ボーカル</p>
+            </div>
+        </div>
 
         <!-- 小島健 -->
-        <section class="member-card border-kojima bg-kojima">
-            <div class="member-header">
-                <span class="member-name text-kojima">小島健</span>
-                <div class="member-links">
-                    <a href="https://www.instagram.com/kozzy.s_boss/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2082?ima=3242" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
-                    <a href="https://www.youtube.com/channel/UCSzP6GqorG6WOfN_3C_b0Hw" target="_blank" rel="noopener noreferrer" style="color: #FF0000;"><i class="fa-brands fa-youtube"></i></a>
-                </div>
+        <div class="member-card member-kojima">
+            <div class="member-socials">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-solid fa-pen"></i></a>
+                <a href="#"><i class="fa-brands fa-youtube"></i></a>
             </div>
-            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
-                生年月日：1999年6月25日（27歳）<br>
-                出身：大阪府<br>
-                血液型：B型<br>
-                担当：キーボード
-            </p>
-        </section>
+            <h3>小島健</h3>
+            <div class="member-info">
+                <p>生年月日：1999年6月25日（27歳）</p>
+                <p>出身：大阪府</p>
+                <p>血液型：B型</p>
+                <p>担当：キーボード</p>
+            </div>
+        </div>
 
         <!-- 佐野晶哉 -->
-        <section class="member-card border-sano bg-sano">
-            <div class="member-header">
-                <span class="member-name text-sano">佐野晶哉</span>
-                <div class="member-links">
-                    <a href="https://www.instagram.com/sano.masaya.0313/" target="_blank" rel="noopener noreferrer" style="color: #E1306C;"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://web.familyclub.jp/s/jwb/diary/F2083?ima=3301" target="_blank" rel="noopener noreferrer" style="color: #ff69b4;"><i class="fa-solid fa-pen-nib"></i></a>
-                </div>
+        <div class="member-card member-sano">
+            <div class="member-socials">
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-solid fa-pen"></i></a>
             </div>
-            <p style="margin-bottom:0; font-size:0.9rem; color:#555; line-height:1.6;">
-                生年月日：2002年3月13日（24歳）<br>
-                出身：兵庫県<br>
-                血液型：B型<br>
-                担当：ドラム
-            </p>
-        </section>
+            <h3>佐野晶哉</h3>
+            <div class="member-info">
+                <p>生年月日：2002年3月13日（24歳）</p>
+                <p>出身：兵庫県</p>
+                <p>血液型：B型</p>
+                <p>担当：ドラム</p>
+            </div>
+        </div>
     </main>
 
     <script>
