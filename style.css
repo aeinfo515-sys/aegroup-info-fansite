@@ -1,83 +1,218 @@
 /* ==========================================
-   🌈 ヘッダー：4人グラデーション（紫・青・赤・緑）
+   🌈 ヘッダー（上部の4色グラデーション）
    ========================================== */
 .hero {
     background: linear-gradient(90deg, #800080 0%, #0000ff 33%, #ff0000 66%, #008000 100%) !important;
     color: white !important;
     text-align: center !important;
-    padding: 38px 20px 28px 20px !important;
+    padding: 35px 20px 25px 20px !important;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
     position: relative !important;
 }
 
 .hero h1 {
-    font-size: 1.9rem;
-    margin: 0 0 6px 0;
+    font-size: 1.8rem;
+    margin: 0 0 5px 0;
     font-weight: bold;
-    letter-spacing: 0.5px;
 }
 
 .hero p {
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     margin: 0;
-    opacity: 0.92;
+    opacity: 0.9;
 }
 
 body {
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
-    background-color: #fff0f5 !important; /* 淡いピンク背景 */
+    background-color: #fff0f5 !important; /* 全体のほんのりピンク背景 */
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden;
 }
 
-/* 🎫 横並びメニュータブ（余白の調整） */
+/* ==========================================
+   🎫 タブ（全8個のナビゲーション）
+   ========================================== */
 .tabs {
     display: flex !important;
     justify-content: center !important;
     background: #ffffff !important;
-    box-shadow: 0 3px 10px rgba(255, 182, 193, 0.2) !important;
-    padding: 12px 10px !important;
-    gap: 10px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+    padding: 10px !important;
+    gap: 8px !important;
     flex-wrap: wrap;
 }
+
 .tabs a {
     display: inline-block !important;
-    padding: 10px 20px !important;
+    padding: 8px 16px !important;
     text-decoration: none !important;
     color: #555 !important;
     border-radius: 20px !important;
-    font-size: 0.9rem !important;
+    font-size: 0.85rem !important;
     font-weight: bold !important;
     background: #fff0f5 !important;
     border: 1px solid #ffb6c1 !important;
-    transition: all 0.2s ease;
 }
+
 .tabs a.active, .tabs a:hover {
     background: #ff69b4 !important;
     color: #ffffff !important;
     border-color: #ff69b4 !important;
 }
 
-/* 📱 ハンバーガーボタン */
+/* 🔍 検索バーのCSS */
+.search-card {
+    padding: 10px 15px !important;
+    margin-bottom: 15px !important;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    background: #fff0f5;
+    border: 1.5px solid #ffb6c1;
+    border-radius: 25px;
+    padding: 8px 15px;
+}
+
+.search-icon {
+    color: #ff69b4;
+    margin-right: 10px;
+    font-size: 1rem;
+}
+
+.search-box input {
+    border: none;
+    background: transparent;
+    outline: none;
+    width: 100%;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* ==========================================
+   📱 カード全体（基本のピンク枠カード）
+   ========================================== */
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
+    border: 2px solid #ffb6c1;
+}
+
+.card h2 {
+    color: #ff69b4;
+    font-size: 1.2rem;
+    border-bottom: 2px solid #ffb6c1;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+/* 新着・スケジュール個別の白枠 */
+.update-item, .today-item { 
+    position: relative; 
+    padding: 12px 15px 12px 22px; 
+    margin-bottom: 12px; 
+    background: #fdfdfd; 
+    border-radius: 10px; 
+    font-size: 0.95rem;
+    overflow: hidden; 
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    border: 1px solid #eee;
+}
+
+.update-item::before, .today-item::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 8px; 
+    background-color: #ff69b4; 
+}
+
+.update-link-btn {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 8px 14px;
+    background-color: #ff69b4;
+    color: #fff !important;
+    text-decoration: none !important;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+/* メンバー別の左ライン色 */
+.bg-group::before { background-color: #ff69b4 !important; }     
+.bg-kojima::before { background-color: #800080 !important; }    
+.bg-masakado::before { background-color: #0000ff !important; }  
+.bg-suezawa::before { background-color: #ff0000 !important; }   
+.bg-sano::before { background-color: #008000 !important; }      
+
+/* ==========================================
+   👤 メンバーカード（スクショ8.jpg通りの立体枠デザイン）
+   ========================================== */
+.member-card {
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: #fff;
+    position: relative;
+}
+
+/* 正門くん (青) */
+.member-masakado {
+    background-color: #f0f4ff !important;
+    border: 2px solid #0000ff !important;
+    box-shadow: -4px 4px 0px #0000ff !important; /* 左と下の立体影 */
+}
+.member-masakado h3 { color: #0000ff; }
+
+/* 末澤くん (赤) */
+.member-suezawa {
+    background-color: #fff0f0 !important;
+    border: 2px solid #ff0000 !important;
+    box-shadow: -4px 4px 0px #ff0000 !important;
+}
+.member-suezawa h3 { color: #ff0000; }
+
+/* 小島くん (紫) */
+.member-kojima {
+    background-color: #fcf0ff !important;
+    border: 2px solid #800080 !important;
+    box-shadow: -4px 4px 0px #800080 !important;
+}
+.member-kojima h3 { color: #800080; }
+
+/* 佐野くん (緑) */
+.member-sano {
+    background-color: #f0fff0 !important;
+    border: 2px solid #008000 !important;
+    box-shadow: -4px 4px 0px #008000 !important;
+}
+.member-sano h3 { color: #008000; }
+
+/* ハンバーガーボタン */
 .menu-trigger {
     display: none;
     position: absolute;
-    top: 16px;
-    right: 16px;
-    font-size: 1.25rem;
+    top: 15px;
+    right: 15px;
+    font-size: 1.2rem;
     color: white;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0,0,0,0.3);
     border: none;
-    padding: 8px 14px;
-    border-radius: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
     cursor: pointer;
     z-index: 1001;
 }
 
-/* ==========================================
-   📱 スマホ版メニュー（ドロワー）
-   ========================================== */
 @media (max-width: 600px) {
     .menu-trigger { display: block !important; }
     
@@ -86,16 +221,16 @@ body {
         flex-direction: column !important;
         position: fixed !important;
         top: 0 !important;
-        right: -260px !important;
-        width: 260px !important;
+        right: -250px !important;
+        width: 250px !important;
         height: 100vh !important;
         box-sizing: border-box !important;
         background: #ffffff !important;
-        padding: 75px 20px 20px 20px !important;
-        box-shadow: -4px 0 16px rgba(0,0,0,0.15) !important;
+        padding: 70px 20px 20px 20px !important;
+        box-shadow: -4px 0 12px rgba(0,0,0,0.1) !important;
         z-index: 1000 !important;
         transition: right 0.3s ease !important;
-        gap: 12px !important;
+        gap: 10px !important;
         justify-content: flex-start !important;
     }
     
@@ -106,8 +241,8 @@ body {
     .tabs a {
         width: 100% !important;
         box-sizing: border-box !important;
-        padding: 14px !important;
-        border-radius: 12px !important;
+        padding: 12px !important;
+        border-radius: 10px !important;
         text-align: center !important;
     }
 }
