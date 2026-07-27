@@ -1,5 +1,5 @@
 /* ==========================================
-   🌈 ヘッダー（上部の4色グラデーション）
+   🌈 ヘッダー（4色グラデーション）
    ========================================== */
 .hero {
     background: linear-gradient(90deg, #800080 0%, #0000ff 33%, #ff0000 66%, #008000 100%) !important;
@@ -24,14 +24,14 @@
 
 body {
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
-    background-color: #fff0f5 !important; /* 全体のほんのりピンク背景 */
+    background-color: #fff0f5 !important;
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden;
 }
 
 /* ==========================================
-   🎫 タブ（全8個のナビゲーション）
+   🎫 タブ（7つのナビゲーション）
    ========================================== */
 .tabs {
     display: flex !important;
@@ -61,38 +61,78 @@ body {
     border-color: #ff69b4 !important;
 }
 
-/* 🔍 検索バーのCSS */
-.search-card {
-    padding: 10px 15px !important;
-    margin-bottom: 15px !important;
+/* ==========================================
+   🔍 高機能検索エリアのデザイン
+   ========================================== */
+.search-container {
+    background: #fff;
+    border: 2px solid #ffb6c1;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(255, 182, 193, 0.3);
 }
 
-.search-box {
+.search-title {
+    color: #ff69b4;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
+    gap: 6px;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     background: #fff0f5;
+    padding: 6px 10px;
+    border-radius: 15px;
+    border: 1px solid #ffb6c1;
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input {
+    accent-color: #ff69b4;
+}
+
+.filter-inputs {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-input-text, .search-input-month {
+    padding: 8px 12px;
     border: 1.5px solid #ffb6c1;
-    border-radius: 25px;
-    padding: 8px 15px;
-}
-
-.search-icon {
-    color: #ff69b4;
-    margin-right: 10px;
-    font-size: 1rem;
-}
-
-.search-box input {
-    border: none;
-    background: transparent;
+    border-radius: 8px;
     outline: none;
-    width: 100%;
     font-size: 0.9rem;
-    color: #333;
+    background: #fff;
+}
+
+.search-input-text {
+    flex: 1;
+    min-width: 180px;
+}
+
+.search-input-month {
+    width: 150px;
 }
 
 /* ==========================================
-   📱 カード全体（基本のピンク枠カード）
+   📱 カード＆リスト表示
    ========================================== */
 .card {
     background: #ffffff;
@@ -112,7 +152,6 @@ body {
     margin-top: 0;
 }
 
-/* 新着・スケジュール個別の白枠 */
 .update-item, .today-item { 
     position: relative; 
     padding: 12px 15px 12px 22px; 
@@ -147,7 +186,6 @@ body {
     font-weight: bold;
 }
 
-/* メンバー別の左ライン色 */
 .bg-group::before { background-color: #ff69b4 !important; }     
 .bg-kojima::before { background-color: #800080 !important; }    
 .bg-masakado::before { background-color: #0000ff !important; }  
@@ -155,49 +193,72 @@ body {
 .bg-sano::before { background-color: #008000 !important; }      
 
 /* ==========================================
-   👤 メンバーカード（スクショ8.jpg通りの立体枠デザイン）
+   👤 メンバーカード（スクショ8.jpg完全復元）
    ========================================== */
 .member-card {
     border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 15px;
+    padding: 16px;
+    margin-bottom: 18px;
     background: #fff;
     position: relative;
 }
 
-/* 正門くん (青) */
 .member-masakado {
     background-color: #f0f4ff !important;
     border: 2px solid #0000ff !important;
-    box-shadow: -4px 4px 0px #0000ff !important; /* 左と下の立体影 */
+    box-shadow: -4px 4px 0px #0000ff !important;
 }
-.member-masakado h3 { color: #0000ff; }
+.member-masakado h3 { color: #0000ff; margin-top: 0; margin-bottom: 8px; }
 
-/* 末澤くん (赤) */
 .member-suezawa {
     background-color: #fff0f0 !important;
     border: 2px solid #ff0000 !important;
     box-shadow: -4px 4px 0px #ff0000 !important;
 }
-.member-suezawa h3 { color: #ff0000; }
+.member-suezawa h3 { color: #ff0000; margin-top: 0; margin-bottom: 8px; }
 
-/* 小島くん (紫) */
 .member-kojima {
     background-color: #fcf0ff !important;
     border: 2px solid #800080 !important;
     box-shadow: -4px 4px 0px #800080 !important;
 }
-.member-kojima h3 { color: #800080; }
+.member-kojima h3 { color: #800080; margin-top: 0; margin-bottom: 8px; }
 
-/* 佐野くん (緑) */
 .member-sano {
     background-color: #f0fff0 !important;
     border: 2px solid #008000 !important;
     box-shadow: -4px 4px 0px #008000 !important;
 }
-.member-sano h3 { color: #008000; }
+.member-sano h3 { color: #008000; margin-top: 0; margin-bottom: 8px; }
 
-/* ハンバーガーボタン */
+.member-info p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+.member-socials {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.member-socials a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: #ffffff;
+    border-radius: 6px;
+    color: #ff69b4;
+    text-decoration: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ハンバーガーメニュー */
 .menu-trigger {
     display: none;
     position: absolute;
