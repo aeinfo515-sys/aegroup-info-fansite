@@ -1,20 +1,10 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-NPHVYVNK6L');
-    </script>
-
     <meta charset="UTF-8">
     <title>Aぇ! group Info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css?v=50">
+    <link rel="stylesheet" href="style.css?v=60">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -25,12 +15,11 @@
         <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     </header>
 
-    <!-- 元通りの7つのタブメニュー -->
     <nav class="tabs" id="navTabs">
         <a href="index.html" class="active">🏠 Home</a>
         <a href="schedule.html">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
-        <a href="works.html">🎬 出演作品　SNS</a>
+        <a href="works.html">🎬 出演作品・SNS</a>
         <a href="sns.html">📱 SNS</a>
         <a href="tickets.html">🎫 Tickets</a>
         <a href="members.html">👤 Members</a>
@@ -38,11 +27,21 @@
 
     <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         
-        <!-- 🔍 検索欄 -->
-        <section class="card search-card">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="searchInput" onkeyup="filterItems()" placeholder="キーワードで検索（例: 正門、YouTube、番組名...）">
+        <!-- 🔍 メンバーチェックボックス＋キーワード＋期間（月ごと）絞り込み検索 -->
+        <section class="search-container">
+            <div class="search-title"><i class="fa-solid fa-filter"></i> 絞り込み検索</div>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" value="Aぇ! group" onchange="applyFilters()"> Aぇ! group</label>
+                <label class="checkbox-label"><input type="checkbox" value="正門" onchange="applyFilters()"> 正門</label>
+                <label class="checkbox-label"><input type="checkbox" value="末澤" onchange="applyFilters()"> 末澤</label>
+                <label class="checkbox-label"><input type="checkbox" value="小島" onchange="applyFilters()"> 小島</label>
+                <label class="checkbox-label"><input type="checkbox" value="佐野" onchange="applyFilters()"> 佐野</label>
+            </div>
+
+            <div class="filter-inputs">
+                <input type="text" id="keywordInput" class="search-input-text" onkeyup="applyFilters()" placeholder="キーワードを入力...">
+                <input type="month" id="monthInput" class="search-input-month" onchange="applyFilters()">
             </div>
         </section>
 
@@ -58,7 +57,7 @@
             <div id="todayList">🔑 読み込み中...</div>
         </section>
 
-        <!-- 3. 📢 サイト説明 -->
+        <!-- 3. 📢 Welcome -->
         <section class="card">
             <h2>📢 Welcome</h2>
             <p style="margin:0; font-size:0.9rem; color:#444; line-height:1.6;">スマートフォンでご覧の方は、右上の ≡ ボタンを押すと各メニュータブが表示されます。</p>
@@ -67,15 +66,15 @@
 
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        let allUpdatesData = [];
+        let allTodayEventsData = [];
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // 絵文字を判定して設定するロジック
         function getMediaEmoji(category, text = "") {
             const combined = (String(category) + " " + String(text)).toLowerCase();
-            
             if (combined.includes("tv") || combined.includes("テレビ") || combined.includes("出演")) return "📺";
             if (combined.includes("ラジオ") || combined.includes("radio")) return "📻";
             if (combined.includes("youtube") || combined.includes("動画") || combined.includes("配信")) return "🎥";
@@ -84,7 +83,6 @@
             if (combined.includes("sns") || combined.includes("インスタ") || combined.includes("x") || combined.includes("ブログ")) return "📱";
             if (combined.includes("記念日") || combined.includes("誕生日")) return "🎊";
             if (combined.includes("販売") || combined.includes("グッズ") || combined.includes("cd")) return "🧾";
-            
             return "⏰";
         }
 
@@ -133,18 +131,102 @@
             return isNaN(d.getTime()) ? 0 : d.getTime();
         }
 
-        // 🔍 リアルタイム検索フィルター関数
-        function filterItems() {
-            const query = document.getElementById("searchInput").value.toLowerCase();
-            const items = document.querySelectorAll(".update-item, .today-item");
-            
-            items.forEach(item => {
-                const text = item.innerText.toLowerCase();
-                if (text.includes(query)) {
-                    item.style.display = "block";
-                } else {
-                    item.style.display = "none";
+        /* 🔍 高機能検索・絞り込み処理 */
+        function applyFilters() {
+            const checkedMembers = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
+            const keyword = document.getElementById("keywordInput").value.toLowerCase();
+            const monthVal = document.getElementById("monthInput").value; // YYYY-MM
+
+            filterSection("updateList", allUpdatesData, checkedMembers, keyword, monthVal, true);
+            filterSection("todayList", allTodayEventsData, checkedMembers, keyword, monthVal, false);
+        }
+
+        function filterSection(elementId, dataset, members, keyword, month, isUpdate) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = "";
+
+            const filtered = dataset.filter(item => {
+                const itemStr = JSON.stringify(item).toLowerCase();
+                
+                // 1. メンバー判定
+                if (members.length > 0) {
+                    const hasMember = members.some(m => itemStr.includes(m.toLowerCase()));
+                    if (!hasMember) return false;
                 }
+
+                // 2. キーワード判定
+                if (keyword && !itemStr.includes(keyword)) return false;
+
+                // 3. 期間（月ごと）判定
+                if (month) {
+                    const timeVal = item["日付"] || item["date"] || item["タイムスタンプ"] || item["Timestamp"];
+                    if (timeVal) {
+                        const d = new Date(timeVal);
+                        if (!isNaN(d.getTime())) {
+                            const itemMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                            if (itemMonth !== month) return false;
+                        }
+                    }
+                }
+
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = "<p style='color:#777;'>条件に合う情報はありません</p>";
+                return;
+            }
+
+            filtered.forEach(item => {
+                const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
+                const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
+                const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
+                
+                let targetUrl = "";
+                for (let key in item) {
+                    if (item.hasOwnProperty(key)) {
+                        const urlCheck = extractUrl(item[key]);
+                        if (urlCheck) { targetUrl = urlCheck; break; }
+                    }
+                }
+
+                const colorClass = getColorClass(detailText + rawTitle + memberText);
+                const div = document.createElement("div");
+
+                if (isUpdate) {
+                    div.className = `update-item ${colorClass}`;
+                    let timeStr = "";
+                    const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"];
+                    if (timeVal) {
+                        try {
+                            const td = new Date(timeVal);
+                            if (!isNaN(td.getTime())) {
+                                timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
+                            }
+                        } catch(e){}
+                    }
+                    let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br><strong>${rawTitle}</strong>`;
+                    if (detailText) htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
+                    if (targetUrl) htmlContent += `<br><a href="${targetUrl}" target="_blank" class="update-link-btn">📸 投稿を見る 🔗</a>`;
+                    div.innerHTML = htmlContent;
+                } else {
+                    div.className = `today-item ${colorClass}`;
+                    const categoryText = item["ジャンル"] || item["媒体"] || item["区分"] || item["D列"] || "";
+                    const emoji = getMediaEmoji(categoryText, rawTitle + detailText);
+                    let timeStr = "";
+                    const timeVal = item["時間"] || item["time"];
+                    if (timeVal) {
+                        try {
+                            const td = new Date(timeVal);
+                            if (!isNaN(td.getTime())) {
+                                timeStr = `${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} `;
+                            }
+                        } catch(e){}
+                    }
+                    div.innerHTML = `<strong>${emoji} ${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${memberText || detailText}</span>`;
+                }
+
+                container.appendChild(div);
             });
         }
 
@@ -153,132 +235,25 @@
                 const response = await fetch(CAL_API_URL);
                 const data = await response.json();
                 
-                // 1. 【更新情報】
-                const updateList = document.getElementById("updateList");
-                updateList.innerHTML = "";
+                allUpdatesData = data.filter(item => checkIsTodayUpdate(item));
+                allUpdatesData.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
 
-                const updates = data.filter(item => checkIsTodayUpdate(item));
-                updates.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
-
-                if (updates.length === 0) {
-                    updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
-                } else {
-                    updates.forEach(item => {
-                        const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
-                        const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
-                        
-                        let targetUrl = "";
-                        for (let key in item) {
-                            if (item.hasOwnProperty(key)) {
-                                const urlCheck = extractUrl(item[key]);
-                                if (urlCheck) {
-                                    targetUrl = urlCheck;
-                                    break; 
-                                }
-                            }
-                        }
-
-                        let displayTitle = rawTitle;
-                        if (rawTitle.startsWith("http")) {
-                            displayTitle = "SNS更新情報";
-                        } else if (targetUrl && rawTitle.includes(targetUrl)) {
-                            displayTitle = rawTitle.replace(targetUrl, '').trim() || "SNS更新情報";
-                        }
-
-                        let cleanDetail = detailText;
-                        if (targetUrl && detailText.includes(targetUrl)) {
-                            cleanDetail = detailText.replace(targetUrl, '').trim();
-                        }
-
-                        let timeStr = "";
-                        const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"];
-                        if (timeVal) {
-                            try {
-                                const td = new Date(timeVal);
-                                if (!isNaN(td.getTime())) {
-                                    timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
-                                }
-                            } catch(e){}
-                        }
-
-                        const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
-                        const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
-                        
-                        const div = document.createElement("div");
-                        div.className = `update-item ${colorClass}`;
-                        
-                        let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br>`;
-                        if (displayTitle) {
-                            htmlContent += `<strong>${displayTitle}</strong>`;
-                        }
-                        
-                        if (cleanDetail && cleanDetail !== displayTitle) {
-                            htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${cleanDetail}</span>`;
-                        } else if (memberText && memberText !== displayTitle) {
-                            htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${memberText}</span>`;
-                        }
-
-                        if (targetUrl) {
-                            htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
-                        }
-
-                        div.innerHTML = htmlContent;
-                        updateList.appendChild(div);
-                    });
-                }
-
-                // 2. 【本日のスケジュール】
-                const todayList = document.getElementById("todayList");
-                todayList.innerHTML = "";
-                
                 const now = new Date();
                 const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
                 
-                const todayEvents = data.filter(item => {
+                allTodayEventsData = data.filter(item => {
                     const dateVal = item["日付"] || item["date"];
                     if (!dateVal || item["タイムスタンプ"]) return false;
-
                     try {
                         const d = new Date(dateVal);
                         if (isNaN(d.getTime())) return false;
                         const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
                         return itemDate === todayStr;
-                    } catch(e) {
-                        return false;
-                    }
+                    } catch(e) { return false; }
                 });
+                allTodayEventsData.sort((a, b) => getTimeMillis(a) - getTimeMillis(b));
 
-                todayEvents.sort((a, b) => getTimeMillis(a) - getTimeMillis(b));
-
-                if (todayEvents.length === 0) {
-                    todayList.innerHTML = "<p style='color:#777;'>今日の予定はありません</p>";
-                } else {
-                    todayEvents.forEach(item => {
-                        const rawTitle = item["タイトル"] || item["title"] || "";
-                        const detailText = item["詳細"] || item["detail"] || "";
-                        const memberText = item["担当"] || item["メンバー"] || "";
-                        const categoryText = item["ジャンル"] || item["媒体"] || item["区分"] || item["D列"] || "";
-                        
-                        const emoji = getMediaEmoji(categoryText, rawTitle + detailText);
-                        const colorClass = getColorClass(detailText + rawTitle + memberText);
-                        
-                        let timeStr = "";
-                        const timeVal = item["時間"] || item["time"];
-                        if (timeVal) {
-                            try {
-                                const td = new Date(timeVal);
-                                if (!isNaN(td.getTime())) {
-                                    timeStr = `${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} `;
-                                }
-                            } catch(e){}
-                        }
-                        
-                        const div = document.createElement("div");
-                        div.className = `today-item ${colorClass}`;
-                        div.innerHTML = `<strong>${emoji} ${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${memberText || detailText}</span>`;
-                        todayList.appendChild(div);
-                    });
-                }
+                applyFilters();
 
             } catch (e) {
                 document.getElementById("todayList").innerText = "データの読み込みに失敗しました。";
