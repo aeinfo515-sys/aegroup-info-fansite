@@ -1,1 +1,283 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
+      gtag('config', 'G-NPHVYVNK6L');
+    </script>
+
+    <meta charset="UTF-8">
+    <title>リクエスト・募集 - Aぇ! group info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .request-section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin: 20px 0 10px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #ff69b4;
+        }
+
+        .request-item { 
+            position: relative; 
+            padding: 14px 16px 14px 22px; 
+            margin-bottom: 12px; 
+            background: #f9f9f9; 
+            border-radius: 8px; 
+            font-size: 0.95rem;
+            overflow: hidden; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        
+        .request-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px; 
+            background-color: #ff69b4; 
+        }
+        
+        .request-link-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .request-link-btn:hover {
+            background-color: #ff1493;
+            opacity: 0.9;
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #eee;
+            color: #555;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        /* メンバーカラーバー */
+        .bg-group::before { background-color: #ff69b4 !important; }     
+        .bg-kojima::before { background-color: #800080 !important; }    
+        .bg-masakado::before { background-color: #0000ff !important; }  
+        .bg-suezawa::before { background-color: #ff0000 !important; }   
+        .bg-sano::before { background-color: #008000 !important; }      
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Aぇ! group Info</h1>
+        <p>インフォメーションサイト(非公式)</p>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <nav class="tabs" id="navTabs">
+        <a href="index.html">🏠 Home</a>
+        <a href="updates.html">🆕 更新情報</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="requests.html" class="active">✉️ リクエスト・募集</a>
+        <a href="works.html">🎬 出演作品・SNS</a>
+        <a href="sns.html">📱 SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
+    </nav>
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+        <section class="card">
+            <h2>✉️ リクエスト・お便り募集一覧</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">
+                テレビ・ラジオ番組へのリクエストやお便り募集のリンク集です。タップして直接投稿・送信ができます。
+            </p>
+
+            <!-- 📻 ラジオ -->
+            <div class="request-section-title">📻 ラジオ</div>
+            
+            <div class="request-item bg-group">
+                <span class="category-badge">📻 ラジオ</span><br>
+                <strong>MBSラジオ「MBSヤングタウン（ヤンタン）」</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! group / 番組メッセージ・お便り募集</span><br>
+                <a href="mailto:ys@mbs1179.com" class="request-link-btn">✉️ メールを送る (ys@mbs1179.com)</a>
+            </div>
+
+            <div class="request-item bg-kojima">
+                <span class="category-badge">📻 ラジオ</span><br>
+                <strong>FM大阪「ラジキング」</strong><br>
+                <span style="font-size:0.85rem; color:#666;">
+                    小島健<br>
+                    ・8/19：面接で答える長所🧑‍💼😏<br>
+                    ・8/26：妄想❤️恋愛( ᵕ̤ ‧̫̮ ᵕ̤ )✧*.💭<br>
+                    ・9/2：最近、笑ったこと😆
+                </span><br>
+                <a href="https://fmosaka.futureartist.net/enquete/355621" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ メッセージフォーム 🔗</a>
+            </div>
+
+            <!-- 📺 レギュラー番組 -->
+            <div class="request-section-title">📺 レギュラー番組</div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">📺 フジテレビ</span><br>
+                <strong>Q&Aぇ!</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! groupに聞きたい＆検証してほしい「Q」を大募集！</span><br>
+                <a href="https://s1.fujitv.co.jp/safe/qandae/examine/form.html?_ga=2.221898264.1665782951.1785169749-100090431.1778572249" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ 質問・検証Qを送る 🔗</a>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">📺 フジテレビ</span><br>
+                <strong>Q&Aぇ! (WANGANフェス)</strong><br>
+                <span style="font-size:0.85rem; color:#666;">視聴者からの“Q” & 時間が許す限り“Ａぇ!”</span><br>
+                <a href="https://s1.fujitv.co.jp/safe/qandae/wanganfes/form.html?_ga=2.210488725.1665782951.1785169749-100090431.1778572249" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ フェス投稿フォーム 🔗</a>
+            </div>
+
+            <!-- 🎧 推し活リクエスト -->
+            <div class="request-section-title">🎧 USEN 推し活リクエスト</div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">🎧 USEN</span><br>
+                <strong>USEN 推し活リクエスト（Aぇ! group）</strong><br>
+                <span style="font-size:0.85rem; color:#666;">楽曲リクエストはこちらから投票</span><br>
+                <a href="https://usen.oshireq.com/artist/983216" target="_blank" rel="noopener noreferrer" class="request-link-btn">🎵 リクエストに投票する 🔗</a>
+            </div>
+
+            <!-- 🎵 音楽番組 リクエスト -->
+            <div class="request-section-title">🎵 音楽番組 リクエスト</div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">テレビ朝日</span><br>
+                <strong>ミュージックステーション（Mステ）</strong><br>
+                <a href="https://form.tv-asahi.co.jp/apps/apply/post.php?fid=8139" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ リクエストを送る 🔗</a>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">TBS</span><br>
+                <strong>CDTVライブ！ライブ！</strong><br>
+                <a href="https://cgi.tbs.co.jp/ppshw/pc/contact/4945/enquete.do" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ リクエストを送る 🔗</a>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">フジテレビ</span><br>
+                <strong>MUSIC FAIR</strong><br>
+                <a href="https://wwws.fujitv.co.jp/ap2/safe/resp/PcWrite?bancode=198000031&type=resprg" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ リクエストを送る 🔗</a>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">NHK</span><br>
+                <strong>うたであえたら</strong><br>
+                <a href="https://forms.nhk.jp/jfe/form/SV_bao8VqfJBTm2itE" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ リクエストを送る 🔗</a>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">NHK</span><br>
+                <strong>Venue101</strong><br>
+                <a href="https://www.nhk.or.jp/css/form/" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ リクエストを送る 🔗</a>
+            </div>
+
+            <div class="request-item bg-group">
+                <span class="category-badge">フジテレビ</span><br>
+                <strong>週刊ナイナイミュージック</strong><br>
+                <a href="https://wwws.fujitv.co.jp/ap2/safe/resp/PcWrite?bancode=423000009&type=resprg" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ リクエストを送る 🔗</a>
+            </div>
+
+            <!-- スプレッドシートから追加で読み込まれたデータがここに入る -->
+            <div id="dynamicRequests"></div>
+        </section>
+    </main>
+
+    <script>
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
+        }
+
+        function getColorClass(text) {
+            if (!text) return "bg-group";
+            if (text.includes("小島")) return "bg-kojima";
+            if (text.includes("正門")) return "bg-masakado";
+            if (text.includes("末澤")) return "bg-suezawa";
+            if (text.includes("佐野")) return "bg-sano";
+            return "bg-group";
+        }
+
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = String(text).match(/(https?:\/\/[^\s]+)/);
+            return match ? match[0] : null;
+        }
+
+        // スプレッドシート側の新しい「リクエスト」追加分を読み込んで末尾に補填する処理
+        async function loadExtraRequests() {
+            try {
+                const response = await fetch(CAL_API_URL);
+                const data = await response.json();
+
+                const container = document.getElementById("dynamicRequests");
+
+                const requestsData = data.filter(item => {
+                    const category = String(item["ジャンル"] || item["媒体"] || item["区分"] || "");
+                    const title = String(item["タイトル"] || item["title"] || "");
+                    const detail = String(item["詳細"] || item["detail"] || "");
+                    
+                    const text = category + title + detail;
+                    return text.includes("リクエスト") || text.includes("募集") || text.includes("お便り");
+                });
+
+                if (requestsData.length > 0) {
+                    let html = '<div class="request-section-title">✨ その他の最新募集（自動読み込み）</div>';
+                    requestsData.forEach(item => {
+                        const rawTitle = item["タイトル"] || item["title"] || "リクエスト募集";
+                        const detailText = item["詳細"] || item["detail"] || "";
+                        const categoryText = item["ジャンル"] || item["媒体"] || "リクエスト";
+                        const memberText = item["担当"] || item["メンバー"] || "";
+
+                        let targetUrl = "";
+                        for (let key in item) {
+                            if (item.hasOwnProperty(key)) {
+                                const urlCheck = extractUrl(item[key]);
+                                if (urlCheck) {
+                                    targetUrl = urlCheck;
+                                    break; 
+                                }
+                            }
+                        }
+
+                        const colorClass = getColorClass(detailText + rawTitle + memberText);
+                        
+                        html += `<div class="request-item ${colorClass}">`;
+                        html += `<span class="category-badge">✉️ ${categoryText}</span><br>`;
+                        html += `<strong>${rawTitle}</strong>`;
+                        if (detailText) html += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
+                        if (targetUrl) html += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="request-link-btn">✉️ フォームへ送る 🔗</a>`;
+                        html += `</div>`;
+                    });
+                    container.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("スプレッドシートデータ取得エラー:", e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadExtraRequests);
+    </script>
+</body>
+</html>
