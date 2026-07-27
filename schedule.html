@@ -89,6 +89,19 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
+        // D列（ジャンル・媒体）の値から絵文字を判定する関数
+        function getMediaEmoji(category) {
+            if (!category) return "⏰";
+            const c = String(category).trim();
+            if (c.includes("出演")) return "📺";
+            if (c.includes("SNS")) return "📱";
+            if (c.includes("雑誌")) return "📕";
+            if (c.includes("イベント")) return "🎤";
+            if (c.includes("記念日")) return "🎊";
+            if (c.includes("販売")) return "🧾";
+            return "⏰";
+        }
+
         function getCalClass(text) {
             if (text.includes("Aぇ! group")) return "cal-group";
             if (text.includes("小島")) return "cal-kojima";
@@ -196,13 +209,20 @@
                 modalList.innerHTML = "<p style='color:#777;'>予定はありません</p>";
             } else {
                 dayItems.forEach(item => {
+                    const categoryText = item["ジャンル"] || item["媒体"] || item["区分"] || item["D列"] || "";
+                    const emoji = getMediaEmoji(categoryText);
+
                     let timeStr = "";
                     if (item["時間"] && String(item["時間"]).includes("T")) {
                         const td = new Date(item["時間"]);
                         const h = String(td.getHours()).padStart(2, "0");
                         const m = String(td.getMinutes()).padStart(2, "0");
-                        if (!(h === "00" && m === "00")) timeStr = `⏰ ${h}:${m} `;
+                        if (!(h === "00" && m === "00")) timeStr = `${emoji} ${h}:${m} `;
                     }
+                    if (!timeStr) {
+                        timeStr = `${emoji} `;
+                    }
+
                     const matchText = (item["詳細"] || "") + (item["タイトル"] || "");
                     const borderCol = getBorderColor(matchText);
 
