@@ -1,1 +1,122 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>更新情報の振り返り - Aぇ! group Info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css?v=100">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
 
+    <header class="hero">
+        <h1>Aぇ! group Info</h1>
+        <p>インフォメーションサイト(非公式)</p>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <nav class="tabs" id="navTabs">
+        <a href="index.html" class="active">🏠 Home</a>
+        <a href="updates.html">🆕 過去更新情報</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="requests.html">✉️ リクエスト・募集</a>
+        <a href="works.html">🎬 出演作品</a>
+        <a href="sns.html">📱 公式SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
+    </nav>
+
+    <main style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
+        <!-- 🔍 絞り込み検索欄 -->
+        <section class="search-container">
+            <div class="search-title"><i class="fa-solid fa-filter"></i> 絞り込み検索</div>
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" value="Aぇ! group" onchange="applyFilters()"> Aぇ! group</label>
+                <label class="checkbox-label"><input type="checkbox" value="正門" onchange="applyFilters()"> 正門</label>
+                <label class="checkbox-label"><input type="checkbox" value="末澤" onchange="applyFilters()"> 末澤</label>
+                <label class="checkbox-label"><input type="checkbox" value="小島" onchange="applyFilters()"> 小島</label>
+                <label class="checkbox-label"><input type="checkbox" value="佐野" onchange="applyFilters()"> 佐野</label>
+            </div>
+            <div class="filter-inputs">
+                <input type="text" id="keywordInput" class="search-input-text" onkeyup="applyFilters()" placeholder="キーワードを入力...">
+                <input type="month" id="monthInput" class="search-input-month" onchange="applyFilters()">
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>🆕 過去の更新情報</h2>
+            <div id="allUpdateList">🔑 読み込み中...</div>
+        </section>
+    </main>
+
+    <script>
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        let rawData = [];
+
+        function toggleMenu() { document.getElementById("navTabs").classList.toggle("show"); }
+
+        function getColorClass(text) {
+            if (!text) return "bg-group";
+            if (text.includes("小島")) return "bg-kojima";
+            if (text.includes("正門")) return "bg-masakado";
+            if (text.includes("末澤")) return "bg-suezawa";
+            if (text.includes("佐野")) return "bg-sano";
+            return "bg-group";
+        }
+
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = String(text).match(/(https?:\/\/[^\s]+)/);
+            return match ? match[0] : null;
+        }
+
+        function applyFilters() {
+            const checkedMembers = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
+            const keyword = document.getElementById("keywordInput").value.toLowerCase();
+            const month = document.getElementById("monthInput").value;
+
+            const container = document.getElementById("allUpdateList");
+            container.innerHTML = "";
+
+            const filtered = rawData.filter(item => {
+                const str = JSON.stringify(item).toLowerCase();
+                if (members.length > 0 && !members.some(m => str.includes(m.toLowerCase()))) return false;
+                if (keyword && !str.includes(keyword)) return false;
+                if (month) {
+                    const ts = item["タイムスタンプ"] || item["Timestamp"] || item["日付"];
+                    if (ts) {
+                        const d = new Date(ts);
+                        const itemMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+                        if (itemMonth !== month) return false;
+                    }
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) container.innerHTML = "<p style='color:#777;'>該当する更新情報はありません</p>";
+            else {
+                filtered.forEach(item => {
+                    const title = item["タイトル"] || item["内容"] || "";
+                    const detail = item["詳細"] || item["メモ"] || "";
+                    const url = extractUrl(title + detail);
+                    const colorClass = getColorClass(title + detail);
+
+                    const div = document.createElement("div");
+                    div.className = `update-item ${colorClass}`;
+                    div.innerHTML = `<strong>${title}</strong><br><span style="font-size:0.85rem; color:#666;">${detail}</span>${url ? `<br><a href="${url}" target="_blank" class="update-link-btn">📸 投稿を見る 🔗</a>` : ''}`;
+                    container.appendChild(div);
+                });
+            }
+        }
+
+        async function loadUpdatesData() {
+            try {
+                const response = await fetch(CAL_API_URL);
+                rawData = await response.json();
+                applyFilters();
+            } catch(e) { console.error(e); }
+        }
+        document.addEventListener('DOMContentLoaded', loadUpdatesData);
+    </script>
+</body>
+</html>
