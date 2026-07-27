@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Schedule - Aぇ! group Info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css?v=60">
+    <link rel="stylesheet" href="style.css?v=100">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -17,6 +17,7 @@
 
     <nav class="tabs" id="navTabs">
         <a href="index.html">🏠 Home</a>
+        <a href="updates.html">🆕 更新情報の振り返り</a>
         <a href="schedule.html" class="active">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
         <a href="works.html">🎬 出演作品・SNS</a>
@@ -25,22 +26,108 @@
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
-        <section class="card" style="padding: 10px;">
-            <h2 style="padding: 10px 10px 0 10px;">📅 スケジュール</h2>
-            <!-- Googleカレンダーまたは埋め込みカレンダー -->
-            <div style="position: relative; padding-bottom: 120%; height: 0; overflow: hidden; border-radius: 8px;">
-                <iframe src="https://calendar.google.com/calendar/embed?src=ja.japanese%23holiday%40group.v.calendar.google.com&ctz=Asia%2FTokyo" 
-                        style="position: absolute; top:0; left: 0; width: 100%; height: 100%; border: 0;" 
-                        frameborder="0" scrolling="no"></iframe>
+    <main style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
+        <!-- 🔍 絞り込み検索欄 -->
+        <section class="search-container">
+            <div class="search-title"><i class="fa-solid fa-filter"></i> スケジュール絞り込み</div>
+            <div class="checkbox-group">
+                <label class="checkbox-label"><input type="checkbox" value="Aぇ! group" onchange="renderCalendar()"> Aぇ! group</label>
+                <label class="checkbox-label"><input type="checkbox" value="正門" onchange="renderCalendar()"> 正門</label>
+                <label class="checkbox-label"><input type="checkbox" value="末澤" onchange="renderCalendar()"> 末澤</label>
+                <label class="checkbox-label"><input type="checkbox" value="小島" onchange="renderCalendar()"> 小島</label>
+                <label class="checkbox-label"><input type="checkbox" value="佐野" onchange="renderCalendar()"> 佐野</label>
             </div>
+            <div class="filter-inputs">
+                <input type="text" id="keywordInput" class="search-input-text" onkeyup="renderCalendar()" placeholder="キーワードを入力...">
+                <input type="month" id="monthInput" class="search-input-month" onchange="renderCalendar()">
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>📅 スケジュール カレンダー</h2>
+            <div id="calendarArea">🔑 読み込み中...</div>
         </section>
     </main>
 
     <script>
-        function toggleMenu() {
-            document.getElementById("navTabs").classList.toggle("show");
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        let rawEvents = [];
+
+        function toggleMenu() { document.getElementById("navTabs").classList.toggle("show"); }
+
+        function renderCalendar() {
+            const monthVal = document.getElementById("monthInput").value;
+            let targetDate = monthVal ? new Date(monthVal + "-01") : new Date();
+            
+            const year = targetDate.getFullYear();
+            const month = targetDate.getMonth();
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+
+            const checkedMembers = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
+            const keyword = document.getElementById("keywordInput").value.toLowerCase();
+
+            let html = `<h3 style="text-align:center; color:#ff69b4; margin-top:0;">${year}年${month + 1}月</h3>`;
+            html += `<table class="calendar-table"><thead><tr><th>日</th><th>月</th><th>火</th><th>水</th><th>木</th><th>金</th><th>土</th></tr></thead><tbody><tr>`;
+
+            for (let i = 0; i < firstDay; i++) { html += `<td></td>`; }
+
+            let currentDay = 1;
+            let dayOfWeek = firstDay;
+
+            while (currentDay <= lastDate) {
+                if (dayOfWeek === 0 && currentDay !== 1) { html += `<tr>`; }
+
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
+                
+                // 該当日のイベント抽出
+                const dayEvents = rawEvents.filter(e => {
+                    const d = new Date(e["日付"] || e["date"]);
+                    if (isNaN(d.getTime())) return false;
+                    const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                    if (itemDate !== dateStr) return false;
+
+                    const str = JSON.stringify(e).toLowerCase();
+                    if (checkedMembers.length > 0 && !checkedMembers.some(m => str.includes(m.toLowerCase()))) return false;
+                    if (keyword && !str.includes(keyword)) return false;
+                    return true;
+                });
+
+                html += `<td><div class="calendar-day-num">${currentDay}</div>`;
+                dayEvents.forEach(e => {
+                    const title = e["タイトル"] || e["title"] || "";
+                    let bg = "#ff69b4";
+                    if (title.includes("正門")) bg = "#0000ff";
+                    if (title.includes("末澤")) bg = "#ff0000";
+                    if (title.includes("小島")) bg = "#800080";
+                    if (title.includes("佐野")) bg = "#008000";
+                    html += `<span class="calendar-event-tag" style="background:${bg};">${title}</span>`;
+                });
+                html += `</td>`;
+
+                dayOfWeek++;
+                if (dayOfWeek === 7) { html += `</tr>`; dayOfWeek = 0; }
+                currentDay++;
+            }
+
+            while (dayOfWeek > 0 && dayOfWeek < 7) { html += `<td></td>`; dayOfWeek++; }
+            if (dayOfWeek === 0) html += `</tr>`;
+
+            html += `</tbody></table>`;
+            document.getElementById("calendarArea").innerHTML = html;
         }
+
+        async function loadCalendarData() {
+            try {
+                const response = await fetch(CAL_API_URL);
+                rawEvents = await response.json();
+                const now = new Date();
+                document.getElementById("monthInput").value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+                renderCalendar();
+            } catch(e) { console.error(e); }
+        }
+        document.addEventListener('DOMContentLoaded', loadCalendarData);
     </script>
 </body>
 </html>
