@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Aぇ! group Info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css?v=60">
+    <link rel="stylesheet" href="style.css?v=100">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -17,6 +17,7 @@
 
     <nav class="tabs" id="navTabs">
         <a href="index.html" class="active">🏠 Home</a>
+        <a href="updates.html">🆕 更新情報の振り返り</a>
         <a href="schedule.html">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
         <a href="works.html">🎬 出演作品・SNS</a>
@@ -25,64 +26,36 @@
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
-        
-        <!-- 🔍 メンバーチェックボックス＋キーワード＋期間（月ごと）絞り込み検索 -->
-        <section class="search-container">
-            <div class="search-title"><i class="fa-solid fa-filter"></i> 絞り込み検索</div>
-            
-            <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" value="Aぇ! group" onchange="applyFilters()"> Aぇ! group</label>
-                <label class="checkbox-label"><input type="checkbox" value="正門" onchange="applyFilters()"> 正門</label>
-                <label class="checkbox-label"><input type="checkbox" value="末澤" onchange="applyFilters()"> 末澤</label>
-                <label class="checkbox-label"><input type="checkbox" value="小島" onchange="applyFilters()"> 小島</label>
-                <label class="checkbox-label"><input type="checkbox" value="佐野" onchange="applyFilters()"> 佐野</label>
-            </div>
-
-            <div class="filter-inputs">
-                <input type="text" id="keywordInput" class="search-input-text" onkeyup="applyFilters()" placeholder="キーワードを入力...">
-                <input type="month" id="monthInput" class="search-input-month" onchange="applyFilters()">
-            </div>
-        </section>
-
-        <!-- 1. 🆕 更新情報 -->
+    <main style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
         <section class="card">
-            <h2>🆕 更新情報</h2>
+            <h2>🆕 本日の更新情報</h2>
             <div id="updateList">🔑 読み込み中...</div>
         </section>
 
-        <!-- 2. 📅 本日のスケジュール -->
         <section class="card">
             <h2>📅 本日のスケジュール</h2>
             <div id="todayList">🔑 読み込み中...</div>
         </section>
 
-        <!-- 3. 📢 Welcome -->
         <section class="card">
             <h2>📢 Welcome</h2>
-            <p style="margin:0; font-size:0.9rem; color:#444; line-height:1.6;">スマートフォンでご覧の方は、右上の ≡ ボタンを押すと各メニュータブが表示されます。</p>
+            <p style="margin:0; font-size:0.92rem; color:#444; line-height:1.6;">スマートフォンでご覧の方は、右上の ≡ ボタンを押すと各メニュータブが表示されます。</p>
         </section>
     </main>
 
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
-        let allUpdatesData = [];
-        let allTodayEventsData = [];
 
-        function toggleMenu() {
-            document.getElementById("navTabs").classList.toggle("show");
-        }
+        function toggleMenu() { document.getElementById("navTabs").classList.toggle("show"); }
 
         function getMediaEmoji(category, text = "") {
             const combined = (String(category) + " " + String(text)).toLowerCase();
-            if (combined.includes("tv") || combined.includes("テレビ") || combined.includes("出演")) return "📺";
-            if (combined.includes("ラジオ") || combined.includes("radio")) return "📻";
-            if (combined.includes("youtube") || combined.includes("動画") || combined.includes("配信")) return "🎥";
-            if (combined.includes("雑誌") || combined.includes("本") || combined.includes("表紙")) return "📕";
-            if (combined.includes("ライブ") || combined.includes("コンサート") || combined.includes("舞台") || combined.includes("イベント")) return "🎤";
-            if (combined.includes("sns") || combined.includes("インスタ") || combined.includes("x") || combined.includes("ブログ")) return "📱";
-            if (combined.includes("記念日") || combined.includes("誕生日")) return "🎊";
-            if (combined.includes("販売") || combined.includes("グッズ") || combined.includes("cd")) return "🧾";
+            if (combined.includes("tv") || combined.includes("テレビ")) return "📺";
+            if (combined.includes("ラジオ")) return "📻";
+            if (combined.includes("youtube") || combined.includes("動画")) return "🎥";
+            if (combined.includes("雑誌")) return "📕";
+            if (combined.includes("ライブ") || combined.includes("イベント")) return "🎤";
+            if (combined.includes("sns") || combined.includes("インスタ") || combined.includes("x")) return "📱";
             return "⏰";
         }
 
@@ -101,167 +74,63 @@
             return match ? match[0] : null;
         }
 
-        function checkIsTodayUpdate(item) {
-            const timestampVal = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
-            if (timestampVal) {
-                try {
-                    const itemDate = new Date(timestampVal);
-                    if (!isNaN(itemDate.getTime())) {
-                        const now = new Date();
-                        return itemDate.getFullYear() === now.getFullYear() &&
-                               itemDate.getMonth() === now.getMonth() &&
-                               itemDate.getDate() === now.getDate();
-                    }
-                } catch(e){}
-            }
-
-            const val = item["予定外の更新"] ?? item["予定外"] ?? item["更新"] ?? item["isExtra"];
-            if (val === true || val === 1) return true;
-            if (typeof val === 'string') {
-                const s = val.trim().toLowerCase();
-                return s === 'true' || s === '1' || s === 'yes';
-            }
-            return false;
-        }
-
-        function getTimeMillis(item) {
-            const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"];
-            if (!timeVal) return 0;
-            const d = new Date(timeVal);
-            return isNaN(d.getTime()) ? 0 : d.getTime();
-        }
-
-        /* 🔍 高機能検索・絞り込み処理 */
-        function applyFilters() {
-            const checkedMembers = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
-            const keyword = document.getElementById("keywordInput").value.toLowerCase();
-            const monthVal = document.getElementById("monthInput").value; // YYYY-MM
-
-            filterSection("updateList", allUpdatesData, checkedMembers, keyword, monthVal, true);
-            filterSection("todayList", allTodayEventsData, checkedMembers, keyword, monthVal, false);
-        }
-
-        function filterSection(elementId, dataset, members, keyword, month, isUpdate) {
-            const container = document.getElementById(elementId);
-            container.innerHTML = "";
-
-            const filtered = dataset.filter(item => {
-                const itemStr = JSON.stringify(item).toLowerCase();
-                
-                // 1. メンバー判定
-                if (members.length > 0) {
-                    const hasMember = members.some(m => itemStr.includes(m.toLowerCase()));
-                    if (!hasMember) return false;
-                }
-
-                // 2. キーワード判定
-                if (keyword && !itemStr.includes(keyword)) return false;
-
-                // 3. 期間（月ごと）判定
-                if (month) {
-                    const timeVal = item["日付"] || item["date"] || item["タイムスタンプ"] || item["Timestamp"];
-                    if (timeVal) {
-                        const d = new Date(timeVal);
-                        if (!isNaN(d.getTime())) {
-                            const itemMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                            if (itemMonth !== month) return false;
-                        }
-                    }
-                }
-
-                return true;
-            });
-
-            if (filtered.length === 0) {
-                container.innerHTML = "<p style='color:#777;'>条件に合う情報はありません</p>";
-                return;
-            }
-
-            filtered.forEach(item => {
-                const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
-                const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
-                const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
-                
-                let targetUrl = "";
-                for (let key in item) {
-                    if (item.hasOwnProperty(key)) {
-                        const urlCheck = extractUrl(item[key]);
-                        if (urlCheck) { targetUrl = urlCheck; break; }
-                    }
-                }
-
-                const colorClass = getColorClass(detailText + rawTitle + memberText);
-                const div = document.createElement("div");
-
-                if (isUpdate) {
-                    div.className = `update-item ${colorClass}`;
-                    let timeStr = "";
-                    const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"];
-                    if (timeVal) {
-                        try {
-                            const td = new Date(timeVal);
-                            if (!isNaN(td.getTime())) {
-                                timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
-                            }
-                        } catch(e){}
-                    }
-                    let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br><strong>${rawTitle}</strong>`;
-                    if (detailText) htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
-                    if (targetUrl) htmlContent += `<br><a href="${targetUrl}" target="_blank" class="update-link-btn">📸 投稿を見る 🔗</a>`;
-                    div.innerHTML = htmlContent;
-                } else {
-                    div.className = `today-item ${colorClass}`;
-                    const categoryText = item["ジャンル"] || item["媒体"] || item["区分"] || item["D列"] || "";
-                    const emoji = getMediaEmoji(categoryText, rawTitle + detailText);
-                    let timeStr = "";
-                    const timeVal = item["時間"] || item["time"];
-                    if (timeVal) {
-                        try {
-                            const td = new Date(timeVal);
-                            if (!isNaN(td.getTime())) {
-                                timeStr = `${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} `;
-                            }
-                        } catch(e){}
-                    }
-                    div.innerHTML = `<strong>${emoji} ${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${memberText || detailText}</span>`;
-                }
-
-                container.appendChild(div);
-            });
-        }
-
         async function loadHomeData() {
             try {
                 const response = await fetch(CAL_API_URL);
                 const data = await response.json();
-                
-                allUpdatesData = data.filter(item => checkIsTodayUpdate(item));
-                allUpdatesData.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
-
                 const now = new Date();
                 const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-                
-                allTodayEventsData = data.filter(item => {
+
+                // 本日の更新情報
+                const updateList = document.getElementById("updateList");
+                updateList.innerHTML = "";
+                const updates = data.filter(item => {
+                    const ts = item["タイムスタンプ"] || item["Timestamp"];
+                    if (!ts) return false;
+                    const d = new Date(ts);
+                    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth() && d.getDate() === now.getDate();
+                });
+
+                if (updates.length === 0) updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
+                else {
+                    updates.forEach(item => {
+                        const title = item["タイトル"] || item["内容"] || "";
+                        const detail = item["詳細"] || item["メモ"] || "";
+                        const colorClass = getColorClass(title + detail);
+                        const url = extractUrl(title + detail);
+                        const div = document.createElement("div");
+                        div.className = `update-item ${colorClass}`;
+                        div.innerHTML = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報</span><br><strong>${title}</strong><br><span style="font-size:0.85rem; color:#666;">${detail}</span>${url ? `<br><a href="${url}" target="_blank" class="update-link-btn">📸 投稿を見る 🔗</a>` : ''}`;
+                        updateList.appendChild(div);
+                    });
+                }
+
+                // 本日のスケジュール
+                const todayList = document.getElementById("todayList");
+                todayList.innerHTML = "";
+                const todayEvents = data.filter(item => {
                     const dateVal = item["日付"] || item["date"];
                     if (!dateVal || item["タイムスタンプ"]) return false;
-                    try {
-                        const d = new Date(dateVal);
-                        if (isNaN(d.getTime())) return false;
-                        const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-                        return itemDate === todayStr;
-                    } catch(e) { return false; }
+                    const d = new Date(dateVal);
+                    const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                    return itemDate === todayStr;
                 });
-                allTodayEventsData.sort((a, b) => getTimeMillis(a) - getTimeMillis(b));
 
-                applyFilters();
-
-            } catch (e) {
-                document.getElementById("todayList").innerText = "データの読み込みに失敗しました。";
-                document.getElementById("updateList").innerText = "データの読み込みに失敗しました。";
-                console.error(e);
-            }
+                if (todayEvents.length === 0) todayList.innerHTML = "<p style='color:#777;'>今日の予定はありません</p>";
+                else {
+                    todayEvents.forEach(item => {
+                        const title = item["タイトル"] || "";
+                        const detail = item["詳細"] || item["メンバー"] || "";
+                        const emoji = getMediaEmoji(item["ジャンル"] || "", title + detail);
+                        const colorClass = getColorClass(title + detail);
+                        const div = document.createElement("div");
+                        div.className = `today-item ${colorClass}`;
+                        div.innerHTML = `<strong>${emoji} ${title}</strong><br><span style="font-size:0.85rem; color:#666;">${detail}</span>`;
+                        todayList.appendChild(div);
+                    });
+                }
+            } catch(e) { console.error(e); }
         }
-
         document.addEventListener('DOMContentLoaded', loadHomeData);
     </script>
 </body>
