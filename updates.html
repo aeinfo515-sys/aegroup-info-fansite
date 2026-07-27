@@ -21,7 +21,6 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <style>
-        /* 検索ボックス */
         .search-container {
             margin: 15px 0 20px 0;
             position: relative;
@@ -50,7 +49,6 @@
             color: #888;
         }
 
-        /* 表示切り替えタブ */
         .view-toggle {
             display: flex;
             gap: 10px;
@@ -74,7 +72,6 @@
             color: #fff;
         }
 
-        /* カレンダーデザイン調整 */
         #calendar {
             background: #fff;
             padding: 10px;
@@ -90,7 +87,6 @@
             padding: 2px 4px;
         }
 
-        /* モーダル（ポップアップ） */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -120,7 +116,6 @@
             color: #888;
         }
 
-        /* リスク表示用カード */
         .update-list {
             display: flex;
             flex-direction: column;
@@ -217,7 +212,7 @@
             </div>
 
             <div id="error-message" style="display: none; color: #e53e3e;">
-                データの取得に失敗しました。<br>時間をおいて再度お試しください。
+                データの取得に失敗しました。<br>GASのアクセス権限（「全員」に公開）をご確認ください。
             </div>
 
             <!-- 📅 カレンダー表示領域 -->
@@ -225,7 +220,7 @@
                 <div id="calendar"></div>
             </div>
 
-            <!-- 📋 リスト表示領域（初期状態は非表示） -->
+            <!-- 📋 リスト表示領域 -->
             <div id="listView" style="display: none;">
                 <div class="update-list" id="updateList"></div>
             </div>
@@ -251,35 +246,82 @@
         let rawData = [];
         let calendar;
 
+        // データ項目を自動解析するヘルパー関数
+        function parseItem(item) {
+            let date = "", title = "", url = "";
+            
+            // 配列で届いた場合
+            if (Array.isArray(item)) {
+                date = item[0] || "";
+                title = item[1] || "";
+                url = item[2] || "";
+            } 
+            // オブジェクトで届いた場合（多様なキー名に対応）
+            else if (typeof item === 'object' && item !== null) {
+                const keys = Object.keys(item);
+                
+                // 日付の検出
+                for (let k of keys) {
+                    if (/date|time|timestamp|日付|日時/i.test(k)) { date = item[k]; break; }
+                }
+                if (!date && keys.length > 0) date = item[keys[0]];
+
+                // タイトルの検出
+                for (let k of keys) {
+                    if (/title|content|text|message|タイトル|内容/i.test(k)) { title = item[k]; break; }
+                }
+                if (!title && keys.length > 1) title = item[keys[1]];
+
+                // URLの検出
+                for (let k of keys) {
+                    if (/url|link|href|リンク/i.test(k)) { url = item[k]; break; }
+                }
+                if (!url && keys.length > 2) url = item[keys[2]];
+            }
+
+            return { date: String(date || ''), title: String(title || '更新情報'), url: String(url || '') };
+        }
+
         async function initPage() {
             try {
-                const response = await fetch(GAS_API_URL);
+                // リダイレクトに自動追従するfetch設定
+                const response = await fetch(GAS_API_URL, { redirect: 'follow' });
                 if (!response.ok) throw new Error('Network error');
                 
-                rawData = await response.json();
+                const json = await response.json();
+                
+                // GASの戻り値構造に対応 (dataフィールドがある場合など)
+                rawData = Array.isArray(json) ? json : (json.data || json.items || []);
+                
                 document.getElementById('loading').style.display = 'none';
+
+                if (rawData.length === 0) {
+                    document.getElementById('updateList').innerHTML = '<p style="text-align:center; color:#888;">更新情報が登録されていません。</p>';
+                }
 
                 initCalendar(rawData);
                 renderList(rawData);
             } catch (error) {
-                console.error(error);
+                console.error("API Fetch Error:", error);
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error-message').style.display = 'block';
             }
         }
 
-        // FullCalendarの初期化
         function initCalendar(data) {
             const calendarEl = document.getElementById('calendar');
             
-            const events = data.map(item => ({
-                title: item.title || item.content || '更新情報',
-                start: item.date || item.datetime || item.timestamp,
-                extendedProps: {
-                    url: item.url || item.link || '',
-                    rawDate: item.date || item.datetime || item.timestamp
-                }
-            }));
+            const events = data.map(rawItem => {
+                const parsed = parseItem(rawItem);
+                return {
+                    title: parsed.title,
+                    start: parsed.date,
+                    extendedProps: {
+                        url: parsed.url,
+                        rawDate: parsed.date
+                    }
+                };
+            }).filter(e => e.start); // 日付が存在するものだけイベント化
 
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
@@ -302,7 +344,6 @@
             calendar.render();
         }
 
-        // リスト描画
         function renderList(data) {
             const updateList = document.getElementById('updateList');
             updateList.innerHTML = '';
@@ -312,22 +353,19 @@
                 return;
             }
 
-            data.forEach(item => {
+            data.forEach(rawItem => {
+                const parsed = parseItem(rawItem);
                 const card = document.createElement('div');
                 card.className = 'update-card';
 
-                const dateText = item.date || item.datetime || item.timestamp || '';
-                const titleText = item.title || item.content || '更新情報';
-                const linkUrl = item.url || item.link || '';
-
                 let html = '';
-                if (dateText) html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(dateText)}</div>`;
-                html += `<div class="update-title">${escapeHtml(titleText)}</div>`;
+                if (parsed.date) html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(parsed.date)}</div>`;
+                html += `<div class="update-title">${escapeHtml(parsed.title)}</div>`;
 
-                if (linkUrl) {
+                if (parsed.url && parsed.url.startsWith('http')) {
                     html += `
                         <div style="margin-top: 8px;">
-                            <a href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener noreferrer" class="update-link-btn">
+                            <a href="${escapeHtml(parsed.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn">
                                 📸 投稿を見る 🔗
                             </a>
                         </div>
@@ -339,32 +377,28 @@
             });
         }
 
-        // 検索フィルター
         function filterUpdates() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = rawData.filter(item => {
-                const title = (item.title || item.content || '').toLowerCase();
-                const date = (item.date || item.datetime || item.timestamp || '').toLowerCase();
-                return title.includes(query) || date.includes(query);
+            const filtered = rawData.filter(rawItem => {
+                const parsed = parseItem(rawItem);
+                return parsed.title.toLowerCase().includes(query) || parsed.date.toLowerCase().includes(query);
             });
 
             renderList(filtered);
 
-            // カレンダーイベントの更新
             if (calendar) {
                 calendar.removeAllEvents();
-                calendar.addEventSource(filtered.map(item => ({
-                    title: item.title || item.content || '更新情報',
-                    start: item.date || item.datetime || item.timestamp,
-                    extendedProps: {
-                        url: item.url || item.link || '',
-                        rawDate: item.date || item.datetime || item.timestamp
-                    }
-                })));
+                calendar.addEventSource(filtered.map(rawItem => {
+                    const parsed = parseItem(rawItem);
+                    return {
+                        title: parsed.title,
+                        start: parsed.date,
+                        extendedProps: { url: parsed.url, rawDate: parsed.date }
+                    };
+                }).filter(e => e.start));
             }
         }
 
-        // ビュー切り替え
         function switchView(viewType) {
             const calendarView = document.getElementById('calendarView');
             const listView = document.getElementById('listView');
@@ -385,13 +419,12 @@
             }
         }
 
-        // モーダル操作
         function showModal(title, date, url) {
             document.getElementById('modalTitle').innerText = title;
             document.getElementById('modalDate').innerText = date ? `📅 ${date}` : '';
             
             const linkContainer = document.getElementById('modalLinkContainer');
-            if (url) {
+            if (url && url.startsWith('http')) {
                 linkContainer.innerHTML = `
                     <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="width:100%; justify-content:center; box-sizing:border-box;">
                         📸 投稿を見る 🔗
