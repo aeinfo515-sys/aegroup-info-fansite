@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NPHVYVNK6L');
+    </script>
+
+    <meta charset="UTF-8">
+    <title>出演作品・SNS - Aぇ! group info</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .work-section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin: 25px 0 12px 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #ff69b4;
+        }
+
+        .work-item { 
+            position: relative; 
+            padding: 14px 16px; 
+            padding-left: 22px;
+            margin-bottom: 12px; 
+            background: #f9f9f9; 
+            border-radius: 8px; 
+            font-size: 0.95rem;
+            overflow: hidden; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        
+        .work-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px; 
+            background-color: #ff69b4; 
+        }
+
+        .category-badge {
+            display: inline-block;
+            background: #eee;
+            color: #555;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-weight: bold;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .work-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .work-link-btn:hover {
+            background-color: #ff1493;
+            opacity: 0.9;
+        }
+        .work-link-btn.btn-x { background-color: #000; }
+        .work-link-btn.btn-x:hover { background-color: #333; }
+        .work-link-btn.btn-insta { background-color: #e1306c; }
+        .work-link-btn.btn-insta:hover { background-color: #c13584; }
+        .work-link-btn.btn-yt { background-color: #ff0000; }
+        .work-link-btn.btn-yt:hover { background-color: #cc0000; }
+
+        /* メンバーカラーバー */
+        .bg-group::before { background-color: #ff69b4 !important; }     
+        .bg-kojima::before { background-color: #800080 !important; }    
+        .bg-masakado::before { background-color: #0000ff !important; }  
+        .bg-suezawa::before { background-color: #ff0000 !important; }   
+        .bg-sano::before { background-color: #008000 !important; }      
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <h1>Aぇ! group Info</h1>
+        <p>インフォメーションサイト(非公式)</p>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <nav class="tabs" id="navTabs">
+        <a href="index.html">🏠 Home</a>
+        <a href="updates.html">🆕 更新情報</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="requests.html">✉️ リクエスト・募集</a>
+        <a href="works.html" class="active">🎬 出演作品・SNS</a>
+        <a href="sns.html">📱 SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
+    </nav>
+
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+        <section class="card">
+            <h2>🎬 出演作品・公式リンク集</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">
+                レギュラー番組、出演ドラマ・舞台、公式SNSなどのリンク集です。
+            </p>
+
+            <!-- 📺 レギュラー番組・ラジオ -->
+            <div class="work-section-title">📺 レギュラー番組 & 📻 ラジオ</div>
+
+            <div class="work-item bg-group">
+                <span class="category-badge">📺 ABCテレビ</span><br>
+                <strong>あっちこっちAぇ!</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! group 冠番組</span>
+                <div class="btn-group">
+                    <a href="https://www.asahi.co.jp/acchikocchi/" target="_blank" rel="noopener noreferrer" class="work-link-btn">🌐 公式HP</a>
+                    <a href="https://x.com/acchikocchiA" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <div class="work-item bg-group">
+                <span class="category-badge">📺 フジテレビ</span><br>
+                <strong>Q&Aぇ!</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! group</span>
+                <div class="btn-group">
+                    <a href="https://www.fujitv.co.jp/qandae/" target="_blank" rel="noopener noreferrer" class="work-link-btn">🌐 公式HP</a>
+                    <a href="https://x.com/q_and_ae" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <div class="work-item bg-group">
+                <span class="category-badge">📻 MBSラジオ</span><br>
+                <strong>MBSヤングタウン（ヤンタン）</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! group（水曜日担当）</span>
+                <div class="btn-group">
+                    <a href="https://www.mbs1179.com/youngtown/" target="_blank" rel="noopener noreferrer" class="work-link-btn">🌐 公式HP</a>
+                    <a href="https://x.com/A_mbs1179" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <div class="work-item bg-kojima">
+                <span class="category-badge">📻 FM大阪</span><br>
+                <strong>ラジキング</strong><br>
+                <span style="font-size:0.85rem; color:#666;">小島健</span>
+                <div class="btn-group">
+                    <a href="https://www.fmosaka.net/_ct/17694939" target="_blank" rel="noopener noreferrer" class="work-link-btn">🌐 公式HP</a>
+                    <a href="https://x.com/fmosaka851" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <!-- 🎭 ドラマ・舞台・映画作品 -->
+            <div class="work-section-title">🎭 出演ドラマ・舞台・映画</div>
+
+            <div class="work-item bg-group">
+                <span class="category-badge">🎭 舞台</span><br>
+                <strong>おそ松さん on STAGE</strong><br>
+                <span style="font-size:0.85rem; color:#666;">Aぇ! group 関連出演作品</span>
+                <div class="btn-group">
+                    <a href="https://osomatsusan-stage-2nd.com/" target="_blank" rel="noopener noreferrer" class="work-link-btn">🌐 公式HP</a>
+                    <a href="https://x.com/osomatsu_stage" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <div class="work-item bg-sano">
+                <span class="category-badge">🎬 ドラマ</span><br>
+                <strong>風、薫る</strong><br>
+                <span style="font-size:0.85rem; color:#666;">佐野晶哉 出演</span>
+                <div class="btn-group">
+                    <a href="https://x.com/kazekaoru_drama" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <div class="work-item bg-kojima">
+                <span class="category-badge">🎬 ドラマ</span><br>
+                <strong>八神瑛子シリーズ（警視庁捜査一課・八神瑛子）</strong><br>
+                <span style="font-size:0.85rem; color:#666;">小島健 出演</span>
+                <div class="btn-group">
+                    <a href="https://x.com/yagami_drama" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <div class="work-item bg-masakado">
+                <span class="category-badge">🎬 ドラマ</span><br>
+                <strong>エスドラ</strong><br>
+                <span style="font-size:0.85rem; color:#666;">正門良規 出演</span>
+                <div class="btn-group">
+                    <a href="https://x.com/S_DURA_official" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <div class="work-item bg-suezawa">
+                <span class="category-badge">🎬 ドラマ / 舞台</span><br>
+                <strong>mentor</strong><br>
+                <span style="font-size:0.85rem; color:#666;">末澤誠也 出演</span>
+                <div class="btn-group">
+                    <a href="https://x.com/mentor_official" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                </div>
+            </div>
+
+            <!-- 📱 公式SNS & YouTube -->
+            <div class="work-section-title">📱 公式SNS & Channel</div>
+
+            <div class="work-item bg-group">
+                <span class="category-badge">📱 公式アカ</span><br>
+                <strong>Aぇ! group 公式SNS</strong>
+                <div class="btn-group">
+                    <a href="https://x.com/Aegroupofficial" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-x"><i class="fa-brands fa-x-twitter"></i> 公式X</a>
+                    <a href="https://www.instagram.com/aegroup_official_0515/" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-insta"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                    <a href="https://www.youtube.com/@Aegroup_official" target="_blank" rel="noopener noreferrer" class="work-link-btn btn-yt"><i class="fa-brands fa-youtube"></i> YouTube</a>
+                </div>
+            </div>
+
+            <!-- スプレッドシートからの動的追加枠 -->
+            <div id="dynamicWorks"></div>
+        </section>
+    </main>
+
+    <script>
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
+        }
+
+        function getColorClass(text) {
+            if (!text) return "bg-group";
+            if (text.includes("小島")) return "bg-kojima";
+            if (text.includes("正門")) return "bg-masakado";
+            if (text.includes("末澤")) return "bg-suezawa";
+            if (text.includes("佐野")) return "bg-sano";
+            return "bg-group";
+        }
+
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = String(text).match(/(https?:\/\/[^\s]+)/);
+            return match ? match[0] : null;
+        }
+
+        // スプレッドシートから追加の作品・番組データがあれば末尾に自動読み込みする処理
+        async function loadExtraWorks() {
+            try {
+                const response = await fetch(CAL_API_URL);
+                const data = await response.json();
+
+                const container = document.getElementById("dynamicWorks");
+
+                const worksData = data.filter(item => {
+                    const category = String(item["ジャンル"] || item["媒体"] || item["区分"] || "");
+                    const title = String(item["タイトル"] || item["title"] || "");
+                    const text = category + title;
+                    return text.includes("作品") || text.includes("ドラマ") || text.includes("映画") || text.includes("舞台");
+                });
+
+                if (worksData.length > 0) {
+                    let html = '<div class="work-section-title">✨ その他の最新作品・番組情報</div>';
+                    worksData.forEach(item => {
+                        const rawTitle = item["タイトル"] || item["title"] || "作品情報";
+                        const detailText = item["詳細"] || item["detail"] || "";
+                        const categoryText = item["ジャンル"] || item["媒体"] || "作品";
+                        const memberText = item["担当"] || item["メンバー"] || "";
+
+                        let targetUrl = "";
+                        for (let key in item) {
+                            if (item.hasOwnProperty(key)) {
+                                const urlCheck = extractUrl(item[key]);
+                                if (urlCheck) {
+                                    targetUrl = urlCheck;
+                                    break; 
+                                }
+                            }
+                        }
+
+                        const colorClass = getColorClass(detailText + rawTitle + memberText);
+                        
+                        html += `<div class="work-item ${colorClass}">`;
+                        html += `<span class="category-badge">${categoryText}</span><br>`;
+                        html += `<strong>${rawTitle}</strong>`;
+                        if (detailText) html += `<br><span style="font-size:0.85rem; color:#666;">${detailText}</span>`;
+                        if (targetUrl) {
+                            html += `<div class="btn-group"><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="work-link-btn">🌐 リンクを開く 🔗</a></div>`;
+                        }
+                        html += `</div>`;
+                    });
+                    container.innerHTML = html;
+                }
+            } catch (e) {
+                console.error("スプレッドシートデータ取得エラー:", e);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadExtraWorks);
+    </script>
+</body>
+</html>
