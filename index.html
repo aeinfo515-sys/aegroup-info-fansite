@@ -1,327 +1,59 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-NPHVYVNK6L');
-    </script>
-
     <meta charset="UTF-8">
-    <title>Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        /* 新着情報・今日の予定の枠デザイン */
-        .update-item, .today-item { 
-            position: relative; 
-            padding: 12px 15px 12px 22px; 
-            margin-bottom: 12px; 
-            background: #f9f9f9; 
-            border-radius: 8px; 
-            font-size: 0.95rem;
-            overflow: hidden; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-        }
-        
-        /* 左端のカラーバー設定 */
-        .update-item::before, .today-item::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 8px; 
-            background-color: #ff69b4; 
-        }
-        
-        /* タップしてワンクリックで飛べるピンクのボタン */
-        .update-link-btn {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 8px 14px;
-            background-color: #ff69b4;
-            color: #fff !important;
-            text-decoration: none !important;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .update-link-btn:hover {
-            background-color: #ff1493;
-            opacity: 0.9;
-        }
-        
-        /* 各メンバーのカラーバーの色 */
-        .bg-group::before { background-color: #ff69b4 !important; }     
-        .bg-kojima::before { background-color: #800080 !important; }    
-        .bg-masakado::before { background-color: #0000ff !important; }  
-        .bg-suezawa::before { background-color: #ff0000 !important; }   
-        .bg-sano::before { background-color: #008000 !important; }      
-    </style>
+    <title>Aぇ! group ファンサイト</title>
+    <!-- パスを「style.css?v=3」に変更し、どのページからでも直下のCSSを参照できるように修正 -->
+    <link rel="stylesheet" href="style.css?v=3">
+    <!-- JSの読み込みも正しく設定 -->
+    <script src="script.js" defer></script>
 </head>
 <body>
 
-    <header class="hero">
-        <h1>Aぇ! group Info</h1>
-        <p>インフォメーションサイト(非公式)</p>
-        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+    <!-- ヘッダー / ナビゲーション -->
+    <header>
+        <div class="logo">Aぇ! group Fan Site</div>
+        
+        <!-- スマホ用ハンバーガーボタン -->
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- ナビゲーションメニュー -->
+        <nav id="nav-menu">
+            <ul>
+                <li><a href="index.html">ホーム</a></li>
+                <li><a href="members.html">メンバー</a></li>
+                <li><a href="sns.html">SNS・リンク</a></li>
+                <li><a href="schedule.html">スケジュール</a></li>
+            </ul>
+        </nav>
     </header>
 
-    <nav class="tabs" id="navTabs">
-        <a href="index.html" class="active">🏠 Home</a>
-        <a href="schedule.html">📅 Schedule</a>
-        <a href="sns.html">📱 SNS</a>
-        <a href="tickets.html">🎫 Tickets</a>
-        <a href="members.html">👤 Members</a>
-    </nav>
-
-    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
-        <!-- 1. 🆕 更新情報 -->
-        <section class="card" style="margin-bottom: 20px;">
-            <h2>🆕 更新情報</h2>
-            <div id="updateList">🔑 読み込み中...</div>
+    <!-- メインコンテンツ -->
+    <main>
+        <section class="hero">
+            <h1>Aぇ! group</h1>
+            <p>非公式ファン情報まとめサイト</p>
         </section>
 
-        <!-- 2. 📅 本日のスケジュール -->
-        <section class="card" style="margin-bottom: 20px;">
-            <h2>📅 本日のスケジュール</h2>
-            <div id="todayList">🔑 読み込み中...</div>
-        </section>
-
-        <!-- 3. 📢 サイト説明 -->
-        <section class="card">
-            <h2>📢 Welcome</h2>
-            <p>スマートフォンでご覧の方は、右上の ≡ ボタンを押すと各メニュータブが表示されます。</p>
+        <section class="tabs-container">
+            <h2>クイックメニュー</h2>
+            <div class="tabs">
+                <a href="members.html" class="tab-btn">メンバー紹介</a>
+                <a href="sns.html" class="tab-btn">公式SNS一覧</a>
+                <a href="schedule.html" class="tab-btn">出演・ライブ情報</a>
+            </div>
         </section>
     </main>
 
-    <script>
-        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+    <!-- フッター -->
+    <footer>
+        <p>&copy; Aぇ! group Fan Site</p>
+    </footer>
 
-        function toggleMenu() {
-            document.getElementById("navTabs").classList.toggle("show");
-        }
-
-        // D列（ジャンル・媒体）の値から絵文字を判定する関数
-        function getMediaEmoji(category) {
-            if (!category) return "⏰";
-            const c = String(category).trim();
-            if (c.includes("出演")) return "📺";
-            if (c.includes("SNS")) return "📱";
-            if (c.includes("雑誌")) return "📕";
-            if (c.includes("イベント")) return "🎤";
-            if (c.includes("記念日")) return "🎊";
-            if (c.includes("販売")) return "🧾";
-            return "⏰";
-        }
-
-        function getColorClass(text) {
-            if (!text) return "bg-group";
-            if (text.includes("小島")) return "bg-kojima";
-            if (text.includes("正門")) return "bg-masakado";
-            if (text.includes("末澤")) return "bg-suezawa";
-            if (text.includes("佐野")) return "bg-sano";
-            return "bg-group";
-        }
-
-        function getLinkButtonText(url) {
-            return "📸 投稿を見る 🔗";
-        }
-
-        function extractUrl(text) {
-            if (!text) return null;
-            const match = String(text).match(/(https?:\/\/[^\s]+)/);
-            return match ? match[0] : null;
-        }
-
-        function checkIsTodayUpdate(item) {
-            const timestampVal = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
-            
-            if (timestampVal) {
-                try {
-                    const itemDate = new Date(timestampVal);
-                    if (!isNaN(itemDate.getTime())) {
-                        const now = new Date();
-                        return itemDate.getFullYear() === now.getFullYear() &&
-                               itemDate.getMonth() === now.getMonth() &&
-                               itemDate.getDate() === now.getDate();
-                    }
-                } catch(e){}
-            }
-
-            const val = item["予定外の更新"] ?? item["予定外"] ?? item["更新"] ?? item["isExtra"];
-            if (val === true || val === 1) return true;
-            if (typeof val === 'string') {
-                const s = val.trim().toLowerCase();
-                return s === 'true' || s === '1' || s === 'yes';
-            }
-            
-            return false;
-        }
-
-        // 日時・時間の値を取得してミリ秒で返すヘルパー関数
-        function getTimeMillis(item) {
-            const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"];
-            if (!timeVal) return 0;
-            const d = new Date(timeVal);
-            return isNaN(d.getTime()) ? 0 : d.getTime();
-        }
-
-        async function loadHomeData() {
-            try {
-                const response = await fetch(CAL_API_URL);
-                const data = await response.json();
-                
-                // 1. 【更新情報】の処理
-                const updateList = document.getElementById("updateList");
-                updateList.innerHTML = "";
-
-                const updates = data.filter(item => checkIsTodayUpdate(item));
-
-                // 💡 更新情報を【新しい時間順（降順：最新が一番上）】にソート
-                updates.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
-
-                if (updates.length === 0) {
-                    updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
-                } else {
-                    updates.forEach(item => {
-                        const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
-                        const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
-                        
-                        let targetUrl = "";
-                        for (let key in item) {
-                            if (item.hasOwnProperty(key)) {
-                                const urlCheck = extractUrl(item[key]);
-                                if (urlCheck) {
-                                    targetUrl = urlCheck;
-                                    break; 
-                                }
-                            }
-                        }
-
-                        let displayTitle = rawTitle;
-                        if (rawTitle.startsWith("http")) {
-                            displayTitle = "SNS更新情報";
-                        } else if (targetUrl && rawTitle.includes(targetUrl)) {
-                            displayTitle = rawTitle.replace(targetUrl, '').trim() || "SNS更新情報";
-                        }
-
-                        let cleanDetail = detailText;
-                        if (targetUrl && detailText.includes(targetUrl)) {
-                            cleanDetail = detailText.replace(targetUrl, '').trim();
-                        }
-
-                        let timeStr = "";
-                        const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"];
-                        if (timeVal) {
-                            try {
-                                const td = new Date(timeVal);
-                                if (!isNaN(td.getTime())) {
-                                    timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
-                                }
-                            } catch(e){}
-                        }
-
-                        const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
-                        const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
-                        
-                        const div = document.createElement("div");
-                        div.className = `update-item ${colorClass}`;
-                        
-                        let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br>`;
-                        if (displayTitle) {
-                            htmlContent += `<strong>${displayTitle}</strong>`;
-                        }
-                        
-                        if (cleanDetail && cleanDetail !== displayTitle) {
-                            htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${cleanDetail}</span>`;
-                        } else if (memberText && memberText !== displayTitle) {
-                            htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${memberText}</span>`;
-                        }
-
-                        if (targetUrl) {
-                            const btnText = getLinkButtonText(targetUrl);
-                            htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
-                        }
-
-                        div.innerHTML = htmlContent;
-                        updateList.appendChild(div);
-                    });
-                }
-
-                // 2. 【本日のスケジュール】の処理
-                const todayList = document.getElementById("todayList");
-                todayList.innerHTML = "";
-                
-                const now = new Date();
-                const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-                
-                const todayEvents = data.filter(item => {
-                    const dateVal = item["日付"] || item["date"];
-                    if (!dateVal || item["タイムスタンプ"]) return false;
-
-                    try {
-                        const d = new Date(dateVal);
-                        if (isNaN(d.getTime())) return false;
-                        const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-                        return itemDate === todayStr;
-                    } catch(e) {
-                        return false;
-                    }
-                });
-
-                // 💡 今日の予定を【早い時間順（昇順：朝〜夜）】にソート
-                todayEvents.sort((a, b) => getTimeMillis(a) - getTimeMillis(b));
-
-                if (todayEvents.length === 0) {
-                    todayList.innerHTML = "<p style='color:#777;'>今日の予定はありません</p>";
-                } else {
-                    todayEvents.forEach(item => {
-                        const rawTitle = item["タイトル"] || item["title"] || "";
-                        const detailText = item["詳細"] || item["detail"] || "";
-                        const memberText = item["担当"] || item["メンバー"] || "";
-                        const categoryText = item["ジャンル"] || item["媒体"] || item["区分"] || item["D列"] || "";
-                        const emoji = getMediaEmoji(categoryText);
-                        
-                        const colorClass = getColorClass(detailText + rawTitle + memberText);
-                        
-                        let timeStr = "";
-                        const timeVal = item["時間"] || item["time"];
-                        if (timeVal) {
-                            try {
-                                const td = new Date(timeVal);
-                                if (!isNaN(td.getTime())) {
-                                    timeStr = `${emoji} ${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} `;
-                                }
-                            } catch(e){}
-                        }
-                        if (!timeStr) {
-                            timeStr = `${emoji} `;
-                        }
-                        
-                        const div = document.createElement("div");
-                        div.className = `today-item ${colorClass}`;
-                        div.innerHTML = `<strong>${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText || memberText}</span>`;
-                        todayList.appendChild(div);
-                    });
-                }
-
-            } catch (e) {
-                document.getElementById("todayList").innerText = "データの読み込みに失敗しました。";
-                document.getElementById("updateList").innerText = "データの読み込みに失敗しました。";
-                console.error(e);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', loadHomeData);
-    </script>
 </body>
 </html>
