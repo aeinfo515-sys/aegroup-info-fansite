@@ -1,43 +1,45 @@
 /* ==========================================
-   🌈 ヘッダー：共通の鮮やかな4人グラデーション（紫・青・赤・緑）
+   🌈 ヘッダー：4人グラデーション（紫・青・赤・緑）
    ========================================== */
 .hero {
     background: linear-gradient(90deg, #800080 0%, #0000ff 33%, #ff0000 66%, #008000 100%) !important;
     color: white !important;
     text-align: center !important;
-    padding: 35px 20px 25px 20px !important;
+    padding: 38px 20px 28px 20px !important;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
     position: relative !important;
 }
 
 .hero h1 {
-    font-size: 1.8rem;
-    margin: 0 0 5px 0;
+    font-size: 1.9rem;
+    margin: 0 0 6px 0;
     font-weight: bold;
+    letter-spacing: 0.5px;
 }
 
 .hero p {
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     margin: 0;
-    opacity: 0.9;
+    opacity: 0.92;
 }
 
 body {
     font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif !important;
-    background-color: #fff0f5 !important; 
+    background-color: #fff0f5 !important; /* 淡いピンク背景 */
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden;
 }
 
-/* 🎫 パソコン版のタブボタン（横並び） */
+/* 🎫 横並びメニュータブ（余白の調整） */
 .tabs {
     display: flex !important;
     justify-content: center !important;
     background: #ffffff !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-    padding: 10px !important;
-    gap: 8px !important;
+    box-shadow: 0 3px 10px rgba(255, 182, 193, 0.2) !important;
+    padding: 12px 10px !important;
+    gap: 10px !important;
+    flex-wrap: wrap;
 }
 .tabs a {
     display: inline-block !important;
@@ -49,6 +51,7 @@ body {
     font-weight: bold !important;
     background: #fff0f5 !important;
     border: 1px solid #ffb6c1 !important;
+    transition: all 0.2s ease;
 }
 .tabs a.active, .tabs a:hover {
     background: #ff69b4 !important;
@@ -56,24 +59,24 @@ body {
     border-color: #ff69b4 !important;
 }
 
-/* 📱 スマホ用メニューボタン（ハンバーガー） */
+/* 📱 ハンバーガーボタン */
 .menu-trigger {
     display: none;
     position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 1.2rem;
+    top: 16px;
+    right: 16px;
+    font-size: 1.25rem;
     color: white;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
     cursor: pointer;
     z-index: 1001;
 }
 
 /* ==========================================
-   📱 スマホ版：右から出てくるメニュー（ドロワー）
+   📱 スマホ版メニュー（ドロワー）
    ========================================== */
 @media (max-width: 600px) {
     .menu-trigger { display: block !important; }
@@ -83,13 +86,13 @@ body {
         flex-direction: column !important;
         position: fixed !important;
         top: 0 !important;
-        right: -250px !important;
-        width: 250px !important;
+        right: -260px !important;
+        width: 260px !important;
         height: 100vh !important;
         box-sizing: border-box !important;
         background: #ffffff !important;
-        padding: 70px 20px 20px 20px !important;
-        box-shadow: -4px 0 12px rgba(0,0,0,0.1) !important;
+        padding: 75px 20px 20px 20px !important;
+        box-shadow: -4px 0 16px rgba(0,0,0,0.15) !important;
         z-index: 1000 !important;
         transition: right 0.3s ease !important;
         gap: 12px !important;
@@ -103,8 +106,8 @@ body {
     .tabs a {
         width: 100% !important;
         box-sizing: border-box !important;
-        padding: 12px !important;
-        border-radius: 10px !important;
+        padding: 14px !important;
+        border-radius: 12px !important;
         text-align: center !important;
     }
 }
