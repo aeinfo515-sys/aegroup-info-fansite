@@ -86,7 +86,7 @@
             cursor: pointer;
         }
 
-        /* カレンダー全体のサイズコンパクト化 */
+        /* カレンダー全体のサイズ調整 */
         #calendar {
             background: #fff;
             padding: 6px;
@@ -116,7 +116,10 @@
             opacity: 1 !important;
         }
 
-        /* 1日の高さ制限＆タイトルのフォント調整 */
+        .fc-daygrid-day {
+            cursor: pointer;
+        }
+
         .fc-daygrid-day-frame {
             min-height: 65px !important;
         }
@@ -126,7 +129,7 @@
             padding: 1px 3px !important;
             margin-bottom: 1px !important;
             border-radius: 4px !important;
-            cursor: pointer;
+            pointer-events: none; /* 日付セルタップを優先 */
         }
 
         .fc-more-link {
@@ -135,7 +138,7 @@
             font-weight: bold;
         }
 
-        /* モーダルポップアップ (詳細表示用) */
+        /* モーダルポップアップ (日付タップ時の一覧表示) */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -151,8 +154,10 @@
             background: #fff;
             border-radius: 16px;
             padding: 20px;
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
         }
@@ -163,7 +168,7 @@
             color: #ff69b4;
             border-bottom: 2px solid #ffd1dc;
             padding-bottom: 8px;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         .modal-close {
@@ -173,6 +178,32 @@
             color: #999;
             cursor: pointer;
         }
+
+        /* モーダル内カード表示 */
+        .modal-schedule-item {
+            position: relative;
+            padding: 10px 12px 10px 18px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            border: 1px solid #eee;
+            overflow: hidden;
+        }
+
+        .modal-schedule-item::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 6px;
+        }
+
+        /* メンバーカラー（左側ボーダー） */
+        .bg-group::before { background-color: #ff69b4 !important; }
+        .bg-kojima::before { background-color: #800080 !important; }
+        .bg-masakado::before { background-color: #0000ff !important; }
+        .bg-suezawa::before { background-color: #ff0000 !important; }
+        .bg-sano::before { background-color: #008000 !important; }
 
         .loading-box {
             text-align: center;
@@ -208,18 +239,18 @@
                 📅 Schedule
             </h2>
 
-            <!-- 検索 & メンバー絞り込み -->
+            <!-- 検索 & メンバー絞り込み (指定順: Aぇ! group・正門・末澤・小島・佐野) -->
             <div class="search-container">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" placeholder="キーワードで検索..." oninput="filterCalendar()">
                 </div>
                 <div class="member-checkboxes">
+                    <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ!</label>
                     <label class="member-label"><input type="checkbox" value="正門" checked onchange="filterCalendar()"> 正門</label>
                     <label class="member-label"><input type="checkbox" value="末澤" checked onchange="filterCalendar()"> 末澤</label>
                     <label class="member-label"><input type="checkbox" value="小島" checked onchange="filterCalendar()"> 小島</label>
                     <label class="member-label"><input type="checkbox" value="佐野" checked onchange="filterCalendar()"> 佐野</label>
-                    <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ!</label>
                 </div>
             </div>
 
@@ -234,14 +265,12 @@
 
     </main>
 
-    <!-- タップ時の詳細ポップアップ -->
+    <!-- 日付タップ時の予定一覧ポップアップ -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></span>
-            <div class="modal-header" id="modalDate">📅 予定の詳細</div>
-            <div style="font-size: 1.1rem; font-weight: bold; color: #111; margin-bottom: 8px;" id="modalTitle"></div>
-            <div style="font-size: 0.9rem; color: #555; margin-bottom: 6px;" id="modalTime"></div>
-            <div style="font-size: 0.9rem; color: #666; font-weight: bold;" id="modalMember"></div>
+            <div class="modal-header" id="modalDate">📅 予定一覧</div>
+            <div id="modalList"></div>
         </div>
     </div>
 
@@ -259,6 +288,7 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
+        // メンバー名・判定カラーの一重定義
         function detectMemberInfo(item) {
             let fullStr = "";
             if (Array.isArray(item)) {
@@ -267,11 +297,11 @@
                 fullStr = Object.values(item).join(" ");
             }
 
-            if (fullStr.includes("佐野")) return { name: "佐野", hex: "#008000" };
-            if (fullStr.includes("小島")) return { name: "小島", hex: "#800080" };
-            if (fullStr.includes("正門")) return { name: "正門", hex: "#0000ff" };
-            if (fullStr.includes("末澤")) return { name: "末澤", hex: "#ff0000" };
-            return { name: "Aぇ! group", hex: "#ff69b4" };
+            if (fullStr.includes("佐野")) return { name: "佐野", colorClass: "bg-sano", hex: "#008000" };
+            if (fullStr.includes("小島")) return { name: "小島", colorClass: "bg-kojima", hex: "#800080" };
+            if (fullStr.includes("正門")) return { name: "正門", colorClass: "bg-masakado", hex: "#0000ff" };
+            if (fullStr.includes("末澤")) return { name: "末澤", colorClass: "bg-suezawa", hex: "#ff0000" };
+            return { name: "Aぇ! group", colorClass: "bg-group", hex: "#ff69b4" };
         }
 
         function toYMD(val) {
@@ -311,10 +341,11 @@
                     }
 
                     return {
-                        title: titleVal, // カレンダーにはタイトルのみ表示
+                        title: titleVal,
                         start: ymd,
                         time: timeStr,
                         member: memberInfo.name,
+                        colorClass: memberInfo.colorClass,
                         hexColor: memberInfo.hex
                     };
                 }).filter(e => e.start !== "");
@@ -332,71 +363,89 @@
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ja',
-                height: 'auto', // 全体がスクロールなしで見えるように自動調整
-                dayMaxEvents: 4, // 1日の表示上限を4件に設定
+                height: 'auto',
+                dayMaxEvents: 4,
                 headerToolbar: {
                     left: 'prev,next',
                     center: 'title',
                     right: 'today'
                 },
                 events: events.map(e => ({
-                    title: e.title, // 時間は含めずタイトルのみ
+                    title: e.title,
                     start: e.start,
                     backgroundColor: e.hexColor,
-                    borderColor: e.hexColor,
-                    extendedProps: {
-                        time: e.time,
-                        member: e.member
-                    }
+                    borderColor: e.hexColor
                 })),
-                eventClick: function(info) {
-                    // タップした時に詳細ダイアログを表示
-                    showModal(
-                        info.event.startStr,
-                        info.event.title,
-                        info.event.extendedProps.time,
-                        info.event.extendedProps.member
-                    );
+                dateClick: function(info) {
+                    // 日付セルタップで該当日の予定をモーダル表示
+                    showDayModal(info.dateStr);
                 }
             });
             calendar.render();
         }
 
-        function filterCalendar() {
+        function getFilteredEvents() {
             const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
             const checkedMembers = Array.from(document.querySelectorAll('.member-checkboxes input:checked')).map(cb => cb.value);
 
-            const filtered = allEvents.filter(e => {
+            return allEvents.filter(e => {
                 const matchKeyword = e.title.toLowerCase().includes(keyword) || e.start.includes(keyword);
                 const matchMember = checkedMembers.includes(e.member);
                 return matchKeyword && matchMember;
             });
+        }
 
+        function filterCalendar() {
+            const filtered = getFilteredEvents();
             if (calendar) {
                 calendar.removeAllEvents();
                 calendar.addEventSource(filtered.map(e => ({
                     title: e.title,
                     start: e.start,
                     backgroundColor: e.hexColor,
-                    borderColor: e.hexColor,
-                    extendedProps: {
-                        time: e.time,
-                        member: e.member
-                    }
+                    borderColor: e.hexColor
                 })));
             }
         }
 
-        function showModal(date, title, time, member) {
-            document.getElementById("modalDate").innerText = `📅 ${date}`;
-            document.getElementById("modalTitle").innerText = title;
-            document.getElementById("modalTime").innerText = time ? `⏰ ${time}` : "⏰ 時間未定 / 終日";
-            document.getElementById("modalMember").innerText = `👤 ${member}`;
+        // 日付タップ時のモーダル表示機能
+        function showDayModal(dateStr) {
+            const filtered = getFilteredEvents();
+            const dayEvents = filtered.filter(e => e.start === dateStr);
+
+            document.getElementById("modalDate").innerText = `📅 ${dateStr} の予定`;
+            const modalList = document.getElementById("modalList");
+            modalList.innerHTML = "";
+
+            if (dayEvents.length === 0) {
+                modalList.innerHTML = "<p style='color:#777; text-align:center; padding:15px;'>この日の予定はありません。</p>";
+            } else {
+                dayEvents.forEach(e => {
+                    const div = document.createElement("div");
+                    div.className = `modal-schedule-item ${e.colorClass}`;
+                    div.innerHTML = `
+                        <div style="font-size:0.8rem; color:#e53e3e; font-weight:bold; margin-bottom:2px;">⏰ ${e.time ? e.time : '時間未定 / 終日'}</div>
+                        <div style="font-size:0.95rem; font-weight:bold; color:#111; margin-bottom:3px;">${escapeHtml(e.title)}</div>
+                        <div style="font-size:0.8rem; color:#666; font-weight:bold;">👤 ${escapeHtml(e.member)}</div>
+                    `;
+                    modalList.appendChild(div);
+                });
+            }
+
             document.getElementById("detailModal").style.display = "flex";
         }
 
         function closeModal() {
             document.getElementById("detailModal").style.display = "none";
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         document.addEventListener('DOMContentLoaded', initSchedule);
