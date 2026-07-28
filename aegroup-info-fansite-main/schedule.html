@@ -21,19 +21,20 @@
     <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
     <style>
-        /* 過去更新情報(updates.html)と共通の検索枠・デザイン */
+        /* 検索ボックスとチェックボックスのエリア */
         .search-container {
             border: 2px solid #ffd1dc;
             border-radius: 16px;
             padding: 12px 15px;
             background-color: #fff;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .search-box {
             position: relative;
             display: flex;
             align-items: center;
+            margin-bottom: 10px;
         }
 
         .search-box i {
@@ -45,10 +46,10 @@
 
         .search-box input {
             width: 100%;
-            padding: 10px 15px 10px 42px;
+            padding: 9px 15px 9px 40px;
             border: 1.5px solid #ddd;
             border-radius: 25px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             outline: none;
             transition: border-color 0.2s;
         }
@@ -57,43 +58,51 @@
             border-color: #ff69b4;
         }
 
-        /* 表示切り替えボタン */
-        .view-toggle-btns {
+        /* メンバー絞り込みチェックボックス */
+        .member-checkboxes {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: space-between;
+            padding-top: 4px;
         }
 
-        .view-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 10px;
+        .member-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.8rem;
             font-weight: bold;
-            font-size: 0.9rem;
+            color: #444;
             cursor: pointer;
-            background-color: #eee;
-            color: #555;
-            transition: background-color 0.2s, color 0.2s;
+            background: #f7f7f7;
+            padding: 4px 8px;
+            border-radius: 12px;
+            border: 1px solid #eee;
         }
 
-        .view-btn.active {
-            background-color: #ff69b4;
-            color: #fff;
+        .member-label input {
+            accent-color: #ff69b4;
+            cursor: pointer;
         }
 
-        /* カレンダー表示調整 */
+        /* カレンダー全体のサイズコンパクト化 */
         #calendar {
             background: #fff;
-            padding: 10px;
+            padding: 6px;
             border-radius: 12px;
             border: 1px solid #ffe4e8;
         }
 
         .fc-toolbar-title {
-            font-size: 1.3rem !important;
+            font-size: 1.15rem !important;
             color: #ff69b4 !important;
             font-weight: bold !important;
+        }
+
+        .fc-button {
+            padding: 4px 8px !important;
+            font-size: 0.8rem !important;
         }
 
         .fc-button-primary {
@@ -107,41 +116,69 @@
             opacity: 1 !important;
         }
 
-        /* イベント・カードの見た目 */
-        .schedule-item {
+        /* 1日の高さ制限＆タイトルのフォント調整 */
+        .fc-daygrid-day-frame {
+            min-height: 65px !important;
+        }
+
+        .fc-event {
+            font-size: 0.72rem !important;
+            padding: 1px 3px !important;
+            margin-bottom: 1px !important;
+            border-radius: 4px !important;
+            cursor: pointer;
+        }
+
+        .fc-more-link {
+            font-size: 0.7rem !important;
+            color: #ff69b4 !important;
+            font-weight: bold;
+        }
+
+        /* モーダルポップアップ (詳細表示用) */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
-            padding: 12px 15px 12px 20px;
+        }
+
+        .modal-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ff69b4;
+            border-bottom: 2px solid #ffd1dc;
+            padding-bottom: 8px;
             margin-bottom: 12px;
-            background: #f9f9f9;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
         }
 
-        .schedule-item::before {
-            content: "";
+        .modal-close {
             position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 8px;
-            background-color: #ff69b4;
+            top: 15px; right: 15px;
+            font-size: 1.2rem;
+            color: #999;
+            cursor: pointer;
         }
-
-        /* メンバーカラー（左側ボーダー） */
-        .bg-group::before { background-color: #ff69b4 !important; }
-        .bg-kojima::before { background-color: #800080 !important; }
-        .bg-masakado::before { background-color: #0000ff !important; }
-        .bg-suezawa::before { background-color: #ff0000 !important; }
-        .bg-sano::before { background-color: #008000 !important; }
 
         .loading-box {
             text-align: center;
-            padding: 30px;
+            padding: 20px;
             color: #666;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
     </style>
 </head>
@@ -164,47 +201,49 @@
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+    <main style="max-width: 800px; margin: 15px auto; padding: 0 10px;">
         
         <section class="card">
-            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 12px; font-size: 1.25rem;">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 10px; font-size: 1.2rem;">
                 📅 Schedule
             </h2>
-            <p style="font-size: 0.88rem; color: #666; margin-bottom: 18px;">
-                Aぇ! groupの出演・配信・発売スケジュール一覧です。
-            </p>
 
-            <!-- 検索バー（過去更新情報と同デザイン） -->
+            <!-- 検索 & メンバー絞り込み -->
             <div class="search-container">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="searchInput" placeholder="キーワードで検索..." oninput="handleSearch()">
+                    <input type="text" id="searchInput" placeholder="キーワードで検索..." oninput="filterCalendar()">
+                </div>
+                <div class="member-checkboxes">
+                    <label class="member-label"><input type="checkbox" value="正門" checked onchange="filterCalendar()"> 正門</label>
+                    <label class="member-label"><input type="checkbox" value="末澤" checked onchange="filterCalendar()"> 末澤</label>
+                    <label class="member-label"><input type="checkbox" value="小島" checked onchange="filterCalendar()"> 小島</label>
+                    <label class="member-label"><input type="checkbox" value="佐野" checked onchange="filterCalendar()"> 佐野</label>
+                    <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ!</label>
                 </div>
             </div>
 
-            <!-- 表示切替ボタン -->
-            <div class="view-toggle-btns">
-                <button class="view-btn active" id="btnCalendar" onclick="switchView('calendar')"><i class="fa-regular fa-calendar-days"></i> カレンダー表示</button>
-                <button class="view-btn" id="btnList" onclick="switchView('list')"><i class="fa-solid fa-list-ul"></i> リスト表示</button>
-            </div>
-
             <div id="loading" class="loading-box">
-                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.8rem; margin-bottom: 8px;"></i><br>スケジュールデータを読み込み中...
+                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.5rem; margin-bottom: 6px;"></i><br>読み込み中...
             </div>
 
             <!-- カレンダー表示エリア -->
-            <div id="calendarView">
-                <div id="calendar"></div>
-            </div>
-
-            <!-- リスト表示エリア -->
-            <div id="listView" style="display: none;">
-                <div id="scheduleList"></div>
-            </div>
+            <div id="calendar"></div>
 
         </section>
 
     </main>
+
+    <!-- タップ時の詳細ポップアップ -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></span>
+            <div class="modal-header" id="modalDate">📅 予定の詳細</div>
+            <div style="font-size: 1.1rem; font-weight: bold; color: #111; margin-bottom: 8px;" id="modalTitle"></div>
+            <div style="font-size: 0.9rem; color: #555; margin-bottom: 6px;" id="modalTime"></div>
+            <div style="font-size: 0.9rem; color: #666; font-weight: bold;" id="modalMember"></div>
+        </div>
+    </div>
 
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
@@ -215,13 +254,11 @@
 
         let allEvents = [];
         let calendar = null;
-        let currentViewMode = "calendar";
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバー判定ロジック
         function detectMemberInfo(item) {
             let fullStr = "";
             if (Array.isArray(item)) {
@@ -230,11 +267,11 @@
                 fullStr = Object.values(item).join(" ");
             }
 
-            if (fullStr.includes("佐野")) return { name: "佐野", colorClass: "bg-sano", hex: "#008000" };
-            if (fullStr.includes("小島")) return { name: "小島", colorClass: "bg-kojima", hex: "#800080" };
-            if (fullStr.includes("正門")) return { name: "正門", colorClass: "bg-masakado", hex: "#0000ff" };
-            if (fullStr.includes("末澤")) return { name: "末澤", colorClass: "bg-suezawa", hex: "#ff0000" };
-            return { name: "Aぇ! group", colorClass: "bg-group", hex: "#ff69b4" };
+            if (fullStr.includes("佐野")) return { name: "佐野", hex: "#008000" };
+            if (fullStr.includes("小島")) return { name: "小島", hex: "#800080" };
+            if (fullStr.includes("正門")) return { name: "正門", hex: "#0000ff" };
+            if (fullStr.includes("末澤")) return { name: "末澤", hex: "#ff0000" };
+            return { name: "Aぇ! group", hex: "#ff69b4" };
         }
 
         function toYMD(val) {
@@ -257,7 +294,6 @@
 
                 document.getElementById("loading").style.display = "none";
 
-                // データをフォーマット変換
                 allEvents = list.map(item => {
                     const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
                     const titleVal = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
@@ -275,22 +311,19 @@
                     }
 
                     return {
-                        title: titleVal,
+                        title: titleVal, // カレンダーにはタイトルのみ表示
                         start: ymd,
                         time: timeStr,
                         member: memberInfo.name,
-                        colorClass: memberInfo.colorClass,
-                        hexColor: memberInfo.hex,
-                        rawItem: item
+                        hexColor: memberInfo.hex
                     };
                 }).filter(e => e.start !== "");
 
                 renderCalendar(allEvents);
-                renderList(allEvents);
 
             } catch (e) {
                 console.error(e);
-                document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>スケジュールデータの読み込みに失敗しました。</p>";
+                document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>データの読み込みに失敗しました。</p>";
             }
         }
 
@@ -299,95 +332,71 @@
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ja',
+                height: 'auto', // 全体がスクロールなしで見えるように自動調整
+                dayMaxEvents: 4, // 1日の表示上限を4件に設定
                 headerToolbar: {
                     left: 'prev,next',
                     center: 'title',
                     right: 'today'
                 },
                 events: events.map(e => ({
-                    title: `${e.time ? e.time + ' ' : ''}${e.title}`,
+                    title: e.title, // 時間は含めずタイトルのみ
                     start: e.start,
                     backgroundColor: e.hexColor,
-                    borderColor: e.hexColor
-                }))
+                    borderColor: e.hexColor,
+                    extendedProps: {
+                        time: e.time,
+                        member: e.member
+                    }
+                })),
+                eventClick: function(info) {
+                    // タップした時に詳細ダイアログを表示
+                    showModal(
+                        info.event.startStr,
+                        info.event.title,
+                        info.event.extendedProps.time,
+                        info.event.extendedProps.member
+                    );
+                }
             });
             calendar.render();
         }
 
-        function renderList(events) {
-            const listEl = document.getElementById("scheduleList");
-            listEl.innerHTML = "";
-
-            if (events.length === 0) {
-                listEl.innerHTML = "<p style='text-align:center; color:#777; padding:20px;'>該当するスケジュールはありません</p>";
-                return;
-            }
-
-            // 日付順降順
-            events.sort((a, b) => new Date(b.start) - new Date(a.start));
-
-            events.forEach(e => {
-                const div = document.createElement("div");
-                div.className = `schedule-item ${e.colorClass}`;
-                div.innerHTML = `
-                    <div style="font-size:0.8rem; color:#e53e3e; font-weight:bold; margin-bottom:2px;">📅 ${e.start} ${e.time}</div>
-                    <div style="font-size:1rem; font-weight:bold; color:#111; margin-bottom:4px;">${escapeHtml(e.title)}</div>
-                    <div style="font-size:0.85rem; color:#666;">${escapeHtml(e.member)}</div>
-                `;
-                listEl.appendChild(div);
-            });
-        }
-
-        function handleSearch() {
+        function filterCalendar() {
             const keyword = document.getElementById("searchInput").value.toLowerCase().trim();
+            const checkedMembers = Array.from(document.querySelectorAll('.member-checkboxes input:checked')).map(cb => cb.value);
+
             const filtered = allEvents.filter(e => {
-                return e.title.toLowerCase().includes(keyword) || 
-                       e.member.toLowerCase().includes(keyword) || 
-                       e.start.includes(keyword);
+                const matchKeyword = e.title.toLowerCase().includes(keyword) || e.start.includes(keyword);
+                const matchMember = checkedMembers.includes(e.member);
+                return matchKeyword && matchMember;
             });
 
-            if (currentViewMode === "calendar" && calendar) {
+            if (calendar) {
                 calendar.removeAllEvents();
                 calendar.addEventSource(filtered.map(e => ({
-                    title: `${e.time ? e.time + ' ' : ''}${e.title}`,
+                    title: e.title,
                     start: e.start,
                     backgroundColor: e.hexColor,
-                    borderColor: e.hexColor
+                    borderColor: e.hexColor,
+                    extendedProps: {
+                        time: e.time,
+                        member: e.member
+                    }
                 })));
-            } else {
-                renderList(filtered);
             }
         }
 
-        function switchView(mode) {
-            currentViewMode = mode;
-            const btnCalendar = document.getElementById("btnCalendar");
-            const btnList = document.getElementById("btnList");
-            const calendarView = document.getElementById("calendarView");
-            const listView = document.getElementById("listView");
-
-            if (mode === "calendar") {
-                btnCalendar.classList.add("active");
-                btnList.classList.remove("active");
-                calendarView.style.display = "block";
-                listView.style.display = "none";
-                if (calendar) calendar.render();
-            } else {
-                btnList.classList.add("active");
-                btnCalendar.classList.remove("active");
-                calendarView.style.display = "none";
-                listView.style.display = "block";
-                handleSearch(); // 最新の検索キーワードを反映して描画
-            }
+        function showModal(date, title, time, member) {
+            document.getElementById("modalDate").innerText = `📅 ${date}`;
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalTime").innerText = time ? `⏰ ${time}` : "⏰ 時間未定 / 終日";
+            document.getElementById("modalMember").innerText = `👤 ${member}`;
+            document.getElementById("detailModal").style.display = "flex";
         }
 
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+        function closeModal() {
+            document.getElementById("detailModal").style.display = "none";
         }
 
         document.addEventListener('DOMContentLoaded', initSchedule);
