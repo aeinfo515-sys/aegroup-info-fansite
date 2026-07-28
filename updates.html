@@ -72,19 +72,22 @@
             color: #fff;
         }
 
+        /* カレンダー表示領域の最適化 */
         #calendar {
             background: #fff;
-            padding: 10px;
+            padding: 5px;
             border-radius: 8px;
             border: 1px solid #eee;
         }
 
+        /* イベントカードの装飾 */
         .fc-event {
             cursor: pointer;
-            background-color: #ff69b4 !important;
-            border-color: #ff69b4 !important;
-            font-size: 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
             padding: 2px 4px;
+            border: none !important;
+            margin-bottom: 2px;
         }
 
         .modal-overlay {
@@ -127,7 +130,7 @@
             background: #f9f9f9;
             border-radius: 8px;
             border: 1px solid #eee;
-            border-left: 5px solid #ff69b4;
+            border-left: 6px solid #ff69b4;
         }
 
         .update-date {
@@ -212,7 +215,7 @@
             </div>
 
             <div id="error-message" style="display: none; color: #e53e3e;">
-                データの取得に失敗しました。<br>GASのアクセス権限（「全員」に公開）をご確認ください。
+                データの取得に失敗しました。<br>時間をおいて再度お試しください。
             </div>
 
             <!-- 📅 カレンダー表示領域 -->
@@ -227,7 +230,7 @@
         </section>
     </main>
 
-    <!-- モーダル（クリック時の詳細ポップアップ） -->
+    <!-- モーダル（詳細ポップアップ） -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
@@ -244,63 +247,109 @@
 
         const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
         let rawData = [];
+        let filteredData = [];
         let calendar;
 
-        // データ項目を自動解析するヘルパー関数
+        // 🎨 現メンバーカラー判定関数
+        function getMemberColor(title) {
+            if (/正門/i.test(title)) return '#d32f2f'; // 赤
+            if (/末澤/i.test(title)) return '#c2185b'; // 赤/ピンク
+            if (/小島/i.test(title)) return '#7b1fa2'; // 紫
+            if (/佐野/i.test(title)) return '#388e3c'; // 緑
+            return '#ff69b4'; // 全体・デフォルト（ピンク）
+        }
+
+        // 📅 日時表示フォーマット変換（YYYY/MM/DD HH:mm）
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+
+            return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
+        }
+
+        // カレンダー配置用（YYYY-MM-DD）
+        function toISODateOnly(dateStr) {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // データ項目の解析処理
         function parseItem(item) {
-            let date = "", title = "", url = "";
-            
-            // 配列で届いた場合
+            let rawDate = "", title = "", url = "";
+
             if (Array.isArray(item)) {
-                date = item[0] || "";
+                rawDate = item[0] || "";
                 title = item[1] || "";
                 url = item[2] || "";
-            } 
-            // オブジェクトで届いた場合（多様なキー名に対応）
-            else if (typeof item === 'object' && item !== null) {
+            } else if (typeof item === 'object' && item !== null) {
                 const keys = Object.keys(item);
                 
-                // 日付の検出
                 for (let k of keys) {
-                    if (/date|time|timestamp|日付|日時/i.test(k)) { date = item[k]; break; }
+                    if (/タイムスタンプ|timestamp|date|時間|日時/i.test(k)) {
+                        rawDate = item[k];
+                        break;
+                    }
                 }
-                if (!date && keys.length > 0) date = item[keys[0]];
+                if (!rawDate && keys.length > 0) rawDate = item[keys[0]];
 
-                // タイトルの検出
                 for (let k of keys) {
-                    if (/title|content|text|message|タイトル|内容/i.test(k)) { title = item[k]; break; }
+                    if (/title|content|text|message|タイトル|内容/i.test(k)) {
+                        title = item[k];
+                        break;
+                    }
                 }
                 if (!title && keys.length > 1) title = item[keys[1]];
 
-                // URLの検出
                 for (let k of keys) {
-                    if (/url|link|href|リンク/i.test(k)) { url = item[k]; break; }
+                    if (/url|link|href|リンク/i.test(k)) {
+                        url = item[k];
+                        break;
+                    }
                 }
                 if (!url && keys.length > 2) url = item[keys[2]];
             }
 
-            return { date: String(date || ''), title: String(title || '更新情報'), url: String(url || '') };
+            return {
+                rawDate: String(rawDate || '').trim(),
+                formattedDate: formatDate(rawDate),
+                calendarDate: toISODateOnly(rawDate),
+                title: String(title || '更新情報').trim(),
+                url: String(url || '').trim(),
+                color: getMemberColor(String(title || ''))
+            };
         }
 
         async function initPage() {
             try {
-                // リダイレクトに自動追従するfetch設定
                 const response = await fetch(GAS_API_URL, { redirect: 'follow' });
                 if (!response.ok) throw new Error('Network error');
                 
                 const json = await response.json();
+                const list = Array.isArray(json) ? json : (json.data || json.items || []);
                 
-                // GASの戻り値構造に対応 (dataフィールドがある場合など)
-                rawData = Array.isArray(json) ? json : (json.data || json.items || []);
-                
+                // A列(タイムスタンプ)が空白でない有効データのみ抽出
+                rawData = list.map(item => parseItem(item)).filter(item => item.rawDate !== "");
+
                 document.getElementById('loading').style.display = 'none';
 
                 if (rawData.length === 0) {
                     document.getElementById('updateList').innerHTML = '<p style="text-align:center; color:#888;">更新情報が登録されていません。</p>';
                 }
 
-                initCalendar(rawData);
-                renderList(rawData);
+                filteredData = [...rawData];
+                initCalendar(filteredData);
+                renderList(filteredData);
             } catch (error) {
                 console.error("API Fetch Error:", error);
                 document.getElementById('loading').style.display = 'none';
@@ -311,21 +360,22 @@
         function initCalendar(data) {
             const calendarEl = document.getElementById('calendar');
             
-            const events = data.map(rawItem => {
-                const parsed = parseItem(rawItem);
-                return {
-                    title: parsed.title,
-                    start: parsed.date,
-                    extendedProps: {
-                        url: parsed.url,
-                        rawDate: parsed.date
-                    }
-                };
-            }).filter(e => e.start); // 日付が存在するものだけイベント化
+            const events = data.map(item => ({
+                title: item.title,
+                start: item.calendarDate,
+                backgroundColor: item.color,
+                borderColor: item.color,
+                extendedProps: {
+                    url: item.url,
+                    formattedDate: item.formattedDate,
+                    color: item.color
+                }
+            }));
 
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ja',
+                height: 'auto', // 📱 スマホ表示での崩れ・不必要なスクロールを防止
                 headerToolbar: {
                     left: 'prev,next',
                     center: 'title',
@@ -335,8 +385,9 @@
                 eventClick: function(info) {
                     showModal(
                         info.event.title, 
-                        info.event.extendedProps.rawDate, 
-                        info.event.extendedProps.url
+                        info.event.extendedProps.formattedDate, 
+                        info.event.extendedProps.url,
+                        info.event.extendedProps.color
                     );
                 }
             });
@@ -353,19 +404,21 @@
                 return;
             }
 
-            data.forEach(rawItem => {
-                const parsed = parseItem(rawItem);
+            data.forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'update-card';
+                card.style.borderLeftColor = item.color;
 
                 let html = '';
-                if (parsed.date) html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(parsed.date)}</div>`;
-                html += `<div class="update-title">${escapeHtml(parsed.title)}</div>`;
+                if (item.formattedDate) {
+                    html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.formattedDate)}</div>`;
+                }
+                html += `<div class="update-title">${escapeHtml(item.title)}</div>`;
 
-                if (parsed.url && parsed.url.startsWith('http')) {
+                if (item.url && item.url.startsWith('http')) {
                     html += `
                         <div style="margin-top: 8px;">
-                            <a href="${escapeHtml(parsed.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn">
+                            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color:${item.color};">
                                 📸 投稿を見る 🔗
                             </a>
                         </div>
@@ -379,23 +432,25 @@
 
         function filterUpdates() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = rawData.filter(rawItem => {
-                const parsed = parseItem(rawItem);
-                return parsed.title.toLowerCase().includes(query) || parsed.date.toLowerCase().includes(query);
-            });
+            filteredData = rawData.filter(item => 
+                item.title.toLowerCase().includes(query) || item.formattedDate.toLowerCase().includes(query)
+            );
 
-            renderList(filtered);
+            renderList(filteredData);
 
             if (calendar) {
                 calendar.removeAllEvents();
-                calendar.addEventSource(filtered.map(rawItem => {
-                    const parsed = parseItem(rawItem);
-                    return {
-                        title: parsed.title,
-                        start: parsed.date,
-                        extendedProps: { url: parsed.url, rawDate: parsed.date }
-                    };
-                }).filter(e => e.start));
+                calendar.addEventSource(filteredData.map(item => ({
+                    title: item.title,
+                    start: item.calendarDate,
+                    backgroundColor: item.color,
+                    borderColor: item.color,
+                    extendedProps: {
+                        url: item.url,
+                        formattedDate: item.formattedDate,
+                        color: item.color
+                    }
+                })));
             }
         }
 
@@ -419,14 +474,14 @@
             }
         }
 
-        function showModal(title, date, url) {
+        function showModal(title, formattedDate, url, color) {
             document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalDate').innerText = date ? `📅 ${date}` : '';
+            document.getElementById('modalDate').innerText = formattedDate ? `📅 ${formattedDate}` : '';
             
             const linkContainer = document.getElementById('modalLinkContainer');
             if (url && url.startsWith('http')) {
                 linkContainer.innerHTML = `
-                    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="width:100%; justify-content:center; box-sizing:border-box;">
+                    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="width:100%; justify-content:center; box-sizing:border-box; background-color:${color};">
                         📸 投稿を見る 🔗
                     </a>
                 `;
