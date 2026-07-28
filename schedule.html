@@ -127,7 +127,7 @@
             background-color: #708090 !important;
             border-color: #708090 !important;
             opacity: 1 !important;
-            text-transform: lowercase; /* todayを小文字表示に揃える */
+            text-transform: lowercase;
         }
 
         .fc-daygrid-day {
@@ -197,7 +197,6 @@
             cursor: pointer;
         }
 
-        /* モーダル内カード表示 */
         .modal-schedule-item {
             position: relative;
             padding: 10px 12px 10px 18px;
@@ -216,7 +215,6 @@
             width: 6px;
         }
 
-        /* メンバーカラー（左側ボーダー） */
         .bg-group::before { background-color: #ff69b4 !important; }
         .bg-kojima::before { background-color: #800080 !important; }
         .bg-masakado::before { background-color: #0000ff !important; }
@@ -253,25 +251,21 @@
     <main style="max-width: 800px; margin: 15px auto; padding: 0 10px;">
         
         <section class="card">
-            <!-- タイトルを日本語「スケジュール」に変更 -->
             <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 10px; font-size: 1.2rem;">
                 📅 スケジュール
             </h2>
 
-            <!-- 検索 & メンバー絞り込み -->
             <div class="search-container">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" placeholder="キーワードで検索..." oninput="filterCalendar()">
                 </div>
                 <div class="member-checkboxes">
-                    <!-- 1段目 -->
                     <div class="checkbox-row">
                         <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ! group</label>
                         <label class="member-label"><input type="checkbox" value="正門" checked onchange="filterCalendar()"> 正門</label>
                         <label class="member-label"><input type="checkbox" value="末澤" checked onchange="filterCalendar()"> 末澤</label>
                     </div>
-                    <!-- 2段目 -->
                     <div class="checkbox-row">
                         <label class="member-label"><input type="checkbox" value="小島" checked onchange="filterCalendar()"> 小島</label>
                         <label class="member-label"><input type="checkbox" value="佐野" checked onchange="filterCalendar()"> 佐野</label>
@@ -283,14 +277,12 @@
                 <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.5rem; margin-bottom: 6px;"></i><br>読み込み中...
             </div>
 
-            <!-- カレンダー表示エリア -->
             <div id="calendar"></div>
 
         </section>
 
     </main>
 
-    <!-- 日付タップ時の予定一覧ポップアップ -->
     <div class="modal-overlay" id="detailModal">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></span>
@@ -305,6 +297,7 @@
 
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        const CACHE_KEY = "aegroup_schedule_cache";
 
         let allEvents = [];
         let calendar = null;
@@ -353,47 +346,71 @@
             return `${month}/${day}(${weekStr})`;
         }
 
+        function processData(rawData) {
+            let list = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
+            return list.map(item => {
+                const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
+                const titleVal = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
+                const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"]);
+                
+                const memberInfo = detectMemberInfo(item);
+                const ymd = toYMD(dateVal);
+
+                let timeStr = "";
+                if (timeVal) {
+                    const td = new Date(timeVal);
+                    if (!isNaN(td.getTime())) {
+                        timeStr = `${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")}`;
+                    }
+                }
+
+                return {
+                    title: titleVal,
+                    start: ymd,
+                    time: timeStr,
+                    member: memberInfo.name,
+                    colorClass: memberInfo.colorClass,
+                    hexColor: memberInfo.hex
+                };
+            }).filter(e => e.start !== "");
+        }
+
         async function initSchedule() {
+            // 1. まず保存してあるキャッシュデータを一瞬で表示する
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            if (cachedData) {
+                try {
+                    allEvents = JSON.parse(cachedData);
+                    document.getElementById("loading").style.display = "none";
+                    renderCalendar(allEvents);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            // 2. 裏で最新データを取ってきて更新する
             try {
                 const response = await fetch(CAL_API_URL);
                 if (!response.ok) throw new Error("通信エラー");
 
                 const rawData = await response.json();
-                let list = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
+                const freshEvents = processData(rawData);
 
+                allEvents = freshEvents;
+                localStorage.setItem(CACHE_KEY, JSON.stringify(freshEvents));
                 document.getElementById("loading").style.display = "none";
 
-                allEvents = list.map(item => {
-                    const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
-                    const titleVal = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
-                    const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"]);
-                    
-                    const memberInfo = detectMemberInfo(item);
-                    const ymd = toYMD(dateVal);
-
-                    let timeStr = "";
-                    if (timeVal) {
-                        const td = new Date(timeVal);
-                        if (!isNaN(td.getTime())) {
-                            timeStr = `${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")}`;
-                        }
-                    }
-
-                    return {
-                        title: titleVal,
-                        start: ymd,
-                        time: timeStr,
-                        member: memberInfo.name,
-                        colorClass: memberInfo.colorClass,
-                        hexColor: memberInfo.hex
-                    };
-                }).filter(e => e.start !== "");
-
-                renderCalendar(allEvents);
+                if (!calendar) {
+                    renderCalendar(allEvents);
+                } else {
+                    filterCalendar();
+                }
 
             } catch (e) {
                 console.error(e);
-                document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>データの読み込みに失敗しました。</p>";
+                if (!cachedData) {
+                    document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>データの読み込みに失敗しました。</p>";
+                }
             }
         }
 
@@ -403,7 +420,7 @@
                 initialView: 'dayGridMonth',
                 locale: 'ja',
                 buttonText: {
-                    today: 'today' /* 「今日」ボタンの表記を「today」に変更 */
+                    today: 'today'
                 },
                 height: 'auto',
                 dayMaxEvents: 4,
