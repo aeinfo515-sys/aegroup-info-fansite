@@ -77,19 +77,24 @@
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
         const UPDATE_API_URL = "https://script.google.com/macros/s/AKfycbwqVSoDqfV4QfKoxY_sA2z0dI90z28N9gYJ5y3Z/exec";
 
-        const CACHE_KEY_SCHEDULE = "aegroup_home_schedule_cache";
-        const CACHE_KEY_UPDATES = "aegroup_home_updates_cache";
+        const CACHE_KEY_SCHEDULE = "aegroup_home_schedule_cache_v2";
+        const CACHE_KEY_UPDATES = "aegroup_home_updates_cache_v2";
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // --- 配列化補正 ---
+        // --- 配列抽出処理 ---
         function extractList(rawData) {
             if (!rawData) return [];
             if (Array.isArray(rawData)) return rawData;
-            if (Array.isArray(rawData.data)) return rawData.data;
-            if (Array.isArray(rawData.items)) return rawData.items;
+            if (typeof rawData === 'object') {
+                if (Array.isArray(rawData.data)) return rawData.data;
+                if (Array.isArray(rawData.items)) return rawData.items;
+                if (Array.isArray(rawData.value)) return rawData.value;
+                // 連番オブジェクトやキー値から配列に変換
+                return Object.values(rawData);
+            }
             return [];
         }
 
@@ -109,13 +114,12 @@
             return "bg-group";
         }
 
-        // --- 時間文字列の正常化（HH:mm形式へ変換） ---
+        // --- 時間文字列の正常化 ---
         function formatTimeString(timeVal) {
             if (!timeVal) return "";
             const str = String(timeVal).trim();
             if (!str || str.toLowerCase() === "undefined" || str.toLowerCase() === "null") return "";
 
-            // 日時文字列（ISO型含む）の場合
             const d = new Date(str);
             if (!isNaN(d.getTime())) {
                 const hh = String(d.getHours()).padStart(2, "0");
@@ -123,7 +127,6 @@
                 return `${hh}:${mm}`;
             }
 
-            // 「18:00:00」のような文字列の場合
             const match = str.match(/(\d{1,2}):(\d{2})/);
             if (match) {
                 const hh = String(match[1]).padStart(2, "0");
@@ -149,19 +152,23 @@
         async function loadLatestUpdates() {
             const container = document.getElementById("latest-updates");
 
+            // キャッシュから取り出して表示
             const cached = localStorage.getItem(CACHE_KEY_UPDATES);
             if (cached) {
                 try { renderLatestUpdates(JSON.parse(cached)); } catch(e){}
             }
 
             try {
-                const res = await fetch(UPDATE_API_URL);
-                if (!res.ok) throw new Error();
+                // キャッシュ無効化クエリ(?t=...)をつけて最新APIを取得
+                const res = await fetch(UPDATE_API_URL + "?t=" + new Date().getTime());
+                if (!res.ok) throw new Error("API取得失敗");
                 const rawData = await res.json();
 
+                // 取得成功したらキャッシュ更新＆画面描画
                 localStorage.setItem(CACHE_KEY_UPDATES, JSON.stringify(rawData));
                 renderLatestUpdates(rawData);
             } catch (e) {
+                console.error("更新情報エラー:", e);
                 if (!cached) {
                     container.innerHTML = "<p style='color:#888; text-align:center;'>更新情報の取得に失敗しました。</p>";
                 }
@@ -177,24 +184,34 @@
                 return;
             }
 
-            const top5 = list.slice(0, 5);
+            // 1行目が「日付」「内容」などのヘッダー行の場合は除外
+            let dataRows = list;
+            if (dataRows.length > 1) {
+                const firstRowStr = JSON.stringify(dataRows[0]);
+                if (firstRowStr.includes("日付") || firstRowStr.includes("date") || firstRowStr.includes("内容")) {
+                    dataRows = dataRows.slice(1);
+                }
+            }
+
+            const top5 = dataRows.slice(0, 5);
             let html = "";
             top5.forEach(item => {
                 let date = "";
                 let content = "";
 
                 if (Array.isArray(item)) {
-                    date = item[0] || item[1] || "";
+                    date = item[0] || "";
                     content = item[1] || item[2] || "";
                 } else if (typeof item === 'object' && item !== null) {
-                    date = item["日付"] || item["date"] || Object.values(item)[0] || "";
-                    content = item["内容"] || item["text"] || Object.values(item)[1] || "";
+                    const keys = Object.keys(item);
+                    date = item["日付"] || item["date"] || item["A"] || item[keys[0]] || "";
+                    content = item["内容"] || item["text"] || item["B"] || item[keys[1]] || "";
                 } else {
                     content = String(item);
                 }
 
-                // 日付が日時オブジェクトっぽい場合は整形
-                if (date && date.length > 10) {
+                // 日付整形
+                if (date && String(date).length > 8 && !isNaN(new Date(date).getTime())) {
                     const ym = toYMD(date);
                     if (ym) date = ym.replace(/-/g, "/");
                 }
@@ -219,13 +236,14 @@
             }
 
             try {
-                const res = await fetch(CAL_API_URL);
-                if (!res.ok) throw new Error();
+                const res = await fetch(CAL_API_URL + "?t=" + new Date().getTime());
+                if (!res.ok) throw new Error("API取得失敗");
                 const rawData = await res.json();
                 
                 localStorage.setItem(CACHE_KEY_SCHEDULE, JSON.stringify(rawData));
                 renderTodaySchedule(rawData);
             } catch (e) {
+                console.error("スケジュールエラー:", e);
                 if (!cached) {
                     container.innerHTML = "<p style='color:#888; text-align:center;'>スケジュールの取得に失敗しました。</p>";
                 }
@@ -243,7 +261,7 @@
             const todayStr = `${yyyy}-${mm}-${dd}`;
             
             const todayEvents = list.filter(item => {
-                const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"]);
+                const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
                 return toYMD(dateVal) === todayStr;
             });
 
@@ -254,8 +272,8 @@
 
             let html = "";
             todayEvents.forEach(item => {
-                const title = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
-                const timeRaw = Array.isArray(item) ? item[3] : (item["時間"] || item["time"]);
+                const title = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2])) || "予定";
+                const timeRaw = Array.isArray(item) ? item[3] : (item["時間"] || item["time"] || Object.values(item)[3]);
                 const timeFormatted = formatTimeString(timeRaw);
                 
                 const memberClass = detectMemberClass(item);
