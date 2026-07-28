@@ -1,276 +1,311 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
 
-      gtag('config', 'G-NPHVYVNK6L');
-    </script>
+gtag('config', 'G-NPHVYVNK6L');
+</script>
 
-    <meta charset="UTF-8">
-    <title>Aぇ! group info</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <style>
-        .update-post-btn-container {
-            margin-top: 15px;
-            text-align: center;
-        }
+<meta charset="UTF-8">
+<title>Aぇ! group info</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* 新着情報・今日の予定の枠デザイン */
+.update-item, .today-item {
+position: relative;
+padding: 12px 15px 12px 22px;
+margin-bottom: 12px;
+background: #f9f9f9;
+border-radius: 8px;
+font-size: 0.95rem;
+overflow: hidden;
+box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+border: 1px solid #eee;
+}
 
-        .update-post-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 10px 20px;
-            background-color: #ff69b4;
-            color: #ffffff !important;
-            text-decoration: none !important;
-            font-weight: bold;
-            font-size: 0.95rem;
-            border-radius: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.2s, transform 0.1s;
-        }
+/* 左端のカラーバー設定 */
+.update-item::before, .today-item::before {
+content: "";
+position: absolute;
+left: 0;
+top: 0;
+bottom: 0;
+width: 8px;
+background-color: #ff69b4;
+}
 
-        .update-post-btn:hover {
-            background-color: #ff1493;
-            transform: translateY(-1px);
-        }
+/* タップしてワンクリックで飛べるピンクのボタン */
+.update-link-btn {
+display: inline-block;
+margin-top: 8px;
+padding: 8px 14px;
+background-color: #ff69b4;
+color: #fff !important;
+text-decoration: none !important;
+border-radius: 6px;
+font-size: 0.85rem;
+font-weight: bold;
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.update-link-btn:hover {
+background-color: #ff1493;
+opacity: 0.9;
+}
 
-        .update-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 15px;
-        }
-
-        .update-card {
-            padding: 14px 16px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            border-left: 5px solid #ff69b4;
-        }
-
-        .update-date {
-            font-size: 0.8rem;
-            color: #888;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .update-title {
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-            word-break: break-word;
-        }
-
-        .update-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 14px;
-            background-color: #ff69b4;
-            color: #fff !important;
-            text-decoration: none !important;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        #loading, #error-message {
-            text-align: center;
-            padding: 20px 10px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-    </style>
+/* 各メンバーのカラーバーの色 */
+.bg-group::before { background-color: #ff69b4 !important; }
+.bg-kojima::before { background-color: #800080 !important; }
+.bg-masakado::before { background-color: #0000ff !important; }
+.bg-suezawa::before { background-color: #ff0000 !important; }
+.bg-sano::before { background-color: #008000 !important; }
+</style>
 </head>
 <body>
 
-    <header class="hero">
-        <h1>Aぇ! group Info</h1>
-        <p>インフォメーションサイト(非公式)</p>
-        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
-    </header>
+<header class="hero">
+<h1>Aぇ! group Info</h1>
+<p>インフォメーションサイト(非公式)</p>
+<button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
+</header>
 
-    <nav class="tabs" id="navTabs">
-        <a href="index.html">🏠 Home</a>
-        <a href="updates.html">🆕 過去更新情報</a>
-        <a href="schedule.html">📅 Schedule</a>
-        <a href="requests.html" class="active">✉️ リクエスト・募集</a>
-        <a href="works.html">🎬 出演作品</a>
-        <a href="sns.html">📱 公式SNS</a>
-        <a href="tickets.html">🎫 Tickets</a>
-        <a href="members.html">👤 Members</a>
-    </nav>
+<nav class="tabs" id="navTabs">
+        <a href="index.html">🏠 Home</a>
+        <a href="updates.html">🆕 過去更新情報</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="requests.html" class="active">✉️ リクエスト・募集</a>
+        <a href="works.html">🎬 出演作品</a>
+        <a href="sns.html">📱 公式SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
+    </nav>
 
-    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
-        <section class="card">
-            <h2>🆕 最新の更新情報</h2>
-            <p style="font-size: 0.85rem; color: #666;">
-                サイトの最新更新履歴です。
-            </p>
+<main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+<!-- 1. 🆕 更新情報 -->
+<section class="card" style="margin-bottom: 20px;">
+<h2>🆕 更新情報</h2>
+<div id="updateList">🔑 読み込み中...</div>
+</section>
 
-            <!-- 📝 投稿フォームへのボタン（復活部分） -->
-            <div class="update-post-btn-container">
-                <a href="https://forms.gle/YOUR_GOOGLE_FORM_URL" target="_blank" rel="noopener noreferrer" class="update-post-btn">
-                    <i class="fa-solid fa-pen-to-square"></i> 更新情報を投稿する
-                </a>
-            </div>
+<!-- 2. 📅 本日のスケジュール -->
+<section class="card" style="margin-bottom: 20px;">
+<h2>📅 本日のスケジュール</h2>
+<div id="todayList">🔑 読み込み中...</div>
+</section>
 
-            <!-- ローディング表示 -->
-            <div id="loading">
-                <div style="color:#ff69b4; font-size:1.5rem; margin-bottom:8px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
-                データを読み込み中...
-            </div>
+<!-- 3. 📢 サイト説明 -->
+<section class="card">
+<h2>📢 Welcome</h2>
+<p>スマートフォンでご覧の方は、右上の ≡ ボタンを押すと各メニュータブが表示されます。</p>
+</section>
+</main>
 
-            <div id="error-message" style="display: none; color: #e53e3e;">
-                データの取得に失敗しました。
-            </div>
+<script>
+const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
 
-            <!-- 📋 最新更新情報リスト -->
-            <div class="update-list" id="homeUpdateList"></div>
-        </section>
-    </main>
+function toggleMenu() {
+document.getElementById("navTabs").classList.toggle("show");
+}
 
-    <script>
-        function toggleMenu() {
-            document.getElementById("navTabs").classList.toggle("show");
-        }
+function getColorClass(text) {
+if (!text) return "bg-group";
+if (text.includes("小島")) return "bg-kojima";
+if (text.includes("正門")) return "bg-masakado";
+if (text.includes("末澤")) return "bg-suezawa";
+if (text.includes("佐野")) return "bg-sano";
+return "bg-group";
+}
 
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+function getLinkButtonText(url) {
+return "📸 投稿を見る 🔗";
+}
 
-        function getMemberColor(title) {
-            if (/正門/i.test(title)) return '#d32f2f';
-            if (/末澤/i.test(title)) return '#c2185b';
-            if (/小島/i.test(title)) return '#7b1fa2';
-            if (/佐野/i.test(title)) return '#388e3c';
-            return '#ff69b4';
-        }
+function extractUrl(text) {
+if (!text) return null;
+const match = String(text).match(/(https?:\/\/[^\s]+)/);
+return match ? match[0] : null;
+}
 
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return dateStr;
+function checkIsTodayUpdate(item) {
+const timestampVal = item["タイムスタンプ"] ?? item["Timestamp"] ?? item["timestamp"];
 
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const hh = String(d.getHours()).padStart(2, '0');
-            const min = String(d.getMinutes()).padStart(2, '0');
+if (timestampVal) {
+try {
+const itemDate = new Date(timestampVal);
+if (!isNaN(itemDate.getTime())) {
+const now = new Date();
+return itemDate.getFullYear() === now.getFullYear() &&
+itemDate.getMonth() === now.getMonth() &&
+itemDate.getDate() === now.getDate();
+}
+} catch(e){}
+}
 
-            return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
-        }
+const val = item["予定外の更新"] ?? item["予定外"] ?? item["更新"] ?? item["isExtra"];
+if (val === true || val === 1) return true;
+if (typeof val === 'string') {
+const s = val.trim().toLowerCase();
+return s === 'true' || s === '1' || s === 'yes';
+}
 
-        function parseItem(item) {
-            let rawDate = "", title = "", url = "";
+return false;
+}
 
-            if (Array.isArray(item)) {
-                rawDate = item[0] || "";
-                title = item[1] || "";
-                url = item[2] || "";
-            } else if (typeof item === 'object' && item !== null) {
-                const keys = Object.keys(item);
-                for (let k of keys) {
-                    if (/タイムスタンプ|timestamp|date|時間|日時/i.test(k)) { rawDate = item[k]; break; }
-                }
-                if (!rawDate && keys.length > 0) rawDate = item[keys[0]];
+// 日時・時間の値を取得してミリ秒で返すヘルパー関数
+function getTimeMillis(item) {
+const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"];
+if (!timeVal) return 0;
+const d = new Date(timeVal);
+return isNaN(d.getTime()) ? 0 : d.getTime();
+}
 
-                for (let k of keys) {
-                    if (/title|content|text|message|タイトル|内容/i.test(k)) { title = item[k]; break; }
-                }
-                if (!title && keys.length > 1) title = item[keys[1]];
+async function loadHomeData() {
+try {
+const response = await fetch(CAL_API_URL);
+const data = await response.json();
 
-                for (let k of keys) {
-                    if (/url|link|href|リンク/i.test(k)) { url = item[k]; break; }
-                }
-                if (!url && keys.length > 2) url = item[keys[2]];
-            }
+// 1. 【更新情報】の処理
+const updateList = document.getElementById("updateList");
+updateList.innerHTML = "";
 
-            return {
-                rawDate: String(rawDate || '').trim(),
-                formattedDate: formatDate(rawDate),
-                title: String(title || '更新情報').trim(),
-                url: String(url || '').trim(),
-                color: getMemberColor(String(title || ''))
-            };
-        }
+const updates = data.filter(item => checkIsTodayUpdate(item));
 
-        async function initHome() {
-            try {
-                const response = await fetch(GAS_API_URL, { redirect: 'follow' });
-                if (!response.ok) throw new Error('Network error');
+// 💡 更新情報を【新しい時間順（降順：最新が一番上）】にソート
+updates.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
 
-                const json = await response.json();
-                const list = Array.isArray(json) ? json : (json.data || json.items || []);
+if (updates.length === 0) {
+updateList.innerHTML = "<p style='color:#777;'>本日の新着更新情報はありません</p>";
+} else {
+updates.forEach(item => {
+const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
+const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
 
-                const validData = list.map(item => parseItem(item)).filter(item => item.rawDate !== "");
+let targetUrl = "";
+for (let key in item) {
+if (item.hasOwnProperty(key)) {
+const urlCheck = extractUrl(item[key]);
+if (urlCheck) {
+targetUrl = urlCheck;
+break;
+}
+}
+}
 
-                document.getElementById('loading').style.display = 'none';
+let displayTitle = rawTitle;
+if (rawTitle.startsWith("http")) {
+displayTitle = "SNS更新情報";
+} else if (targetUrl && rawTitle.includes(targetUrl)) {
+displayTitle = rawTitle.replace(targetUrl, '').trim() || "SNS更新情報";
+}
 
-                const updateList = document.getElementById('homeUpdateList');
-                updateList.innerHTML = '';
+let cleanDetail = detailText;
+if (targetUrl && detailText.includes(targetUrl)) {
+cleanDetail = detailText.replace(targetUrl, '').trim();
+}
 
-                if (validData.length === 0) {
-                    updateList.innerHTML = '<p style="text-align:center; color:#888;">更新情報はありません。</p>';
-                    return;
-                }
+let timeStr = "";
+const timeVal = item["タイムスタンプ"] || item["時間"] || item["Timestamp"];
+if (timeVal) {
+try {
+const td = new Date(timeVal);
+if (!isNaN(td.getTime())) {
+timeStr = ` (${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} 更新)`;
+}
+} catch(e){}
+}
 
-                // 最新の5件のみを表示
-                const recentItems = validData.slice(-5).reverse();
+const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
+const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
 
-                recentItems.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'update-card';
-                    card.style.borderLeftColor = item.color;
+const div = document.createElement("div");
+div.className = `update-item ${colorClass}`;
 
-                    let html = '';
-                    if (item.formattedDate) {
-                        html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.formattedDate)}</div>`;
-                    }
-                    html += `<div class="update-title">${escapeHtml(item.title)}</div>`;
+let htmlContent = `<span style="color:#e1306c; font-weight:bold;">🔥 新着情報${timeStr}</span><br>`;
+if (displayTitle) {
+htmlContent += `<strong>${displayTitle}</strong>`;
+}
 
-                    if (item.url && item.url.startsWith('http')) {
-                        html += `
-                            <div style="margin-top: 8px;">
-                                <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color:${item.color};">
-                                    📸 投稿を見る 🔗
-                                </a>
-                            </div>
-                        `;
-                    }
+if (cleanDetail && cleanDetail !== displayTitle) {
+htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${cleanDetail}</span>`;
+} else if (memberText && memberText !== displayTitle) {
+htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${memberText}</span>`;
+}
 
-                    card.innerHTML = html;
-                    updateList.appendChild(card);
-                });
-            } catch (error) {
-                console.error("API Fetch Error:", error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error-message').style.display = 'block';
-            }
-        }
+if (targetUrl) {
+const btnText = getLinkButtonText(targetUrl);
+htmlContent += `<br><a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">${btnText}</a>`;
+}
 
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
+div.innerHTML = htmlContent;
+updateList.appendChild(div);
+});
+}
 
-        document.addEventListener('DOMContentLoaded', initHome);
-    </script>
+// 2. 【本日のスケジュール】の処理
+const todayList = document.getElementById("todayList");
+todayList.innerHTML = "";
+
+const now = new Date();
+const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+
+const todayEvents = data.filter(item => {
+const dateVal = item["日付"] || item["date"];
+if (!dateVal || item["タイムスタンプ"]) return false;
+
+try {
+const d = new Date(dateVal);
+if (isNaN(d.getTime())) return false;
+const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+return itemDate === todayStr;
+} catch(e) {
+return false;
+}
+});
+
+// 💡 今日の予定を【早い時間順（昇順：朝〜夜）】にソート
+todayEvents.sort((a, b) => getTimeMillis(a) - getTimeMillis(b));
+
+if (todayEvents.length === 0) {
+todayList.innerHTML = "<p style='color:#777;'>今日の予定はありません</p>";
+} else {
+todayEvents.forEach(item => {
+const rawTitle = item["タイトル"] || item["title"] || "";
+const detailText = item["詳細"] || item["detail"] || "";
+const memberText = item["担当"] || item["メンバー"] || "";
+const colorClass = getColorClass(detailText + rawTitle + memberText);
+
+let timeStr = "";
+const timeVal = item["時間"] || item["time"];
+if (timeVal) {
+try {
+const td = new Date(timeVal);
+if (!isNaN(td.getTime())) {
+timeStr = `⏰ ${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")} `;
+}
+} catch(e){}
+}
+
+const div = document.createElement("div");
+div.className = `today-item ${colorClass}`;
+div.innerHTML = `<strong>${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText || memberText}</span>`;
+todayList.appendChild(div);
+});
+}
+
+} catch (e) {
+document.getElementById("todayList").innerText = "データの読み込みに失敗しました。";
+document.getElementById("updateList").innerText = "データの読み込みに失敗しました。";
+console.error(e);
+}
+}
+
+document.addEventListener('DOMContentLoaded', loadHomeData);
+</script>
 </body>
 </html>
