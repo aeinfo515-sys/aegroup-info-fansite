@@ -58,7 +58,7 @@
             border-color: #ff69b4;
         }
 
-        /* メンバー絞り込みチェックボックス (改行防止と整列) */
+        /* メンバー絞り込みチェックボックス */
         .member-checkboxes {
             display: flex;
             flex-direction: column;
@@ -87,7 +87,7 @@
             border-radius: 10px;
             border: 1px solid #e0e0e0;
             user-select: none;
-            white-space: nowrap; /* テキストの途中で折り返さない */
+            white-space: nowrap;
             flex-shrink: 0;
         }
 
@@ -151,7 +151,7 @@
             font-weight: bold;
         }
 
-        /* モーダルポップアップ (画面中央に配置) */
+        /* モーダルポップアップ */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -174,7 +174,7 @@
             overflow-y: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
-            margin: auto; /* 中央配置補正 */
+            margin: auto;
             box-sizing: border-box;
         }
 
@@ -336,7 +336,6 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // 日付を「7/28(火)」形式にフォーマットする関数
         function formatJapaneseDate(dateStr) {
             const parts = dateStr.split('-');
             if (parts.length !== 3) return dateStr;
@@ -445,11 +444,19 @@
             }
         }
 
+        // 時間順ソート機能を追加したモーダル表示処理
         function showDayModal(dateStr) {
             const filtered = getFilteredEvents();
             const dayEvents = filtered.filter(e => e.start === dateStr);
 
-            // 「7/28(火)の予定」形式に変換
+            // 時間の昇順（早い時間順）に並び替え（時間が未定のものは最後に配置）
+            dayEvents.sort((a, b) => {
+                if (!a.time && !b.time) return 0;
+                if (!a.time) return 1;
+                if (!b.time) return -1;
+                return a.time.localeCompare(b.time);
+            });
+
             const formattedDate = formatJapaneseDate(dateStr);
             document.getElementById("modalDate").innerText = `🗓️ ${formattedDate} の予定`;
             
