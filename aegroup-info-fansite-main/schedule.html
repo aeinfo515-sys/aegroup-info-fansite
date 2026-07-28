@@ -12,7 +12,7 @@
     </script>
 
     <meta charset="UTF-8">
-    <title>スケジュール - Aぇ! group info</title>
+    <title>Schedule - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -127,6 +127,7 @@
             background-color: #708090 !important;
             border-color: #708090 !important;
             opacity: 1 !important;
+            text-transform: lowercase; /* todayを小文字表示に揃える */
         }
 
         .fc-daygrid-day {
@@ -252,8 +253,9 @@
     <main style="max-width: 800px; margin: 15px auto; padding: 0 10px;">
         
         <section class="card">
+            <!-- タイトルを日本語「スケジュール」に変更 -->
             <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 10px; font-size: 1.2rem;">
-                📅 Schedule
+                📅 スケジュール
             </h2>
 
             <!-- 検索 & メンバー絞り込み -->
@@ -400,6 +402,9 @@
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ja',
+                buttonText: {
+                    today: 'today' /* 「今日」ボタンの表記を「today」に変更 */
+                },
                 height: 'auto',
                 dayMaxEvents: 4,
                 headerToolbar: {
@@ -444,12 +449,10 @@
             }
         }
 
-        // 時間順ソート機能を追加したモーダル表示処理
         function showDayModal(dateStr) {
             const filtered = getFilteredEvents();
             const dayEvents = filtered.filter(e => e.start === dateStr);
 
-            // 時間の昇順（早い時間順）に並び替え（時間が未定のものは最後に配置）
             dayEvents.sort((a, b) => {
                 if (!a.time && !b.time) return 0;
                 if (!a.time) return 1;
