@@ -16,6 +16,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* メンバーカラー（左側ボーダー） */
+        .bg-group { border-left: 4px solid #ff69b4 !important; }
+        .bg-kojima { border-left: 4px solid #800080 !important; }
+        .bg-masakado { border-left: 4px solid #0000ff !important; }
+        .bg-suezawa { border-left: 4px solid #ff0000 !important; }
+        .bg-sano { border-left: 4px solid #008000 !important; }
+    </style>
 </head>
 <body>
 
@@ -26,14 +35,14 @@
     </header>
 
     <nav class="tabs" id="navTabs">
-        <a href="index.html" class="active">🏠 ホーム</a>
+        <a href="index.html" class="active">🏠 Home</a>
         <a href="updates.html">🆕 過去更新情報</a>
-        <a href="schedule.html">📅 スケジュール</a>
+        <a href="schedule.html">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
         <a href="works.html">🎬 出演作品</a>
         <a href="sns.html">📱 公式SNS</a>
-        <a href="tickets.html">🎫 チケット</a>
-        <a href="members.html">👤 メンバー</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
     </nav>
 
     <main style="max-width: 800px; margin: 15px auto; padding: 0 10px;">
@@ -75,13 +84,65 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // --- データの安全な配列抽出 ---
+        // --- 配列化補正 ---
         function extractList(rawData) {
             if (!rawData) return [];
             if (Array.isArray(rawData)) return rawData;
             if (Array.isArray(rawData.data)) return rawData.data;
             if (Array.isArray(rawData.items)) return rawData.items;
             return [];
+        }
+
+        // --- メンバー判定 ---
+        function detectMemberClass(item) {
+            let fullStr = "";
+            if (Array.isArray(item)) {
+                fullStr = item.join(" ");
+            } else if (typeof item === 'object' && item !== null) {
+                fullStr = Object.values(item).join(" ");
+            }
+
+            if (fullStr.includes("佐野")) return "bg-sano";
+            if (fullStr.includes("小島")) return "bg-kojima";
+            if (fullStr.includes("正門")) return "bg-masakado";
+            if (fullStr.includes("末澤")) return "bg-suezawa";
+            return "bg-group";
+        }
+
+        // --- 時間文字列の正常化（HH:mm形式へ変換） ---
+        function formatTimeString(timeVal) {
+            if (!timeVal) return "";
+            const str = String(timeVal).trim();
+            if (!str || str.toLowerCase() === "undefined" || str.toLowerCase() === "null") return "";
+
+            // 日時文字列（ISO型含む）の場合
+            const d = new Date(str);
+            if (!isNaN(d.getTime())) {
+                const hh = String(d.getHours()).padStart(2, "0");
+                const mm = String(d.getMinutes()).padStart(2, "0");
+                return `${hh}:${mm}`;
+            }
+
+            // 「18:00:00」のような文字列の場合
+            const match = str.match(/(\d{1,2}):(\d{2})/);
+            if (match) {
+                const hh = String(match[1]).padStart(2, "0");
+                const mm = match[2];
+                return `${hh}:${mm}`;
+            }
+
+            return str;
+        }
+
+        // --- YYYY-MM-DD 変換 ---
+        function toYMD(val) {
+            if (!val) return "";
+            const d = new Date(val);
+            if (isNaN(d.getTime())) return "";
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            return `${yyyy}-${mm}-${dd}`;
         }
 
         // --- 1. 最新更新情報読み込み ---
@@ -119,8 +180,24 @@
             const top5 = list.slice(0, 5);
             let html = "";
             top5.forEach(item => {
-                const date = typeof item === 'object' ? (item["日付"] || item["date"] || item[0] || "") : "";
-                const content = typeof item === 'object' ? (item["内容"] || item["text"] || item[1] || "") : item;
+                let date = "";
+                let content = "";
+
+                if (Array.isArray(item)) {
+                    date = item[0] || item[1] || "";
+                    content = item[1] || item[2] || "";
+                } else if (typeof item === 'object' && item !== null) {
+                    date = item["日付"] || item["date"] || Object.values(item)[0] || "";
+                    content = item["内容"] || item["text"] || Object.values(item)[1] || "";
+                } else {
+                    content = String(item);
+                }
+
+                // 日付が日時オブジェクトっぽい場合は整形
+                if (date && date.length > 10) {
+                    const ym = toYMD(date);
+                    if (ym) date = ym.replace(/-/g, "/");
+                }
 
                 html += `
                     <div style="border-bottom:1px dashed #eee; padding:8px 0; font-size:0.9rem;">
@@ -167,15 +244,7 @@
             
             const todayEvents = list.filter(item => {
                 const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"]);
-                if (!dateVal) return false;
-                
-                const d = new Date(dateVal);
-                if (isNaN(d.getTime())) return false;
-                
-                const dY = d.getFullYear();
-                const dM = String(d.getMonth() + 1).padStart(2, '0');
-                const dD = String(d.getDate()).padStart(2, '0');
-                return `${dY}-${dM}-${dD}` === todayStr;
+                return toYMD(dateVal) === todayStr;
             });
 
             if (todayEvents.length === 0) {
@@ -186,11 +255,14 @@
             let html = "";
             todayEvents.forEach(item => {
                 const title = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
-                const time = Array.isArray(item) ? item[3] : (item["時間"] || item["time"]);
+                const timeRaw = Array.isArray(item) ? item[3] : (item["時間"] || item["time"]);
+                const timeFormatted = formatTimeString(timeRaw);
                 
+                const memberClass = detectMemberClass(item);
+
                 html += `
-                    <div style="background:#f9f9f9; border-left:4px solid #ff69b4; padding:10px 12px; margin-bottom:8px; border-radius:6px;">
-                        <div style="font-size:0.8rem; color:#e53e3e; font-weight:bold;">⏰ ${time ? escapeHtml(time) : '時間未定'}</div>
+                    <div class="${memberClass}" style="background:#f9f9f9; padding:10px 12px; margin-bottom:8px; border-radius:6px;">
+                        <div style="font-size:0.8rem; color:#e53e3e; font-weight:bold;">⏰ ${timeFormatted ? escapeHtml(timeFormatted) : '時間未定 / 終日'}</div>
                         <div style="font-size:0.95rem; font-weight:bold; color:#333;">${escapeHtml(title)}</div>
                     </div>
                 `;
