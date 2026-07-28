@@ -189,11 +189,15 @@
             return match ? match[0] : null;
         }
 
-        function getTimeMillis(item) {
-            const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
-            if (!timeVal) return 0;
-            const d = new Date(timeVal);
-            return isNaN(d.getTime()) ? 0 : d.getTime();
+        // 日付を YYYY-MM-DD 形式の文字列にする関数
+        function toYMD(val) {
+            if (!val) return "";
+            const d = new Date(val);
+            if (isNaN(d.getTime())) return "";
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            return `${yyyy}-${mm}-${dd}`;
         }
 
         async function loadHomeData() {
@@ -208,7 +212,6 @@
 
                 const rawData = await response.json();
                 
-                // 配列データの安全な抽出
                 let list = [];
                 if (Array.isArray(rawData)) {
                     list = rawData;
@@ -227,73 +230,81 @@
                     return;
                 }
 
-                // 日付降順ソート（最新順）
-                list.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
-
-                // 1. 最新更新情報（5件）
-                const recentUpdates = list.slice(0, 5);
-                recentUpdates.forEach(item => {
-                    const title = item["タイトル"] || item["title"] || item["内容"] || "新着情報";
-                    const detail = item["詳細"] || item["detail"] || "";
-                    const member = item["担当"] || item["メンバー"] || item["出演者"] || "";
-                    
-                    let targetUrl = "";
-                    for (let key in item) {
-                        const urlCheck = extractUrl(item[key]);
-                        if (urlCheck) { targetUrl = urlCheck; break; }
-                    }
-
-                    let timeStr = "";
-                    const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
-                    if (timeVal) {
-                        const td = new Date(timeVal);
-                        if (!isNaN(td.getTime())) {
-                            const hh = String(td.getHours()).padStart(2, "0");
-                            const min = String(td.getMinutes()).padStart(2, "0");
-                            timeStr = `${hh}:${min}`;
-                        }
-                    }
-
-                    const colorClass = getColorClass(title + detail + member);
-
-                    const div = document.createElement("div");
-                    div.className = `update-item ${colorClass}`;
-
-                    let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
-                    html += `<div class="update-title">${escapeHtml(title)}</div>`;
-                    if (member) {
-                        html += `<div class="update-member">${escapeHtml(member)}</div>`;
-                    }
-                    if (targetUrl) {
-                        html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
-                    }
-
-                    div.innerHTML = html;
-                    updateList.appendChild(div);
-                });
-
-                // 2. 本日のスケジュール判定
                 const today = new Date();
                 const todayYMD = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-                const todayItems = list.filter(item => {
-                    const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
-                    if (!timeVal) return false;
-                    const td = new Date(timeVal);
-                    if (isNaN(td.getTime())) return false;
-                    const itemYMD = `${td.getFullYear()}-${String(td.getMonth() + 1).padStart(2, '0')}-${String(td.getDate()).padStart(2, '0')}`;
-                    return itemYMD === todayYMD;
+                // --- 1. 🆕 更新情報 (A列：タイムスタンプが今日の日付) ---
+                const todayUpdates = list.filter(item => {
+                    const timestampVal = item["タイムスタンプ"] || item["Timestamp"] || item["timestamp"] || item["A"];
+                    return toYMD(timestampVal) === todayYMD;
                 });
 
-                if (todayItems.length === 0) {
+                // 新しい時間順にソート
+                todayUpdates.sort((a, b) => {
+                    const tA = new Date(a["タイムスタンプ"] || a["Timestamp"] || 0).getTime();
+                    const tB = new Date(b["タイムスタンプ"] || b["Timestamp"] || 0).getTime();
+                    return tB - tA;
+                });
+
+                if (todayUpdates.length === 0) {
+                    updateList.innerHTML = "<p style='color:#777; text-align:center; padding:10px;'>本日の更新情報はありません</p>";
+                } else {
+                    todayUpdates.forEach(item => {
+                        const title = item["タイトル"] || item["title"] || item["内容"] || "新着情報";
+                        const detail = item["詳細"] || item["detail"] || "";
+                        const member = item["担当"] || item["メンバー"] || item["出演者"] || "";
+                        
+                        let targetUrl = "";
+                        for (let key in item) {
+                            const urlCheck = extractUrl(item[key]);
+                            if (urlCheck) { targetUrl = urlCheck; break; }
+                        }
+
+                        let timeStr = "";
+                        const timeVal = item["タイムスタンプ"] || item["Timestamp"];
+                        if (timeVal) {
+                            const td = new Date(timeVal);
+                            if (!isNaN(td.getTime())) {
+                                const hh = String(td.getHours()).padStart(2, "0");
+                                const min = String(td.getMinutes()).padStart(2, "0");
+                                timeStr = `${hh}:${min}`;
+                            }
+                        }
+
+                        const colorClass = getColorClass(title + detail + member);
+
+                        const div = document.createElement("div");
+                        div.className = `update-item ${colorClass}`;
+
+                        let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
+                        html += `<div class="update-title">${escapeHtml(title)}</div>`;
+                        if (member) {
+                            html += `<div class="update-member">${escapeHtml(member)}</div>`;
+                        }
+                        if (targetUrl) {
+                            html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
+                        }
+
+                        div.innerHTML = html;
+                        updateList.appendChild(div);
+                    });
+                }
+
+                // --- 2. 📅 本日のスケジュール (B列：日付が今日の日付) ---
+                const todaySchedules = list.filter(item => {
+                    const dateVal = item["日付"] || item["date"] || item["B"];
+                    return toYMD(dateVal) === todayYMD;
+                });
+
+                if (todaySchedules.length === 0) {
                     scheduleList.innerHTML = "<p style='color:#777; text-align:center; padding: 10px;'>本日の予定はありません</p>";
                 } else {
-                    todayItems.forEach(item => {
+                    todaySchedules.forEach(item => {
                         const title = item["タイトル"] || item["title"] || item["内容"] || "本日の予定";
                         const member = item["担当"] || item["メンバー"] || item["出演者"] || "Aぇ! group";
                         
-                        let timeStr = "00:00";
-                        const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
+                        let timeStr = "";
+                        const timeVal = item["時間"] || item["time"] || item["日付"] || item["date"];
                         if (timeVal) {
                             const td = new Date(timeVal);
                             if (!isNaN(td.getTime())) {
@@ -309,7 +320,7 @@
                         div.className = `schedule-item ${colorClass}`;
 
                         div.innerHTML = `
-                            <div class="schedule-time"><i class="fa-regular fa-clock" style="color:#e53e3e;"></i> ${timeStr} ${escapeHtml(title)}</div>
+                            <div class="schedule-time"><i class="fa-regular fa-clock" style="color:#e53e3e;"></i> ${timeStr ? timeStr + ' ' : ''}${escapeHtml(title)}</div>
                             <div class="schedule-member">${escapeHtml(member)}</div>
                         `;
                         scheduleList.appendChild(div);
