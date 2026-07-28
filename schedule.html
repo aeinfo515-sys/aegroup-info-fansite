@@ -25,7 +25,7 @@
         .search-container {
             border: 2px solid #ffd1dc;
             border-radius: 18px;
-            padding: 14px 15px;
+            padding: 12px 10px;
             background-color: #fff;
             margin-bottom: 15px;
         }
@@ -58,41 +58,45 @@
             border-color: #ff69b4;
         }
 
-        /* メンバー絞り込みチェックボックス (画像000.jpgの配置を再現) */
+        /* メンバー絞り込みチェックボックス (改行防止と整列) */
         .member-checkboxes {
             display: flex;
             flex-direction: column;
             gap: 8px;
             align-items: center;
+            width: 100%;
         }
 
         .checkbox-row {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 6px;
             width: 100%;
         }
 
         .member-label {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            font-size: 0.85rem;
+            gap: 4px;
+            font-size: 0.8rem;
             font-weight: bold;
             color: #333;
             cursor: pointer;
             background: #f3f3f3;
-            padding: 6px 12px;
+            padding: 6px 8px;
             border-radius: 10px;
             border: 1px solid #e0e0e0;
             user-select: none;
+            white-space: nowrap; /* テキストの途中で折り返さない */
+            flex-shrink: 0;
         }
 
         .member-label input {
             accent-color: #ff69b4;
             cursor: pointer;
-            width: 15px;
-            height: 15px;
+            width: 14px;
+            height: 14px;
+            margin: 0;
         }
 
         /* カレンダー全体のサイズ調整 */
@@ -147,28 +151,31 @@
             font-weight: bold;
         }
 
-        /* モーダルポップアップ (日付タップ時の一覧表示) */
+        /* モーダルポップアップ (画面中央に配置) */
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(0,0,0,0.5);
             z-index: 9999;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
+            box-sizing: border-box;
         }
 
         .modal-content {
             background: #fff;
             border-radius: 16px;
             padding: 20px;
-            max-width: 450px;
+            max-width: 420px;
             width: 100%;
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
+            margin: auto; /* 中央配置補正 */
+            box-sizing: border-box;
         }
 
         .modal-header {
@@ -178,6 +185,7 @@
             border-bottom: 2px solid #ffd1dc;
             padding-bottom: 8px;
             margin-bottom: 15px;
+            padding-right: 25px;
         }
 
         .modal-close {
@@ -248,20 +256,20 @@
                 📅 Schedule
             </h2>
 
-            <!-- 検索 & メンバー絞り込み (000.jpg と全く同じ2段配置) -->
+            <!-- 検索 & メンバー絞り込み -->
             <div class="search-container">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" placeholder="キーワードで検索..." oninput="filterCalendar()">
                 </div>
                 <div class="member-checkboxes">
-                    <!-- 1段目: Aぇ! group / 正門 / 末澤 -->
+                    <!-- 1段目 -->
                     <div class="checkbox-row">
                         <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ! group</label>
                         <label class="member-label"><input type="checkbox" value="正門" checked onchange="filterCalendar()"> 正門</label>
                         <label class="member-label"><input type="checkbox" value="末澤" checked onchange="filterCalendar()"> 末澤</label>
                     </div>
-                    <!-- 2段目: 小島 / 佐野 -->
+                    <!-- 2段目 -->
                     <div class="checkbox-row">
                         <label class="member-label"><input type="checkbox" value="小島" checked onchange="filterCalendar()"> 小島</label>
                         <label class="member-label"><input type="checkbox" value="佐野" checked onchange="filterCalendar()"> 佐野</label>
@@ -326,6 +334,22 @@
             const mm = String(d.getMonth() + 1).padStart(2, "0");
             const dd = String(d.getDate()).padStart(2, "0");
             return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // 日付を「7/28(火)」形式にフォーマットする関数
+        function formatJapaneseDate(dateStr) {
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            
+            const year = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10);
+            const day = parseInt(parts[2], 10);
+            
+            const dateObj = new Date(year, month - 1, day);
+            const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
+            const weekStr = weekDays[dateObj.getDay()];
+
+            return `${month}/${day}(${weekStr})`;
         }
 
         async function initSchedule() {
@@ -425,7 +449,10 @@
             const filtered = getFilteredEvents();
             const dayEvents = filtered.filter(e => e.start === dateStr);
 
-            document.getElementById("modalDate").innerText = `📅 ${dateStr} の予定`;
+            // 「7/28(火)の予定」形式に変換
+            const formattedDate = formatJapaneseDate(dateStr);
+            document.getElementById("modalDate").innerText = `🗓️ ${formattedDate} の予定`;
+            
             const modalList = document.getElementById("modalList");
             modalList.innerHTML = "";
 
