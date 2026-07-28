@@ -14,6 +14,11 @@
     <meta charset="UTF-8">
     <title>Schedule - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- 外部接続の高速化 -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -105,6 +110,7 @@
             padding: 6px;
             border-radius: 12px;
             border: 1px solid #ffe4e8;
+            min-height: 400px;
         }
 
         .fc-toolbar-title {
@@ -127,7 +133,7 @@
             background-color: #708090 !important;
             border-color: #708090 !important;
             opacity: 1 !important;
-            text-transform: lowercase; /* todayを小文字表示に揃える */
+            text-transform: lowercase;
         }
 
         .fc-daygrid-day {
@@ -225,11 +231,15 @@
 
         .loading-box {
             text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 0.9rem;
+            padding: 10px;
+            color: #888;
+            font-size: 0.8rem;
         }
     </style>
+    
+    <!-- FullCalendar JS (deferで並行読み込み) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ja.js"></script>
 </head>
 <body>
 
@@ -253,7 +263,6 @@
     <main style="max-width: 800px; margin: 15px auto; padding: 0 10px;">
         
         <section class="card">
-            <!-- タイトルを日本語「スケジュール」に変更 -->
             <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 10px; font-size: 1.2rem;">
                 📅 スケジュール
             </h2>
@@ -265,13 +274,11 @@
                     <input type="text" id="searchInput" placeholder="キーワードで検索..." oninput="filterCalendar()">
                 </div>
                 <div class="member-checkboxes">
-                    <!-- 1段目 -->
                     <div class="checkbox-row">
                         <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ! group</label>
                         <label class="member-label"><input type="checkbox" value="正門" checked onchange="filterCalendar()"> 正門</label>
                         <label class="member-label"><input type="checkbox" value="末澤" checked onchange="filterCalendar()"> 末澤</label>
                     </div>
-                    <!-- 2段目 -->
                     <div class="checkbox-row">
                         <label class="member-label"><input type="checkbox" value="小島" checked onchange="filterCalendar()"> 小島</label>
                         <label class="member-label"><input type="checkbox" value="佐野" checked onchange="filterCalendar()"> 佐野</label>
@@ -280,7 +287,7 @@
             </div>
 
             <div id="loading" class="loading-box">
-                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.5rem; margin-bottom: 6px;"></i><br>読み込み中...
+                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; margin-right:4px;"></i> 最新データを確認中...
             </div>
 
             <!-- カレンダー表示エリア -->
@@ -299,16 +306,13 @@
         </div>
     </div>
 
-    <!-- FullCalendar JS -->
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/ja.js"></script>
-
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
         const CACHE_KEY = "aegroup_schedule_data_cache";
 
         let allEvents = [];
         let calendar = null;
+        let pendingData = null; // FullCalendar読み込み待ち用のデータ退避
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
@@ -357,8 +361,6 @@
         function processScheduleData(rawData) {
             let list = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
 
-            document.getElementById("loading").style.display = "none";
-
             allEvents = list.map(item => {
                 const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
                 const titleVal = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
@@ -385,48 +387,16 @@
                 };
             }).filter(e => e.start !== "");
 
+            // FullCalendarがまだ準備できていない場合は退避
+            if (typeof FullCalendar === 'undefined') {
+                pendingData = rawData;
+                return;
+            }
+
             if (!calendar) {
                 renderCalendar(getFilteredEvents());
             } else {
                 filterCalendar();
-            }
-        }
-
-        async function initSchedule() {
-            let hasCache = false;
-
-            // 1. キャッシュが存在すれば即時反映
-            const cachedData = localStorage.getItem(CACHE_KEY);
-            if (cachedData) {
-                try {
-                    const json = JSON.parse(cachedData);
-                    processScheduleData(json);
-                    hasCache = true;
-                } catch (e) {
-                    console.error("Cache Read Error:", e);
-                }
-            }
-
-            // 2. バックグラウンドでGASから通信取得
-            try {
-                const response = await fetch(CAL_API_URL);
-                if (!response.ok) throw new Error("HTTPエラー");
-
-                const rawData = await response.json();
-
-                // 取得できたらキャッシュ保存＆描画を最新データにする
-                localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
-                processScheduleData(rawData);
-
-            } catch (e) {
-                console.error("Fetch Error:", e);
-                // キャッシュもAPI通信も両方ダメだった場合のみエラーを表示
-                if (!hasCache) {
-                    document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>データの読み込みに失敗しました。</p>";
-                } else {
-                    // キャッシュで表示できている場合はローディング表示だけ消す
-                    document.getElementById("loading").style.display = "none";
-                }
             }
         }
 
@@ -435,9 +405,7 @@
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ja',
-                buttonText: {
-                    today: 'today'
-                },
+                buttonText: { today: 'today' },
                 height: 'auto',
                 dayMaxEvents: 4,
                 headerToolbar: {
@@ -456,6 +424,45 @@
                 }
             });
             calendar.render();
+        }
+
+        async function initSchedule() {
+            let hasCache = false;
+
+            // 1. キャッシュがあれば超即時にデータ変換を実行
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            if (cachedData) {
+                try {
+                    const json = JSON.parse(cachedData);
+                    processScheduleData(json);
+                    hasCache = true;
+                } catch (e) {
+                    console.error("Cache Read Error:", e);
+                }
+            }
+
+            // 2. バックグラウンドでGASからデータ取得（非同期）
+            try {
+                const response = await fetch(CAL_API_URL);
+                if (!response.ok) throw new Error("HTTP Error");
+
+                const rawData = await response.json();
+
+                // キャッシュ更新＆画面反映
+                localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
+                processScheduleData(rawData);
+
+            } catch (e) {
+                console.error("Fetch Error:", e);
+                if (!hasCache) {
+                    document.getElementById("loading").innerHTML = "<span style='color:#e53e3e;'>データの読み込みに失敗しました。再読み込みをお試しください。</span>";
+                    return;
+                }
+            } finally {
+                // 完了したらローディングを非表示
+                const loader = document.getElementById("loading");
+                if (loader) loader.style.display = "none";
+            }
         }
 
         function getFilteredEvents() {
@@ -530,7 +537,13 @@
                 .replace(/'/g, '&#39;');
         }
 
-        document.addEventListener('DOMContentLoaded', initSchedule);
+        // JSライブラリの準備が整ったら初期化を開始する
+        window.addEventListener('load', () => {
+            initSchedule();
+            if (pendingData) {
+                processScheduleData(pendingData);
+            }
+        });
     </script>
 </body>
 </html>
