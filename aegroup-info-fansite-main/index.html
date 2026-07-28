@@ -1,8 +1,8 @@
-"<!DOCTYPE html>
-<html lang=""ja"">
+<!DOCTYPE html>
+<html lang="ja">
 <head>
     <!-- Google tag (gtag.js) -->
-    <script async src=""https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L""></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
@@ -11,116 +11,176 @@
       gtag('config', 'G-NPHVYVNK6L');
     </script>
 
-    <meta charset=""UTF-8"">
+    <meta charset="UTF-8">
     <title>Aぇ! group info</title>
-    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-    <link rel=""stylesheet"" href=""aegroup-info-fansite-main/style.css"">
-    <link rel=""stylesheet"" href=""https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
-        /* 新着情報・今日の予定の枠デザイン */
-        .update-item, .today-item { 
-            position: relative; 
-            padding: 12px 15px 12px 22px; 
-            margin-bottom: 12px; 
-            background: #f9f9f9; 
-            border-radius: 8px; 
+        .update-item, .schedule-item {
+            position: relative;
+            padding: 12px 15px 12px 20px;
+            margin-bottom: 12px;
+            background: #f9f9f9;
+            border-radius: 12px;
             font-size: 0.95rem;
-            overflow: hidden; 
+            overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             border: 1px solid #eee;
         }
-        
-        /* 左端のカラーバー設定 */
-        .update-item::before, .today-item::before {
-            content: """";
+
+        .update-item::before, .schedule-item::before {
+            content: "";
             position: absolute;
             left: 0;
             top: 0;
             bottom: 0;
-            width: 8px; 
-            background-color: #ff69b4; 
+            width: 8px;
+            background-color: #ff69b4;
         }
-        
-        /* タップしてワンクリックで飛べるピンクのボタン */
+
+        .update-badge {
+            color: #e53e3e;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .schedule-time {
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .update-title, .schedule-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 2px;
+        }
+
+        .update-member, .schedule-member {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
         .update-link-btn {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 8px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            padding: 6px 14px;
             background-color: #ff69b4;
             color: #fff !important;
             text-decoration: none !important;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 0.85rem;
             font-weight: bold;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: opacity 0.2s;
         }
+
         .update-link-btn:hover {
-            background-color: #ff1493;
-            opacity: 0.9;
+            opacity: 0.85;
         }
-        
-        /* 各メンバーのカラーバーの色 */
-        .bg-group::before { background-color: #ff69b4 !important; }     
-        .bg-kojima::before { background-color: #800080 !important; }    
-        .bg-masakado::before { background-color: #0000ff !important; }  
-        .bg-suezawa::before { background-color: #ff0000 !important; }   
-        .bg-sano::before { background-color: #008000 !important; }      
+
+        /* メンバーカラー指定 */
+        .bg-group::before { background-color: #ff69b4 !important; }
+        .bg-kojima::before { background-color: #800080 !important; }
+        .bg-masakado::before { background-color: #0000ff !important; }
+        .bg-suezawa::before { background-color: #ff0000 !important; }
+        .bg-sano::before { background-color: #008000 !important; }
+
+        .loading-box {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
 
-    <header class=""hero"">
+    <header class="hero">
         <h1>Aぇ! group Info</h1>
         <p>インフォメーションサイト(非公式)</p>
-        <button class=""menu-trigger"" onclick=""toggleMenu()""><i class=""fa-solid fa-bars""></i></button>
+        <button class="menu-trigger" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></button>
     </header>
 
-    <nav class=""tabs"" id=""navTabs"">
-        <a href=""index.html"" class=""active"">🏠 Home</a>
-        <a href=""schedule.html"">📅 Schedule</a>
-        <a href=""sns.html"">📱 SNS</a>
-        <a href=""tickets.html"">🎫 Tickets</a>
-        <a href=""members.html"">👤 Members</a>
+    <nav class="tabs" id="navTabs">
+        <a href="index.html" class="active">🏠 Home</a>
+        <a href="updates.html">🆕 過去更新情報</a>
+        <a href="schedule.html">📅 Schedule</a>
+        <a href="requests.html">✉️ リクエスト・募集</a>
+        <a href="works.html">🎬 出演作品</a>
+        <a href="sns.html">📱 公式SNS</a>
+        <a href="tickets.html">🎫 Tickets</a>
+        <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style=""max-width: 800px; margin: 20px auto; padding: 0 15px;"">
-        <!-- 1. 🆕 更新情報 -->
-        <section class=""card"" style=""margin-bottom: 20px;"">
-            <h2>🆕 更新情報</h2>
-            <div id=""updateList"">🔑 読み込み中...</div>
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
+        
+        <!-- 🆕 更新情報カード -->
+        <section class="card">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.2rem;">
+                <span style="background: #708090; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; vertical-align: middle; margin-right: 4px;">NEW</span> 更新情報
+            </h2>
+
+            <div id="loading-updates" class="loading-box">
+                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.5rem; margin-bottom: 6px;"></i><br>データを読み込み中...
+            </div>
+
+            <div id="updateList"></div>
         </section>
 
-        <!-- 2. 📅 本日のスケジュール -->
-        <section class=""card"" style=""margin-bottom: 20px;"">
-            <h2>📅 本日のスケジュール</h2>
-            <div id=""todayList"">🔑 読み込み中...</div>
+        <!-- 📅 本日のスケジュールカード -->
+        <section class="card" style="margin-top: 20px;">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.2rem;">
+                📅 本日のスケジュール
+            </h2>
+
+            <div id="loading-schedules" class="loading-box">
+                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.5rem; margin-bottom: 6px;"></i><br>データを読み込み中...
+            </div>
+
+            <div id="scheduleList"></div>
         </section>
 
-        <!-- 3. 📢 サイト説明 -->
-        <section class=""card"">
-            <h2>📢 Welcome</h2>
-            <p>スマートフォンでご覧の方は、右上の ≡ ボタンを押すと各メニュータブが表示されます。</p>
+        <!-- 📢 Welcomeカード -->
+        <section class="card" style="margin-top: 20px;">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.2rem;">
+                📢 Welcome
+            </h2>
+            <p style="font-size: 0.95rem; color: #333; line-height: 1.6;">
+                スマートフォンでご覧の方は、右上の ☰ ボタンを押すと各メニュータブが表示されます。
+            </p>
         </section>
+
     </main>
 
     <script>
-        const CAL_API_URL = ""https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec"";
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
 
         function toggleMenu() {
-            document.getElementById(""navTabs"").classList.toggle(""show"");
+            document.getElementById("navTabs").classList.toggle("show");
         }
 
         function getColorClass(text) {
-            if (!text) return ""bg-group"";
-            if (text.includes(""小島"")) return ""bg-kojima"";
-            if (text.includes(""正門"")) return ""bg-masakado"";
-            if (text.includes(""末澤"")) return ""bg-suezawa"";
-            if (text.includes(""佐野"")) return ""bg-sano"";
-            return ""bg-group"";
-        }
-
-        function getLinkButtonText(url) {
-            return ""📸 投稿を見る 🔗"";
+            if (!text) return "bg-group";
+            if (text.includes("小島")) return "bg-kojima";
+            if (text.includes("正門")) return "bg-masakado";
+            if (text.includes("末澤")) return "bg-suezawa";
+            if (text.includes("佐野")) return "bg-sano";
+            return "bg-group";
         }
 
         function extractUrl(text) {
@@ -129,180 +189,152 @@
             return match ? match[0] : null;
         }
 
-        function checkIsTodayUpdate(item) {
-            const timestampVal = item[""タイムスタンプ""] ?? item[""Timestamp""] ?? item[""timestamp""];
-            
-            if (timestampVal) {
-                try {
-                    const itemDate = new Date(timestampVal);
-                    if (!isNaN(itemDate.getTime())) {
-                        const now = new Date();
-                        return itemDate.getFullYear() === now.getFullYear() &&
-                               itemDate.getMonth() === now.getMonth() &&
-                               itemDate.getDate() === now.getDate();
-                    }
-                } catch(e){}
-            }
-
-            const val = item[""予定外の更新""] ?? item[""予定外""] ?? item[""更新""] ?? item[""isExtra""];
-            if (val === true || val === 1) return true;
-            if (typeof val === 'string') {
-                const s = val.trim().toLowerCase();
-                return s === 'true' || s === '1' || s === 'yes';
-            }
-            
-            return false;
-        }
-
-        // 日時・時間の値を取得してミリ秒で返すヘルパー関数
         function getTimeMillis(item) {
-            const timeVal = item[""タイムスタンプ""] || item[""Timestamp""] || item[""時間""] || item[""time""];
+            const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
             if (!timeVal) return 0;
             const d = new Date(timeVal);
             return isNaN(d.getTime()) ? 0 : d.getTime();
         }
 
         async function loadHomeData() {
+            const updateList = document.getElementById("updateList");
+            const scheduleList = document.getElementById("scheduleList");
+            const loadingUpdates = document.getElementById("loading-updates");
+            const loadingSchedules = document.getElementById("loading-schedules");
+
             try {
                 const response = await fetch(CAL_API_URL);
-                const data = await response.json();
+                if (!response.ok) throw new Error("ネットワークエラー");
+
+                const rawData = await response.json();
                 
-                // 1. 【更新情報】の処理
-                const updateList = document.getElementById(""updateList"");
-                updateList.innerHTML = """";
+                // 配列データの安全な抽出
+                let list = [];
+                if (Array.isArray(rawData)) {
+                    list = rawData;
+                } else if (rawData && typeof rawData === 'object') {
+                    list = rawData.data || rawData.items || rawData.updates || [];
+                }
 
-                const updates = data.filter(item => checkIsTodayUpdate(item));
+                loadingUpdates.style.display = "none";
+                loadingSchedules.style.display = "none";
+                updateList.innerHTML = "";
+                scheduleList.innerHTML = "";
 
-                // 💡 更新情報を【新しい時間順（降順：最新が一番上）】にソート
-                updates.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
+                if (!list || list.length === 0) {
+                    updateList.innerHTML = "<p style='color:#777; text-align:center;'>更新情報はありません</p>";
+                    scheduleList.innerHTML = "<p style='color:#777; text-align:center;'>本日の予定はありません</p>";
+                    return;
+                }
 
-                if (updates.length === 0) {
-                    updateList.innerHTML = ""<p style='color:#777;'>本日の新着更新情報はありません</p>"";
+                // 日付降順ソート（最新順）
+                list.sort((a, b) => getTimeMillis(b) - getTimeMillis(a));
+
+                // 1. 最新更新情報（5件）
+                const recentUpdates = list.slice(0, 5);
+                recentUpdates.forEach(item => {
+                    const title = item["タイトル"] || item["title"] || item["内容"] || "新着情報";
+                    const detail = item["詳細"] || item["detail"] || "";
+                    const member = item["担当"] || item["メンバー"] || item["出演者"] || "";
+                    
+                    let targetUrl = "";
+                    for (let key in item) {
+                        const urlCheck = extractUrl(item[key]);
+                        if (urlCheck) { targetUrl = urlCheck; break; }
+                    }
+
+                    let timeStr = "";
+                    const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
+                    if (timeVal) {
+                        const td = new Date(timeVal);
+                        if (!isNaN(td.getTime())) {
+                            const hh = String(td.getHours()).padStart(2, "0");
+                            const min = String(td.getMinutes()).padStart(2, "0");
+                            timeStr = `${hh}:${min}`;
+                        }
+                    }
+
+                    const colorClass = getColorClass(title + detail + member);
+
+                    const div = document.createElement("div");
+                    div.className = `update-item ${colorClass}`;
+
+                    let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
+                    html += `<div class="update-title">${escapeHtml(title)}</div>`;
+                    if (member) {
+                        html += `<div class="update-member">${escapeHtml(member)}</div>`;
+                    }
+                    if (targetUrl) {
+                        html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
+                    }
+
+                    div.innerHTML = html;
+                    updateList.appendChild(div);
+                });
+
+                // 2. 本日のスケジュール判定
+                const today = new Date();
+                const todayYMD = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+                const todayItems = list.filter(item => {
+                    const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
+                    if (!timeVal) return false;
+                    const td = new Date(timeVal);
+                    if (isNaN(td.getTime())) return false;
+                    const itemYMD = `${td.getFullYear()}-${String(td.getMonth() + 1).padStart(2, '0')}-${String(td.getDate()).padStart(2, '0')}`;
+                    return itemYMD === todayYMD;
+                });
+
+                if (todayItems.length === 0) {
+                    scheduleList.innerHTML = "<p style='color:#777; text-align:center; padding: 10px;'>本日の予定はありません</p>";
                 } else {
-                    updates.forEach(item => {
-                        const rawTitle = item[""タイトル""] || item[""title""] || item[""内容""] || """";
-                        const detailText = item[""詳細""] || item[""detail""] || item[""メモ""] || """";
+                    todayItems.forEach(item => {
+                        const title = item["タイトル"] || item["title"] || item["内容"] || "本日の予定";
+                        const member = item["担当"] || item["メンバー"] || item["出演者"] || "Aぇ! group";
                         
-                        let targetUrl = """";
-                        for (let key in item) {
-                            if (item.hasOwnProperty(key)) {
-                                const urlCheck = extractUrl(item[key]);
-                                if (urlCheck) {
-                                    targetUrl = urlCheck;
-                                    break; 
-                                }
+                        let timeStr = "00:00";
+                        const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
+                        if (timeVal) {
+                            const td = new Date(timeVal);
+                            if (!isNaN(td.getTime())) {
+                                const hh = String(td.getHours()).padStart(2, "0");
+                                const min = String(td.getMinutes()).padStart(2, "0");
+                                timeStr = `${hh}:${min}`;
                             }
                         }
 
-                        let displayTitle = rawTitle;
-                        if (rawTitle.startsWith(""http"")) {
-                            displayTitle = ""SNS更新情報"";
-                        } else if (targetUrl && rawTitle.includes(targetUrl)) {
-                            displayTitle = rawTitle.replace(targetUrl, '').trim() || ""SNS更新情報"";
-                        }
+                        const colorClass = getColorClass(title + member);
 
-                        let cleanDetail = detailText;
-                        if (targetUrl && detailText.includes(targetUrl)) {
-                            cleanDetail = detailText.replace(targetUrl, '').trim();
-                        }
+                        const div = document.createElement("div");
+                        div.className = `schedule-item ${colorClass}`;
 
-                        let timeStr = """";
-                        const timeVal = item[""タイムスタンプ""] || item[""時間""] || item[""Timestamp""];
-                        if (timeVal) {
-                            try {
-                                const td = new Date(timeVal);
-                                if (!isNaN(td.getTime())) {
-                                    timeStr = ` (${String(td.getHours()).padStart(2, ""0"")}:${String(td.getMinutes()).padStart(2, ""0"")} 更新)`;
-                                }
-                            } catch(e){}
-                        }
-
-                        const memberText = item[""担当""] || item[""メンバー""] || item[""出演者""] || """";
-                        const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
-                        
-                        const div = document.createElement(""div"");
-                        div.className = `update-item ${colorClass}`;
-                        
-                        let htmlContent = `<span style=""color:#e1306c; font-weight:bold;"">🔥 新着情報${timeStr}</span><br>`;
-                        if (displayTitle) {
-                            htmlContent += `<strong>${displayTitle}</strong>`;
-                        }
-                        
-                        if (cleanDetail && cleanDetail !== displayTitle) {
-                            htmlContent += `<br><span style=""font-size:0.85rem; color:#666;"">${cleanDetail}</span>`;
-                        } else if (memberText && memberText !== displayTitle) {
-                            htmlContent += `<br><span style=""font-size:0.85rem; color:#666;"">${memberText}</span>`;
-                        }
-
-                        if (targetUrl) {
-                            const btnText = getLinkButtonText(targetUrl);
-                            htmlContent += `<br><a href=""${targetUrl}"" target=""_blank"" rel=""noopener noreferrer"" class=""update-link-btn"">${btnText}</a>`;
-                        }
-
-                        div.innerHTML = htmlContent;
-                        updateList.appendChild(div);
-                    });
-                }
-
-                // 2. 【本日のスケジュール】の処理
-                const todayList = document.getElementById(""todayList"");
-                todayList.innerHTML = """";
-                
-                const now = new Date();
-                const todayStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
-                
-                const todayEvents = data.filter(item => {
-                    const dateVal = item[""日付""] || item[""date""];
-                    if (!dateVal || item[""タイムスタンプ""]) return false;
-
-                    try {
-                        const d = new Date(dateVal);
-                        if (isNaN(d.getTime())) return false;
-                        const itemDate = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-                        return itemDate === todayStr;
-                    } catch(e) {
-                        return false;
-                    }
-                });
-
-                // 💡 今日の予定を【早い時間順（昇順：朝〜夜）】にソート
-                todayEvents.sort((a, b) => getTimeMillis(a) - getTimeMillis(b));
-
-                if (todayEvents.length === 0) {
-                    todayList.innerHTML = ""<p style='color:#777;'>今日の予定はありません</p>"";
-                } else {
-                    todayEvents.forEach(item => {
-                        const rawTitle = item[""タイトル""] || item[""title""] || """";
-                        const detailText = item[""詳細""] || item[""detail""] || """";
-                        const memberText = item[""担当""] || item[""メンバー""] || """";
-                        const colorClass = getColorClass(detailText + rawTitle + memberText);
-                        
-                        let timeStr = """";
-                        const timeVal = item[""時間""] || item[""time""];
-                        if (timeVal) {
-                            try {
-                                const td = new Date(timeVal);
-                                if (!isNaN(td.getTime())) {
-                                    timeStr = `⏰ ${String(td.getHours()).padStart(2, ""0"")}:${String(td.getMinutes()).padStart(2, ""0"")} `;
-                                }
-                            } catch(e){}
-                        }
-                        
-                        const div = document.createElement(""div"");
-                        div.className = `today-item ${colorClass}`;
-                        div.innerHTML = `<strong>${timeStr}${rawTitle}</strong><br><span style='font-size:0.85rem;color:#666;'>${detailText || memberText}</span>`;
-                        todayList.appendChild(div);
+                        div.innerHTML = `
+                            <div class="schedule-time"><i class="fa-regular fa-clock" style="color:#e53e3e;"></i> ${timeStr} ${escapeHtml(title)}</div>
+                            <div class="schedule-member">${escapeHtml(member)}</div>
+                        `;
+                        scheduleList.appendChild(div);
                     });
                 }
 
             } catch (e) {
-                document.getElementById(""todayList"").innerText = ""データの読み込みに失敗しました。"";
-                document.getElementById(""updateList"").innerText = ""データの読み込みに失敗しました。"";
-                console.error(e);
+                console.error("Data Load Error:", e);
+                loadingUpdates.style.display = "none";
+                loadingSchedules.style.display = "none";
+                updateList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
+                scheduleList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
             }
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         document.addEventListener('DOMContentLoaded', loadHomeData);
     </script>
 </body>
-</html>"
+</html>
