@@ -169,6 +169,7 @@
 
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        const CACHE_KEY = "aegroup_home_data_cache";
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
@@ -214,152 +215,180 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
+        // データを描画する専用関数（表示ロジックはそのまま）
+        function renderHomeData(rawData) {
+            const updateList = document.getElementById("updateList");
+            const scheduleList = document.getElementById("scheduleList");
+            const loadingUpdates = document.getElementById("loading-updates");
+            const loadingSchedules = document.getElementById("loading-schedules");
+
+            let list = [];
+            if (Array.isArray(rawData)) {
+                list = rawData;
+            } else if (rawData && typeof rawData === 'object') {
+                list = rawData.data || rawData.items || rawData.updates || [];
+            }
+
+            loadingUpdates.style.display = "none";
+            loadingSchedules.style.display = "none";
+            updateList.innerHTML = "";
+            scheduleList.innerHTML = "";
+
+            if (!list || list.length === 0) {
+                updateList.innerHTML = "<p style='color:#777; text-align:center;'>更新情報はありません</p>";
+                scheduleList.innerHTML = "<p style='color:#777; text-align:center;'>本日の予定はありません</p>";
+                return;
+            }
+
+            const today = new Date();
+            const todayYMD = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+            // --- 1. 🆕 更新情報 (A列：タイムスタンプが今日の日付) ---
+            const todayUpdates = list.filter(item => {
+                const timestampVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"] || item["A"] || Object.values(item)[0]);
+                return toYMD(timestampVal) === todayYMD;
+            });
+
+            todayUpdates.sort((a, b) => {
+                const timeA = Array.isArray(a) ? a[0] : (a["タイムスタンプ"] || a["Timestamp"] || Object.values(a)[0]);
+                const timeB = Array.isArray(b) ? b[0] : (b["タイムスタンプ"] || b["Timestamp"] || Object.values(b)[0]);
+                return new Date(timeB).getTime() - new Date(timeA).getTime();
+            });
+
+            if (todayUpdates.length === 0) {
+                updateList.innerHTML = "<p style='color:#777; text-align:center; padding:10px;'>本日の更新情報はありません</p>";
+            } else {
+                todayUpdates.forEach(item => {
+                    let title = "新着情報";
+                    if (Array.isArray(item)) {
+                        title = item[2] || item[1] || "新着情報";
+                    } else {
+                        title = item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2] || Object.values(item)[1] || "新着情報";
+                    }
+
+                    // URL取得
+                    let targetUrl = "";
+                    if (Array.isArray(item)) {
+                        targetUrl = extractUrl(item.join(' ')) || "";
+                    } else {
+                        for (let key in item) {
+                            const urlCheck = extractUrl(item[key]);
+                            if (urlCheck) { targetUrl = urlCheck; break; }
+                        }
+                    }
+
+                    // 時刻取得
+                    let timeStr = "";
+                    const timeVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"] || Object.values(item)[0]);
+                    if (timeVal) {
+                        const td = new Date(timeVal);
+                        if (!isNaN(td.getTime())) {
+                            const hh = String(td.getHours()).padStart(2, "0");
+                            const min = String(td.getMinutes()).padStart(2, "0");
+                            timeStr = `${hh}:${min}`;
+                        }
+                    }
+
+                    // メンバー情報とカラー取得
+                    const memberInfo = detectMemberInfo(item);
+
+                    const div = document.createElement("div");
+                    div.className = `update-item ${memberInfo.colorClass}`;
+
+                    let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
+                    html += `<div class="update-title">${escapeHtml(title)}</div>`;
+                    html += `<div class="update-member">${escapeHtml(memberInfo.name)}</div>`;
+
+                    if (targetUrl) {
+                        html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
+                    }
+
+                    div.innerHTML = html;
+                    updateList.appendChild(div);
+                });
+            }
+
+            // --- 2. 📅 本日のスケジュール (B列：日付が今日の日付) ---
+            const todaySchedules = list.filter(item => {
+                const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
+                return toYMD(dateVal) === todayYMD;
+            });
+
+            if (todaySchedules.length === 0) {
+                scheduleList.innerHTML = "<p style='color:#777; text-align:center; padding: 10px;'>本日の予定はありません</p>";
+            } else {
+                todaySchedules.forEach(item => {
+                    let title = "本日の予定";
+                    if (Array.isArray(item)) {
+                        title = item[2] || "本日の予定";
+                    } else {
+                        title = item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2] || "本日の予定";
+                    }
+
+                    let timeStr = "";
+                    const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"] || item["日付"] || item["date"] || Object.values(item)[3]);
+                    if (timeVal) {
+                        const td = new Date(timeVal);
+                        if (!isNaN(td.getTime())) {
+                            const hh = String(td.getHours()).padStart(2, "0");
+                            const min = String(td.getMinutes()).padStart(2, "0");
+                            timeStr = `${hh}:${min}`;
+                        }
+                    }
+
+                    // メンバー情報とカラー取得
+                    const memberInfo = detectMemberInfo(item);
+
+                    const div = document.createElement("div");
+                    div.className = `schedule-item ${memberInfo.colorClass}`;
+
+                    div.innerHTML = `
+                        <div class="schedule-time"><i class="fa-regular fa-clock" style="color:#e53e3e;"></i> ${timeStr ? timeStr + ' ' : ''}${escapeHtml(title)}</div>
+                        <div class="schedule-member">${escapeHtml(memberInfo.name)}</div>
+                    `;
+                    scheduleList.appendChild(div);
+                });
+            }
+        }
+
         async function loadHomeData() {
             const updateList = document.getElementById("updateList");
             const scheduleList = document.getElementById("scheduleList");
             const loadingUpdates = document.getElementById("loading-updates");
             const loadingSchedules = document.getElementById("loading-schedules");
 
+            // 1. まずキャッシュがあれば即時描画する（爆速化）
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            if (cachedData) {
+                try {
+                    renderHomeData(JSON.parse(cachedData));
+                } catch (e) {
+                    console.error("Cache Read Error:", e);
+                }
+            }
+
+            // 2. バックグラウンドで最新データを取得
             try {
                 const response = await fetch(CAL_API_URL);
                 if (!response.ok) throw new Error("ネットワークエラー");
 
                 const rawData = await response.json();
                 
-                let list = [];
-                if (Array.isArray(rawData)) {
-                    list = rawData;
-                } else if (rawData && typeof rawData === 'object') {
-                    list = rawData.data || rawData.items || rawData.updates || [];
-                }
+                // キャッシュを最新化
+                localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
 
-                loadingUpdates.style.display = "none";
-                loadingSchedules.style.display = "none";
-                updateList.innerHTML = "";
-                scheduleList.innerHTML = "";
-
-                if (!list || list.length === 0) {
-                    updateList.innerHTML = "<p style='color:#777; text-align:center;'>更新情報はありません</p>";
-                    scheduleList.innerHTML = "<p style='color:#777; text-align:center;'>本日の予定はありません</p>";
-                    return;
-                }
-
-                const today = new Date();
-                const todayYMD = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-                // --- 1. 🆕 更新情報 (A列：タイムスタンプが今日の日付) ---
-                const todayUpdates = list.filter(item => {
-                    const timestampVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"] || item["A"] || Object.values(item)[0]);
-                    return toYMD(timestampVal) === todayYMD;
-                });
-
-                todayUpdates.sort((a, b) => {
-                    const timeA = Array.isArray(a) ? a[0] : (a["タイムスタンプ"] || a["Timestamp"] || Object.values(a)[0]);
-                    const timeB = Array.isArray(b) ? b[0] : (b["タイムスタンプ"] || b["Timestamp"] || Object.values(b)[0]);
-                    return new Date(timeB).getTime() - new Date(timeA).getTime();
-                });
-
-                if (todayUpdates.length === 0) {
-                    updateList.innerHTML = "<p style='color:#777; text-align:center; padding:10px;'>本日の更新情報はありません</p>";
-                } else {
-                    todayUpdates.forEach(item => {
-                        let title = "新着情報";
-                        if (Array.isArray(item)) {
-                            title = item[2] || item[1] || "新着情報";
-                        } else {
-                            title = item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2] || Object.values(item)[1] || "新着情報";
-                        }
-
-                        // URL取得
-                        let targetUrl = "";
-                        if (Array.isArray(item)) {
-                            targetUrl = extractUrl(item.join(' ')) || "";
-                        } else {
-                            for (let key in item) {
-                                const urlCheck = extractUrl(item[key]);
-                                if (urlCheck) { targetUrl = urlCheck; break; }
-                            }
-                        }
-
-                        // 時刻取得
-                        let timeStr = "";
-                        const timeVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"] || Object.values(item)[0]);
-                        if (timeVal) {
-                            const td = new Date(timeVal);
-                            if (!isNaN(td.getTime())) {
-                                const hh = String(td.getHours()).padStart(2, "0");
-                                const min = String(td.getMinutes()).padStart(2, "0");
-                                timeStr = `${hh}:${min}`;
-                            }
-                        }
-
-                        // メンバー情報とカラー取得
-                        const memberInfo = detectMemberInfo(item);
-
-                        const div = document.createElement("div");
-                        div.className = `update-item ${memberInfo.colorClass}`;
-
-                        let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
-                        html += `<div class="update-title">${escapeHtml(title)}</div>`;
-                        html += `<div class="update-member">${escapeHtml(memberInfo.name)}</div>`;
-
-                        if (targetUrl) {
-                            html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
-                        }
-
-                        div.innerHTML = html;
-                        updateList.appendChild(div);
-                    });
-                }
-
-                // --- 2. 📅 本日のスケジュール (B列：日付が今日の日付) ---
-                const todaySchedules = list.filter(item => {
-                    const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
-                    return toYMD(dateVal) === todayYMD;
-                });
-
-                if (todaySchedules.length === 0) {
-                    scheduleList.innerHTML = "<p style='color:#777; text-align:center; padding: 10px;'>本日の予定はありません</p>";
-                } else {
-                    todaySchedules.forEach(item => {
-                        let title = "本日の予定";
-                        if (Array.isArray(item)) {
-                            title = item[2] || "本日の予定";
-                        } else {
-                            title = item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2] || "本日の予定";
-                        }
-
-                        let timeStr = "";
-                        const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"] || item["日付"] || item["date"] || Object.values(item)[3]);
-                        if (timeVal) {
-                            const td = new Date(timeVal);
-                            if (!isNaN(td.getTime())) {
-                                const hh = String(td.getHours()).padStart(2, "0");
-                                const min = String(td.getMinutes()).padStart(2, "0");
-                                timeStr = `${hh}:${min}`;
-                            }
-                        }
-
-                        // メンバー情報とカラー取得
-                        const memberInfo = detectMemberInfo(item);
-
-                        const div = document.createElement("div");
-                        div.className = `schedule-item ${memberInfo.colorClass}`;
-
-                        div.innerHTML = `
-                            <div class="schedule-time"><i class="fa-regular fa-clock" style="color:#e53e3e;"></i> ${timeStr ? timeStr + ' ' : ''}${escapeHtml(title)}</div>
-                            <div class="schedule-member">${escapeHtml(memberInfo.name)}</div>
-                        `;
-                        scheduleList.appendChild(div);
-                    });
-                }
+                // 画面を最新データで再描画
+                renderHomeData(rawData);
 
             } catch (e) {
                 console.error("Data Load Error:", e);
-                loadingUpdates.style.display = "none";
-                loadingSchedules.style.display = "none";
-                updateList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
-                scheduleList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
+                // キャッシュもない完全な初期エラー時のみエラーメッセージを表示
+                if (!cachedData) {
+                    loadingUpdates.style.display = "none";
+                    loadingSchedules.style.display = "none";
+                    updateList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
+                    scheduleList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
+                }
             }
         }
 
