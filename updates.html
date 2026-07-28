@@ -67,7 +67,7 @@
         .bg-suezawa::before { background-color: #ff0000 !important; }
         .bg-sano::before { background-color: #008000 !important; }
 
-        /* 🔍 検索バー修正位置 */
+        /* 🔍 検索バー構造修正 */
         .search-area {
             background: #fff;
             padding: 15px;
@@ -76,37 +76,43 @@
             margin-bottom: 20px;
         }
 
-        .search-container {
-            position: relative;
-            width: 100%;
-            margin-bottom: 12px;
+        .search-box-wrapper {
+            position: relative !important;
+            width: 100% !important;
+            margin-bottom: 12px !important;
+            display: block !important;
         }
 
         .search-input {
-            width: 100%;
-            padding: 10px 15px 10px 40px;
-            font-size: 0.95rem;
-            border: 2px solid #ddd;
-            border-radius: 25px;
-            outline: none;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
-            height: 42px;
+            width: 100% !important;
+            padding: 10px 15px 10px 42px !important;
+            font-size: 0.95rem !important;
+            border: 2px solid #ddd !important;
+            border-radius: 25px !important;
+            outline: none !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.2s !important;
+            height: 42px !important;
+            background-color: #fff !important;
         }
 
         .search-input:focus {
-            border-color: #ff69b4;
+            border-color: #ff69b4 !important;
         }
 
-        /* 🔍 アイコンの上下中央揃えを確実に指定 */
+        /* アイコンを入力枠内の左側に固定 */
         .search-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
-            font-size: 0.95rem;
-            pointer-events: none;
+            position: absolute !important;
+            left: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #888 !important;
+            font-size: 1rem !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
+            line-height: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
         /* メンバーフィルター（チェックボックス） */
@@ -234,7 +240,7 @@
 
             <!-- 検索＆絞り込みエリア -->
             <div class="search-area">
-                <div class="search-container">
+                <div class="search-box-wrapper">
                     <i class="fa-solid fa-magnifying-glass search-icon"></i>
                     <input type="text" id="searchInput" class="search-input" placeholder="キーワードで検索..." onkeyup="filterUpdates()">
                 </div>
