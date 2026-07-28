@@ -12,18 +12,100 @@
     </script>
 
     <meta charset="UTF-8">
-    <title>Home - Aぇ! group info</title>
+    <title>Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+    
     <style>
+        .update-item, .schedule-item {
+            position: relative;
+            padding: 12px 15px 12px 20px;
+            margin-bottom: 12px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .update-item::before, .schedule-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background-color: #ff69b4;
+        }
+
         /* メンバーカラー（左側ボーダー） */
-        .bg-group { border-left: 4px solid #ff69b4 !important; }
-        .bg-kojima { border-left: 4px solid #800080 !important; }
-        .bg-masakado { border-left: 4px solid #0000ff !important; }
-        .bg-suezawa { border-left: 4px solid #ff0000 !important; }
-        .bg-sano { border-left: 4px solid #008000 !important; }
+        .bg-group::before { background-color: #ff69b4 !important; }
+        .bg-kojima::before { background-color: #800080 !important; }
+        .bg-masakado::before { background-color: #0000ff !important; }
+        .bg-suezawa::before { background-color: #ff0000 !important; }
+        .bg-sano::before { background-color: #008000 !important; }
+
+        .update-badge {
+            color: #e53e3e;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .schedule-time {
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .update-title, .schedule-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 2px;
+        }
+
+        .update-member, .schedule-member {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 6px;
+        }
+
+        .update-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+            padding: 6px 14px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: opacity 0.2s;
+        }
+
+        .update-link-btn:hover {
+            opacity: 0.85;
+        }
+
+        .loading-box {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -45,61 +127,55 @@
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 15px auto; padding: 0 10px;">
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         
-        <!-- ① 最新更新情報（上配置） -->
+        <!-- 🆕 更新情報カード -->
         <section class="card">
-            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 12px; font-size: 1.2rem;">
-                🆕 最新更新情報
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.2rem;">
+                <span style="background: #708090; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; vertical-align: middle; margin-right: 4px;">NEW</span> 更新情報
             </h2>
-            <div id="latest-updates">
-                <div class="loading-text" style="text-align: center; color: #888; padding: 15px;">
-                    <i class="fa-solid fa-spinner fa-spin" style="color: #ff69b4;"></i> 読み込み中...
-                </div>
+
+            <div id="loading-updates" class="loading-box">
+                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.5rem; margin-bottom: 6px;"></i><br>データを読み込み中...
             </div>
+
+            <div id="updateList"></div>
         </section>
 
-        <!-- ② 本日のスケジュール（下配置） -->
+        <!-- 📅 本日のスケジュールカード -->
         <section class="card" style="margin-top: 20px;">
-            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 12px; font-size: 1.2rem;">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.2rem;">
                 📅 本日のスケジュール
             </h2>
-            <div id="today-schedule">
-                <div class="loading-text" style="text-align: center; color: #888; padding: 15px;">
-                    <i class="fa-solid fa-spinner fa-spin" style="color: #ff69b4;"></i> 読み込み中...
-                </div>
+
+            <div id="loading-schedules" class="loading-box">
+                <i class="fa-solid fa-spinner fa-spin" style="color:#ff69b4; font-size:1.5rem; margin-bottom: 6px;"></i><br>データを読み込み中...
             </div>
+
+            <div id="scheduleList"></div>
+        </section>
+
+        <!-- 📢 Welcomeカード -->
+        <section class="card" style="margin-top: 20px;">
+            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.2rem;">
+                📢 Welcome
+            </h2>
+            <p style="font-size: 0.95rem; color: #333; line-height: 1.6;">
+                スマートフォンでご覧の方は、右上の ☰ ボタンを押すと各メニュータブが表示されます。
+            </p>
         </section>
 
     </main>
 
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
-        const UPDATE_API_URL = "https://script.google.com/macros/s/AKfycbwqVSoDqfV4QfKoxY_sA2z0dI90z28N9gYJ5y3Z/exec";
-
-        const CACHE_KEY_SCHEDULE = "aegroup_home_schedule_cache_v2";
-        const CACHE_KEY_UPDATES = "aegroup_home_updates_cache_v2";
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // --- 配列抽出処理 ---
-        function extractList(rawData) {
-            if (!rawData) return [];
-            if (Array.isArray(rawData)) return rawData;
-            if (typeof rawData === 'object') {
-                if (Array.isArray(rawData.data)) return rawData.data;
-                if (Array.isArray(rawData.items)) return rawData.items;
-                if (Array.isArray(rawData.value)) return rawData.value;
-                // 連番オブジェクトやキー値から配列に変換
-                return Object.values(rawData);
-            }
-            return [];
-        }
-
-        // --- メンバー判定 ---
-        function detectMemberClass(item) {
+        // アイテム全体の文字情報からメンバー情報（表示名・クラス）を判定する
+        function detectMemberInfo(item) {
             let fullStr = "";
             if (Array.isArray(item)) {
                 fullStr = item.join(" ");
@@ -107,37 +183,27 @@
                 fullStr = Object.values(item).join(" ");
             }
 
-            if (fullStr.includes("佐野")) return "bg-sano";
-            if (fullStr.includes("小島")) return "bg-kojima";
-            if (fullStr.includes("正門")) return "bg-masakado";
-            if (fullStr.includes("末澤")) return "bg-suezawa";
-            return "bg-group";
+            if (fullStr.includes("佐野")) {
+                return { name: "佐野", colorClass: "bg-sano" };
+            }
+            if (fullStr.includes("小島")) {
+                return { name: "小島", colorClass: "bg-kojima" };
+            }
+            if (fullStr.includes("正門")) {
+                return { name: "正門", colorClass: "bg-masakado" };
+            }
+            if (fullStr.includes("末澤")) {
+                return { name: "末澤", colorClass: "bg-suezawa" };
+            }
+            return { name: "Aぇ! group", colorClass: "bg-group" };
         }
 
-        // --- 時間文字列の正常化 ---
-        function formatTimeString(timeVal) {
-            if (!timeVal) return "";
-            const str = String(timeVal).trim();
-            if (!str || str.toLowerCase() === "undefined" || str.toLowerCase() === "null") return "";
-
-            const d = new Date(str);
-            if (!isNaN(d.getTime())) {
-                const hh = String(d.getHours()).padStart(2, "0");
-                const mm = String(d.getMinutes()).padStart(2, "0");
-                return `${hh}:${mm}`;
-            }
-
-            const match = str.match(/(\d{1,2}):(\d{2})/);
-            if (match) {
-                const hh = String(match[1]).padStart(2, "0");
-                const mm = match[2];
-                return `${hh}:${mm}`;
-            }
-
-            return str;
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = String(text).match(/(https?:\/\/[^\s]+)/);
+            return match ? match[0] : null;
         }
 
-        // --- YYYY-MM-DD 変換 ---
         function toYMD(val) {
             if (!val) return "";
             const d = new Date(val);
@@ -148,155 +214,165 @@
             return `${yyyy}-${mm}-${dd}`;
         }
 
-        // --- 1. 最新更新情報読み込み ---
-        async function loadLatestUpdates() {
-            const container = document.getElementById("latest-updates");
-
-            // キャッシュから取り出して表示
-            const cached = localStorage.getItem(CACHE_KEY_UPDATES);
-            if (cached) {
-                try { renderLatestUpdates(JSON.parse(cached)); } catch(e){}
-            }
+        async function loadHomeData() {
+            const updateList = document.getElementById("updateList");
+            const scheduleList = document.getElementById("scheduleList");
+            const loadingUpdates = document.getElementById("loading-updates");
+            const loadingSchedules = document.getElementById("loading-schedules");
 
             try {
-                // キャッシュ無効化クエリ(?t=...)をつけて最新APIを取得
-                const res = await fetch(UPDATE_API_URL + "?t=" + new Date().getTime());
-                if (!res.ok) throw new Error("API取得失敗");
-                const rawData = await res.json();
+                const response = await fetch(CAL_API_URL);
+                if (!response.ok) throw new Error("ネットワークエラー");
 
-                // 取得成功したらキャッシュ更新＆画面描画
-                localStorage.setItem(CACHE_KEY_UPDATES, JSON.stringify(rawData));
-                renderLatestUpdates(rawData);
-            } catch (e) {
-                console.error("更新情報エラー:", e);
-                if (!cached) {
-                    container.innerHTML = "<p style='color:#888; text-align:center;'>更新情報の取得に失敗しました。</p>";
+                const rawData = await response.json();
+                
+                let list = [];
+                if (Array.isArray(rawData)) {
+                    list = rawData;
+                } else if (rawData && typeof rawData === 'object') {
+                    list = rawData.data || rawData.items || rawData.updates || [];
                 }
-            }
-        }
 
-        function renderLatestUpdates(rawData) {
-            const container = document.getElementById("latest-updates");
-            const list = extractList(rawData);
+                loadingUpdates.style.display = "none";
+                loadingSchedules.style.display = "none";
+                updateList.innerHTML = "";
+                scheduleList.innerHTML = "";
 
-            if (list.length === 0) {
-                container.innerHTML = "<p style='color:#777; text-align:center; padding:10px;'>更新情報はありません。</p>";
-                return;
-            }
-
-            // 1行目が「日付」「内容」などのヘッダー行の場合は除外
-            let dataRows = list;
-            if (dataRows.length > 1) {
-                const firstRowStr = JSON.stringify(dataRows[0]);
-                if (firstRowStr.includes("日付") || firstRowStr.includes("date") || firstRowStr.includes("内容")) {
-                    dataRows = dataRows.slice(1);
+                if (!list || list.length === 0) {
+                    updateList.innerHTML = "<p style='color:#777; text-align:center;'>更新情報はありません</p>";
+                    scheduleList.innerHTML = "<p style='color:#777; text-align:center;'>本日の予定はありません</p>";
+                    return;
                 }
-            }
 
-            const top5 = dataRows.slice(0, 5);
-            let html = "";
-            top5.forEach(item => {
-                let date = "";
-                let content = "";
+                const today = new Date();
+                const todayYMD = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-                if (Array.isArray(item)) {
-                    date = item[0] || "";
-                    content = item[1] || item[2] || "";
-                } else if (typeof item === 'object' && item !== null) {
-                    const keys = Object.keys(item);
-                    date = item["日付"] || item["date"] || item["A"] || item[keys[0]] || "";
-                    content = item["内容"] || item["text"] || item["B"] || item[keys[1]] || "";
+                // --- 1. 🆕 更新情報 (A列：タイムスタンプが今日の日付) ---
+                const todayUpdates = list.filter(item => {
+                    const timestampVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"] || item["A"] || Object.values(item)[0]);
+                    return toYMD(timestampVal) === todayYMD;
+                });
+
+                todayUpdates.sort((a, b) => {
+                    const timeA = Array.isArray(a) ? a[0] : (a["タイムスタンプ"] || a["Timestamp"] || Object.values(a)[0]);
+                    const timeB = Array.isArray(b) ? b[0] : (b["タイムスタンプ"] || b["Timestamp"] || Object.values(b)[0]);
+                    return new Date(timeB).getTime() - new Date(timeA).getTime();
+                });
+
+                if (todayUpdates.length === 0) {
+                    updateList.innerHTML = "<p style='color:#777; text-align:center; padding:10px;'>本日の更新情報はありません</p>";
                 } else {
-                    content = String(item);
+                    todayUpdates.forEach(item => {
+                        let title = "新着情報";
+                        if (Array.isArray(item)) {
+                            title = item[2] || item[1] || "新着情報";
+                        } else {
+                            title = item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2] || Object.values(item)[1] || "新着情報";
+                        }
+
+                        // URL取得
+                        let targetUrl = "";
+                        if (Array.isArray(item)) {
+                            targetUrl = extractUrl(item.join(' ')) || "";
+                        } else {
+                            for (let key in item) {
+                                const urlCheck = extractUrl(item[key]);
+                                if (urlCheck) { targetUrl = urlCheck; break; }
+                            }
+                        }
+
+                        // 時刻取得
+                        let timeStr = "";
+                        const timeVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"] || Object.values(item)[0]);
+                        if (timeVal) {
+                            const td = new Date(timeVal);
+                            if (!isNaN(td.getTime())) {
+                                const hh = String(td.getHours()).padStart(2, "0");
+                                const min = String(td.getMinutes()).padStart(2, "0");
+                                timeStr = `${hh}:${min}`;
+                            }
+                        }
+
+                        // メンバー情報とカラー取得
+                        const memberInfo = detectMemberInfo(item);
+
+                        const div = document.createElement("div");
+                        div.className = `update-item ${memberInfo.colorClass}`;
+
+                        let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
+                        html += `<div class="update-title">${escapeHtml(title)}</div>`;
+                        html += `<div class="update-member">${escapeHtml(memberInfo.name)}</div>`;
+
+                        if (targetUrl) {
+                            html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
+                        }
+
+                        div.innerHTML = html;
+                        updateList.appendChild(div);
+                    });
                 }
 
-                // 日付整形
-                if (date && String(date).length > 8 && !isNaN(new Date(date).getTime())) {
-                    const ym = toYMD(date);
-                    if (ym) date = ym.replace(/-/g, "/");
+                // --- 2. 📅 本日のスケジュール (B列：日付が今日の日付) ---
+                const todaySchedules = list.filter(item => {
+                    const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
+                    return toYMD(dateVal) === todayYMD;
+                });
+
+                if (todaySchedules.length === 0) {
+                    scheduleList.innerHTML = "<p style='color:#777; text-align:center; padding: 10px;'>本日の予定はありません</p>";
+                } else {
+                    todaySchedules.forEach(item => {
+                        let title = "本日の予定";
+                        if (Array.isArray(item)) {
+                            title = item[2] || "本日の予定";
+                        } else {
+                            title = item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2] || "本日の予定";
+                        }
+
+                        let timeStr = "";
+                        const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"] || item["日付"] || item["date"] || Object.values(item)[3]);
+                        if (timeVal) {
+                            const td = new Date(timeVal);
+                            if (!isNaN(td.getTime())) {
+                                const hh = String(td.getHours()).padStart(2, "0");
+                                const min = String(td.getMinutes()).padStart(2, "0");
+                                timeStr = `${hh}:${min}`;
+                            }
+                        }
+
+                        // メンバー情報とカラー取得
+                        const memberInfo = detectMemberInfo(item);
+
+                        const div = document.createElement("div");
+                        div.className = `schedule-item ${memberInfo.colorClass}`;
+
+                        div.innerHTML = `
+                            <div class="schedule-time"><i class="fa-regular fa-clock" style="color:#e53e3e;"></i> ${timeStr ? timeStr + ' ' : ''}${escapeHtml(title)}</div>
+                            <div class="schedule-member">${escapeHtml(memberInfo.name)}</div>
+                        `;
+                        scheduleList.appendChild(div);
+                    });
                 }
 
-                html += `
-                    <div style="border-bottom:1px dashed #eee; padding:8px 0; font-size:0.9rem;">
-                        <span style="color:#ff69b4; font-weight:bold; margin-right:8px;">${escapeHtml(date)}</span>
-                        <span style="color:#333;">${escapeHtml(content)}</span>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        // --- 2. 本日のスケジュール読み込み ---
-        async function loadTodaySchedule() {
-            const container = document.getElementById("today-schedule");
-
-            const cached = localStorage.getItem(CACHE_KEY_SCHEDULE);
-            if (cached) {
-                try { renderTodaySchedule(JSON.parse(cached)); } catch(e){}
-            }
-
-            try {
-                const res = await fetch(CAL_API_URL + "?t=" + new Date().getTime());
-                if (!res.ok) throw new Error("API取得失敗");
-                const rawData = await res.json();
-                
-                localStorage.setItem(CACHE_KEY_SCHEDULE, JSON.stringify(rawData));
-                renderTodaySchedule(rawData);
             } catch (e) {
-                console.error("スケジュールエラー:", e);
-                if (!cached) {
-                    container.innerHTML = "<p style='color:#888; text-align:center;'>スケジュールの取得に失敗しました。</p>";
-                }
+                console.error("Data Load Error:", e);
+                loadingUpdates.style.display = "none";
+                loadingSchedules.style.display = "none";
+                updateList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
+                scheduleList.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
             }
-        }
-
-        function renderTodaySchedule(rawData) {
-            const container = document.getElementById("today-schedule");
-            const list = extractList(rawData);
-
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            const todayStr = `${yyyy}-${mm}-${dd}`;
-            
-            const todayEvents = list.filter(item => {
-                const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
-                return toYMD(dateVal) === todayStr;
-            });
-
-            if (todayEvents.length === 0) {
-                container.innerHTML = "<p style='color:#777; text-align:center; padding:10px;'>本日予定されているスケジュールはありません。</p>";
-                return;
-            }
-
-            let html = "";
-            todayEvents.forEach(item => {
-                const title = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"] || Object.values(item)[2])) || "予定";
-                const timeRaw = Array.isArray(item) ? item[3] : (item["時間"] || item["time"] || Object.values(item)[3]);
-                const timeFormatted = formatTimeString(timeRaw);
-                
-                const memberClass = detectMemberClass(item);
-
-                html += `
-                    <div class="${memberClass}" style="background:#f9f9f9; padding:10px 12px; margin-bottom:8px; border-radius:6px;">
-                        <div style="font-size:0.8rem; color:#e53e3e; font-weight:bold;">⏰ ${timeFormatted ? escapeHtml(timeFormatted) : '時間未定 / 終日'}</div>
-                        <div style="font-size:0.95rem; font-weight:bold; color:#333;">${escapeHtml(title)}</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
         }
 
         function escapeHtml(str) {
-            if (!str) return "";
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
-        document.addEventListener("DOMContentLoaded", () => {
-            loadLatestUpdates();
-            loadTodaySchedule();
-        });
+        document.addEventListener('DOMContentLoaded', loadHomeData);
     </script>
 </body>
 </html>
