@@ -21,6 +21,13 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <style>
+        /* 各メンバーのカラーバー・テーマカラー定義 */
+        .bg-group { border-left-color: #ff69b4 !important; }
+        .bg-kojima { border-left-color: #800080 !important; }
+        .bg-masakado { border-left-color: #0000ff !important; }
+        .bg-suezawa { border-left-color: #ff0000 !important; }
+        .bg-sano { border-left-color: #008000 !important; }
+
         .search-container {
             margin: 15px 0 20px 0;
             position: relative;
@@ -72,21 +79,29 @@
             color: #fff;
         }
 
+        /* カレンダー領域 */
         #calendar {
             background: #fff;
-            padding: 10px;
+            padding: 5px;
             border-radius: 8px;
             border: 1px solid #eee;
         }
 
+        /* FullCalendarイベント */
         .fc-event {
             cursor: pointer;
-            background-color: #ff69b4 !important;
-            border-color: #ff69b4 !important;
-            font-size: 0.8rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
             padding: 2px 4px;
+            border: none !important;
+            margin-bottom: 2px;
         }
 
+        .fc-daygrid-day {
+            cursor: pointer;
+        }
+
+        /* モーダル表示 */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -102,7 +117,9 @@
             padding: 20px;
             border-radius: 12px;
             max-width: 90%;
-            width: 400px;
+            width: 420px;
+            max-height: 80vh;
+            overflow-y: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
         }
@@ -111,9 +128,18 @@
             position: absolute;
             top: 10px;
             right: 15px;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             cursor: pointer;
             color: #888;
+        }
+
+        .modal-date-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #ff69b4;
+            padding-bottom: 6px;
+            margin-bottom: 15px;
         }
 
         .update-list {
@@ -123,11 +149,11 @@
         }
 
         .update-card {
-            padding: 14px 16px;
+            padding: 12px 14px;
             background: #f9f9f9;
             border-radius: 8px;
             border: 1px solid #eee;
-            border-left: 5px solid #ff69b4;
+            border-left: 6px solid #ff69b4;
         }
 
         .update-date {
@@ -150,7 +176,6 @@
             align-items: center;
             gap: 5px;
             padding: 6px 14px;
-            background-color: #ff69b4;
             color: #fff !important;
             text-decoration: none !important;
             border-radius: 6px;
@@ -227,13 +252,12 @@
         </section>
     </main>
 
-    <!-- モーダル（クリック時の詳細ポップアップ） -->
+    <!-- モーダル（日付選択時一覧ポップアップ） -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
-            <div class="update-date" id="modalDate"></div>
-            <div class="update-title" id="modalTitle" style="margin-top:8px;"></div>
-            <div id="modalLinkContainer" style="margin-top:15px;"></div>
+            <div class="modal-date-title" id="modalDateTitle">📅 更新情報</div>
+            <div class="update-list" id="modalUpdateList"></div>
         </div>
     </div>
 
@@ -247,28 +271,59 @@
         let filteredData = [];
         let calendar;
 
-        // データ解析（配列 or オブジェクト双方に対応）
+        // 🎨 メンバーカラー判定関数（指定カラー設定）
+        function getMemberColorInfo(title) {
+            if (/正門/i.test(title)) return { color: '#0000ff', className: 'bg-masakado' }; // 青
+            if (/末澤/i.test(title)) return { color: '#ff0000', className: 'bg-suezawa' };  // 赤
+            if (/小島/i.test(title)) return { color: '#800080', className: 'bg-kojima' };   // 紫
+            if (/佐野/i.test(title)) return { color: '#008000', className: 'bg-sano' };     // 緑
+            return { color: '#ff69b4', className: 'bg-group' };                             // ピンク（グループ）
+        }
+
+        // 📅 日時フォーマット (YYYY/MM/DD HH:mm)
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+
+            return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
+        }
+
+        // カレンダー用日付 (YYYY-MM-DD)
+        function toISODateOnly(dateStr) {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        // データ解析
         function parseItem(item) {
-            let date = "", title = "", url = "";
+            let rawDate = "", title = "", url = "";
 
             if (Array.isArray(item)) {
-                // A列: タイムスタンプ, B列: タイトル, C列: URL の構成
-                date = item[0] || "";
+                rawDate = item[0] || "";
                 title = item[1] || "";
                 url = item[2] || "";
             } else if (typeof item === 'object' && item !== null) {
                 const keys = Object.keys(item);
                 
-                // タイムスタンプ・日付の優先取得（A列優先）
                 for (let k of keys) {
                     if (/タイムスタンプ|timestamp|date|時間|日時/i.test(k)) {
-                        date = item[k];
+                        rawDate = item[k];
                         break;
                     }
                 }
-                if (!date && keys.length > 0) date = item[keys[0]];
+                if (!rawDate && keys.length > 0) rawDate = item[keys[0]];
 
-                // タイトルの取得
                 for (let k of keys) {
                     if (/title|content|text|message|タイトル|内容/i.test(k)) {
                         title = item[k];
@@ -277,7 +332,6 @@
                 }
                 if (!title && keys.length > 1) title = item[keys[1]];
 
-                // URLの取得
                 for (let k of keys) {
                     if (/url|link|href|リンク/i.test(k)) {
                         url = item[k];
@@ -287,10 +341,16 @@
                 if (!url && keys.length > 2) url = item[keys[2]];
             }
 
+            const colorInfo = getMemberColorInfo(String(title || ''));
+
             return {
-                date: String(date || '').trim(),
+                rawDate: String(rawDate || '').trim(),
+                formattedDate: formatDate(rawDate),
+                calendarDate: toISODateOnly(rawDate),
                 title: String(title || '更新情報').trim(),
-                url: String(url || '').trim()
+                url: String(url || '').trim(),
+                color: colorInfo.color,
+                className: colorInfo.className
             };
         }
 
@@ -302,8 +362,7 @@
                 const json = await response.json();
                 const list = Array.isArray(json) ? json : (json.data || json.items || []);
                 
-                // 🔴 A列(タイムスタンプ/日付)に記載がある行のみ抽出（フィルタリング）
-                rawData = list.map(item => parseItem(item)).filter(item => item.date !== "");
+                rawData = list.map(item => parseItem(item)).filter(item => item.rawDate !== "");
 
                 document.getElementById('loading').style.display = 'none';
 
@@ -326,32 +385,55 @@
             
             const events = data.map(item => ({
                 title: item.title,
-                start: item.date,
-                extendedProps: {
-                    url: item.url,
-                    rawDate: item.date
-                }
+                start: item.calendarDate,
+                backgroundColor: item.color,
+                borderColor: item.color,
+                extendedProps: item
             }));
 
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'ja',
+                height: 'auto',
+                dayMaxEvents: 4, // 🔴 1日あたり最大4件まで表示し、超えた分は折りたたむ設定
                 headerToolbar: {
                     left: 'prev,next',
                     center: 'title',
                     right: 'today'
                 },
                 events: events,
+                // 🔴 日付のマス目をクリックした際にその日の予定一覧を表示
+                dateClick: function(info) {
+                    showDateEventsModal(info.dateStr);
+                },
+                // 🔴 イベントクリック時もその日の予定一覧を表示
                 eventClick: function(info) {
-                    showModal(
-                        info.event.title, 
-                        info.event.extendedProps.rawDate, 
-                        info.event.extendedProps.url
-                    );
+                    showDateEventsModal(info.event.startStr);
                 }
             });
 
             calendar.render();
+        }
+
+        // 指定した日付の更新情報をポップアップでまとめて表示する処理
+        function showDateEventsModal(dateStr) {
+            const dayEvents = filteredData.filter(item => item.calendarDate === dateStr);
+            const container = document.getElementById('modalUpdateList');
+            container.innerHTML = '';
+
+            const displayDateStr = dateStr ? dateStr.replace(/-/g, '/') : '';
+            document.getElementById('modalDateTitle').innerText = `📅 ${displayDateStr} の更新情報 (${dayEvents.length}件)`;
+
+            if (dayEvents.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888; padding:10px;">この日の更新情報はありません。</p>';
+            } else {
+                dayEvents.forEach(item => {
+                    const card = createUpdateCard(item);
+                    container.appendChild(card);
+                });
+            }
+
+            document.getElementById('modalOverlay').style.display = 'flex';
         }
 
         function renderList(data) {
@@ -364,32 +446,40 @@
             }
 
             data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'update-card';
-
-                let html = '';
-                if (item.date) html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.date)}</div>`;
-                html += `<div class="update-title">${escapeHtml(item.title)}</div>`;
-
-                if (item.url && item.url.startsWith('http')) {
-                    html += `
-                        <div style="margin-top: 8px;">
-                            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn">
-                                📸 投稿を見る 🔗
-                            </a>
-                        </div>
-                    `;
-                }
-
-                card.innerHTML = html;
+                const card = createUpdateCard(item);
                 updateList.appendChild(card);
             });
+        }
+
+        // カード要素を生成する関数
+        function createUpdateCard(item) {
+            const card = document.createElement('div');
+            card.className = `update-card ${item.className}`;
+
+            let html = '';
+            if (item.formattedDate) {
+                html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.formattedDate)}</div>`;
+            }
+            html += `<div class="update-title">${escapeHtml(item.title)}</div>`;
+
+            if (item.url && item.url.startsWith('http')) {
+                html += `
+                    <div style="margin-top: 8px;">
+                        <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color:${item.color};">
+                            📸 投稿を見る 🔗
+                        </a>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = html;
+            return card;
         }
 
         function filterUpdates() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             filteredData = rawData.filter(item => 
-                item.title.toLowerCase().includes(query) || item.date.toLowerCase().includes(query)
+                item.title.toLowerCase().includes(query) || item.formattedDate.toLowerCase().includes(query)
             );
 
             renderList(filteredData);
@@ -398,8 +488,10 @@
                 calendar.removeAllEvents();
                 calendar.addEventSource(filteredData.map(item => ({
                     title: item.title,
-                    start: item.date,
-                    extendedProps: { url: item.url, rawDate: item.date }
+                    start: item.calendarDate,
+                    backgroundColor: item.color,
+                    borderColor: item.color,
+                    extendedProps: item
                 })));
             }
         }
@@ -422,24 +514,6 @@
                 btnList.classList.add('active');
                 btnCalendar.classList.remove('active');
             }
-        }
-
-        function showModal(title, date, url) {
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalDate').innerText = date ? `📅 ${date}` : '';
-            
-            const linkContainer = document.getElementById('modalLinkContainer');
-            if (url && url.startsWith('http')) {
-                linkContainer.innerHTML = `
-                    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="width:100%; justify-content:center; box-sizing:border-box;">
-                        📸 投稿を見る 🔗
-                    </a>
-                `;
-            } else {
-                linkContainer.innerHTML = '';
-            }
-
-            document.getElementById('modalOverlay').style.display = 'flex';
         }
 
         function closeModal() {
