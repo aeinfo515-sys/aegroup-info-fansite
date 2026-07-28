@@ -37,7 +37,7 @@
             top: 0;
             bottom: 0;
             width: 8px;
-            background-color: #ff69b4; /* デフォルト（箱推しピンク） */
+            background-color: #ff69b4;
         }
 
         /* メンバーカラー（左側ボーダー） */
@@ -175,24 +175,35 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // テキスト内容（タイトル・詳細・メンバー名）からカラーClassを判定
-        function getColorClass(text) {
-            if (!text) return "bg-group";
-            if (text.includes("小島")) return "bg-kojima";
-            if (text.includes("正門")) return "bg-masakado";
-            if (text.includes("末澤")) return "bg-suezawa";
-            if (text.includes("佐野")) return "bg-sano";
+        // F列（メンバー）から値を取得する専用関数
+        function getFColumnValue(item) {
+            if (!item) return "";
+            // 配列で返ってきた場合はインデックス5（F列）
+            if (Array.isArray(item)) {
+                return item[5] ? String(item[5]).trim() : "";
+            }
+            // オブジェクトで返ってきた場合（1行目のヘッダー名で受ける）
+            return String(item["メンバー"] || item["担当"] || item["出演者"] || item["F"] || item["f"] || "").trim();
+        }
+
+        // F列のテキストからカラー判定
+        function getColorClassFromMember(memberText) {
+            if (!memberText) return "bg-group";
+            if (memberText.includes("小島")) return "bg-kojima";
+            if (memberText.includes("正門")) return "bg-masakado";
+            if (memberText.includes("末澤")) return "bg-suezawa";
+            if (memberText.includes("佐野")) return "bg-sano";
             return "bg-group";
         }
 
-        // メンバーカラーのHexコード取得（ボタン背景色用）
+        // カラーClassからHexコード取得
         function getMemberHexColor(colorClass) {
             switch(colorClass) {
                 case 'bg-masakado': return '#0000ff'; // 青
                 case 'bg-suezawa': return '#ff0000';  // 赤
                 case 'bg-kojima': return '#800080';   // 紫
                 case 'bg-sano': return '#008000';     // 緑
-                default: return '#ff69b4';            // ピンク（Aぇ! group）
+                default: return '#ff69b4';            // ピンク
             }
         }
 
@@ -247,33 +258,35 @@
 
                 // --- 1. 🆕 更新情報 (A列：タイムスタンプが今日の日付) ---
                 const todayUpdates = list.filter(item => {
-                    const timestampVal = item["タイムスタンプ"] || item["Timestamp"] || item["timestamp"] || item["A"];
+                    const timestampVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"] || item["A"]);
                     return toYMD(timestampVal) === todayYMD;
                 });
 
                 todayUpdates.sort((a, b) => {
-                    const tA = new Date(a["タイムスタンプ"] || a["Timestamp"] || 0).getTime();
-                    const tB = new Date(b["タイムスタンプ"] || b["Timestamp"] || 0).getTime();
-                    return tB - tA;
+                    const timeA = Array.isArray(a) ? a[0] : (a["タイムスタンプ"] || a["Timestamp"] || 0);
+                    const timeB = Array.isArray(b) ? b[0] : (b["タイムスタンプ"] || b["Timestamp"] || 0);
+                    return new Date(timeB).getTime() - new Date(timeA).getTime();
                 });
 
                 if (todayUpdates.length === 0) {
                     updateList.innerHTML = "<p style='color:#777; text-align:center; padding:10px;'>本日の更新情報はありません</p>";
                 } else {
                     todayUpdates.forEach(item => {
-                        const title = item["タイトル"] || item["title"] || item["内容"] || "新着情報";
-                        const detail = item["詳細"] || item["detail"] || "";
-                        // メンバー名の取得（無ければ自動判定でグループ表記）
-                        let member = item["担当"] || item["メンバー"] || item["出演者"] || "";
+                        const title = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "新着情報";
+                        const memberVal = getFColumnValue(item);
                         
                         let targetUrl = "";
-                        for (let key in item) {
-                            const urlCheck = extractUrl(item[key]);
-                            if (urlCheck) { targetUrl = urlCheck; break; }
+                        if (Array.isArray(item)) {
+                            targetUrl = extractUrl(item.join(' ')) || "";
+                        } else {
+                            for (let key in item) {
+                                const urlCheck = extractUrl(item[key]);
+                                if (urlCheck) { targetUrl = urlCheck; break; }
+                            }
                         }
 
                         let timeStr = "";
-                        const timeVal = item["タイムスタンプ"] || item["Timestamp"];
+                        const timeVal = Array.isArray(item) ? item[0] : (item["タイムスタンプ"] || item["Timestamp"]);
                         if (timeVal) {
                             const td = new Date(timeVal);
                             if (!isNaN(td.getTime())) {
@@ -283,25 +296,17 @@
                             }
                         }
 
-                        // メンバーカラークラスの適用
-                        const colorClass = getColorClass(title + detail + member);
+                        // F列のデータをもとにカラー判定
+                        const colorClass = getColorClassFromMember(memberVal);
                         const hexColor = getMemberHexColor(colorClass);
-
-                        // メンバー名が空の場合は判定結果から補助設定
-                        if (!member) {
-                            if (colorClass === 'bg-masakado') member = '正門';
-                            else if (colorClass === 'bg-suezawa') member = '末澤';
-                            else if (colorClass === 'bg-kojima') member = '小島';
-                            else if (colorClass === 'bg-sano') member = '佐野';
-                            else member = 'Aぇ! group';
-                        }
+                        const displayMember = memberVal || "Aぇ! group";
 
                         const div = document.createElement("div");
                         div.className = `update-item ${colorClass}`;
 
                         let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
                         html += `<div class="update-title">${escapeHtml(title)}</div>`;
-                        html += `<div class="update-member">${escapeHtml(member)}</div>`;
+                        html += `<div class="update-member">${escapeHtml(displayMember)}</div>`;
 
                         if (targetUrl) {
                             html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color: ${hexColor};">📸 投稿を見る 🔗</a>`;
@@ -314,7 +319,7 @@
 
                 // --- 2. 📅 本日のスケジュール (B列：日付が今日の日付) ---
                 const todaySchedules = list.filter(item => {
-                    const dateVal = item["日付"] || item["date"] || item["B"];
+                    const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"]);
                     return toYMD(dateVal) === todayYMD;
                 });
 
@@ -322,11 +327,11 @@
                     scheduleList.innerHTML = "<p style='color:#777; text-align:center; padding: 10px;'>本日の予定はありません</p>";
                 } else {
                     todaySchedules.forEach(item => {
-                        const title = item["タイトル"] || item["title"] || item["内容"] || "本日の予定";
-                        let member = item["担当"] || item["メンバー"] || item["出演者"] || "";
+                        const title = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "本日の予定";
+                        const memberVal = getFColumnValue(item);
 
                         let timeStr = "";
-                        const timeVal = item["時間"] || item["time"] || item["日付"] || item["date"];
+                        const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"] || item["日付"] || item["date"]);
                         if (timeVal) {
                             const td = new Date(timeVal);
                             if (!isNaN(td.getTime())) {
@@ -336,22 +341,16 @@
                             }
                         }
 
-                        const colorClass = getColorClass(title + member);
-
-                        if (!member) {
-                            if (colorClass === 'bg-masakado') member = '正門';
-                            else if (colorClass === 'bg-suezawa') member = '末澤';
-                            else if (colorClass === 'bg-kojima') member = '小島';
-                            else if (colorClass === 'bg-sano') member = '佐野';
-                            else member = 'Aぇ! group';
-                        }
+                        // F列のデータをもとにカラー判定
+                        const colorClass = getColorClassFromMember(memberVal);
+                        const displayMember = memberVal || "Aぇ! group";
 
                         const div = document.createElement("div");
                         div.className = `schedule-item ${colorClass}`;
 
                         div.innerHTML = `
                             <div class="schedule-time"><i class="fa-regular fa-clock" style="color:#e53e3e;"></i> ${timeStr ? timeStr + ' ' : ''}${escapeHtml(title)}</div>
-                            <div class="schedule-member">${escapeHtml(member)}</div>
+                            <div class="schedule-member">${escapeHtml(displayMember)}</div>
                         `;
                         scheduleList.appendChild(div);
                     });
