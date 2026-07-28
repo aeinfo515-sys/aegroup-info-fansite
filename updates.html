@@ -21,12 +21,51 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
     <style>
-        /* 各メンバーのカラーバー・テーマカラー定義 */
-        .bg-group { border-left-color: #ff69b4 !important; }
-        .bg-kojima { border-left-color: #800080 !important; }
-        .bg-masakado { border-left-color: #0000ff !important; }
-        .bg-suezawa { border-left-color: #ff0000 !important; }
-        .bg-sano { border-left-color: #008000 !important; }
+        .update-item {
+            position: relative;
+            padding: 12px 15px 12px 22px;
+            margin-bottom: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .update-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background-color: #ff69b4;
+        }
+
+        .update-link-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 14px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .update-link-btn:hover {
+            background-color: #ff1493;
+            opacity: 0.9;
+        }
+
+        /* 各メンバーのカラーバーの色 */
+        .bg-group::before { background-color: #ff69b4 !important; }
+        .bg-kojima::before { background-color: #800080 !important; }
+        .bg-masakado::before { background-color: #0000ff !important; }
+        .bg-suezawa::before { background-color: #ff0000 !important; }
+        .bg-sano::before { background-color: #008000 !important; }
 
         .search-container {
             margin: 15px 0 20px 0;
@@ -79,7 +118,6 @@
             color: #fff;
         }
 
-        /* カレンダー領域 */
         #calendar {
             background: #fff;
             padding: 5px;
@@ -87,7 +125,6 @@
             border: 1px solid #eee;
         }
 
-        /* FullCalendarイベント */
         .fc-event {
             cursor: pointer;
             border-radius: 4px;
@@ -117,7 +154,7 @@
             padding: 20px;
             border-radius: 12px;
             max-width: 90%;
-            width: 420px;
+            width: 450px;
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
@@ -140,48 +177,6 @@
             border-bottom: 2px solid #ff69b4;
             padding-bottom: 6px;
             margin-bottom: 15px;
-        }
-
-        .update-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .update-card {
-            padding: 12px 14px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            border-left: 6px solid #ff69b4;
-        }
-
-        .update-date {
-            font-size: 0.8rem;
-            color: #888;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .update-title {
-            font-size: 0.95rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 8px;
-            word-break: break-word;
-        }
-
-        .update-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 14px;
-            color: #fff !important;
-            text-decoration: none !important;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         #loading, #error-message {
@@ -218,19 +213,16 @@
                 サイトの更新履歴・お知らせ一覧です。
             </p>
 
-            <!-- 🔍 検索ボックス -->
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" id="searchInput" class="search-input" placeholder="キーワードで検索..." onkeyup="filterUpdates()">
             </div>
 
-            <!-- 表示切り替えボタン -->
             <div class="view-toggle">
                 <button class="toggle-btn active" id="btnCalendarView" onclick="switchView('calendar')"><i class="fa-regular fa-calendar-days"></i> カレンダー表示</button>
                 <button class="toggle-btn" id="btnListView" onclick="switchView('list')"><i class="fa-solid fa-list"></i> リスト表示</button>
             </div>
 
-            <!-- ローディング表示 -->
             <div id="loading">
                 <div style="color:#ff69b4; font-size:1.5rem; margin-bottom:8px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
                 データを読み込み中...
@@ -247,7 +239,7 @@
 
             <!-- 📋 リスト表示領域 -->
             <div id="listView" style="display: none;">
-                <div class="update-list" id="updateList"></div>
+                <div id="updateList"></div>
             </div>
         </section>
     </main>
@@ -257,117 +249,123 @@
         <div class="modal-content">
             <span class="modal-close" onclick="closeModal()">&times;</span>
             <div class="modal-date-title" id="modalDateTitle">📅 更新情報</div>
-            <div class="update-list" id="modalUpdateList"></div>
+            <div id="modalUpdateList"></div>
         </div>
     </div>
 
     <script>
-        function toggleMenu() {
-            document.getElementById("navTabs").classList.toggle("show");
-        }
-
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        
         let rawData = [];
         let filteredData = [];
         let calendar;
 
-        // 🎨 メンバーカラー判定関数（指定カラー設定）
-        function getMemberColorInfo(title) {
-            if (/正門/i.test(title)) return { color: '#0000ff', className: 'bg-masakado' }; // 青
-            if (/末澤/i.test(title)) return { color: '#ff0000', className: 'bg-suezawa' };  // 赤
-            if (/小島/i.test(title)) return { color: '#800080', className: 'bg-kojima' };   // 紫
-            if (/佐野/i.test(title)) return { color: '#008000', className: 'bg-sano' };     // 緑
-            return { color: '#ff69b4', className: 'bg-group' };                             // ピンク（グループ）
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // 📅 日時フォーマット (YYYY/MM/DD HH:mm)
-        function formatDate(dateStr) {
-            if (!dateStr) return '';
-            const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return dateStr;
-
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            const hh = String(d.getHours()).padStart(2, '0');
-            const min = String(d.getMinutes()).padStart(2, '0');
-
-            return `${yyyy}/${mm}/${dd} ${hh}:${min}`;
+        function getColorClass(text) {
+            if (!text) return "bg-group";
+            if (text.includes("小島")) return "bg-kojima";
+            if (text.includes("正門")) return "bg-masakado";
+            if (text.includes("末澤")) return "bg-suezawa";
+            if (text.includes("佐野")) return "bg-sano";
+            return "bg-group";
         }
 
-        // カレンダー用日付 (YYYY-MM-DD)
-        function toISODateOnly(dateStr) {
-            const d = new Date(dateStr);
-            if (isNaN(d.getTime())) return dateStr;
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            return `${yyyy}-${mm}-${dd}`;
+        function getMemberHexColor(colorClass) {
+            switch(colorClass) {
+                case 'bg-masakado': return '#0000ff';
+                case 'bg-suezawa': return '#ff0000';
+                case 'bg-kojima': return '#800080';
+                case 'bg-sano': return '#008000';
+                default: return '#ff69b4';
+            }
         }
 
-        // データ解析
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = String(text).match(/(https?:\/\/[^\s]+)/);
+            return match ? match[0] : null;
+        }
+
         function parseItem(item) {
-            let rawDate = "", title = "", url = "";
+            const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
+            const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
+            const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
 
-            if (Array.isArray(item)) {
-                rawDate = item[0] || "";
-                title = item[1] || "";
-                url = item[2] || "";
-            } else if (typeof item === 'object' && item !== null) {
-                const keys = Object.keys(item);
-                
-                for (let k of keys) {
-                    if (/タイムスタンプ|timestamp|date|時間|日時/i.test(k)) {
-                        rawDate = item[k];
+            let targetUrl = "";
+            for (let key in item) {
+                if (item.hasOwnProperty(key)) {
+                    const urlCheck = extractUrl(item[key]);
+                    if (urlCheck) {
+                        targetUrl = urlCheck;
                         break;
                     }
                 }
-                if (!rawDate && keys.length > 0) rawDate = item[keys[0]];
-
-                for (let k of keys) {
-                    if (/title|content|text|message|タイトル|内容/i.test(k)) {
-                        title = item[k];
-                        break;
-                    }
-                }
-                if (!title && keys.length > 1) title = item[keys[1]];
-
-                for (let k of keys) {
-                    if (/url|link|href|リンク/i.test(k)) {
-                        url = item[k];
-                        break;
-                    }
-                }
-                if (!url && keys.length > 2) url = item[keys[2]];
             }
 
-            const colorInfo = getMemberColorInfo(String(title || ''));
+            let displayTitle = rawTitle;
+            if (rawTitle.startsWith("http")) {
+                displayTitle = "更新情報";
+            } else if (targetUrl && rawTitle.includes(targetUrl)) {
+                displayTitle = rawTitle.replace(targetUrl, '').trim() || "更新情報";
+            }
+
+            let cleanDetail = detailText;
+            if (targetUrl && detailText.includes(targetUrl)) {
+                cleanDetail = detailText.replace(targetUrl, '').trim();
+            }
+
+            let timeStr = "";
+            let calendarDate = "";
+            const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
+            
+            if (timeVal) {
+                try {
+                    const td = new Date(timeVal);
+                    if (!isNaN(td.getTime())) {
+                        const yyyy = td.getFullYear();
+                        const mm = String(td.getMonth() + 1).padStart(2, "0");
+                        const dd = String(td.getDate()).padStart(2, "0");
+                        const hh = String(td.getHours()).padStart(2, "0");
+                        const min = String(td.getMinutes()).padStart(2, "0");
+                        
+                        timeStr = `${yyyy}/${mm}/${dd} ${hh}:${min}`;
+                        calendarDate = `${yyyy}-${mm}-${dd}`;
+                    }
+                } catch(e){}
+            }
+
+            const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
+            const hexColor = getMemberHexColor(colorClass);
 
             return {
-                rawDate: String(rawDate || '').trim(),
-                formattedDate: formatDate(rawDate),
-                calendarDate: toISODateOnly(rawDate),
-                title: String(title || '更新情報').trim(),
-                url: String(url || '').trim(),
-                color: colorInfo.color,
-                className: colorInfo.className
+                title: displayTitle,
+                detail: cleanDetail,
+                member: memberText,
+                url: targetUrl,
+                formattedDate: timeStr,
+                calendarDate: calendarDate,
+                colorClass: colorClass,
+                hexColor: hexColor
             };
         }
 
         async function initPage() {
             try {
-                const response = await fetch(GAS_API_URL, { redirect: 'follow' });
-                if (!response.ok) throw new Error('Network error');
+                const response = await fetch(CAL_API_URL);
+                if (!response.ok) throw new Error("Network error");
                 
                 const json = await response.json();
                 const list = Array.isArray(json) ? json : (json.data || json.items || []);
-                
-                rawData = list.map(item => parseItem(item)).filter(item => item.rawDate !== "");
+
+                rawData = list.map(item => parseItem(item)).filter(item => item.calendarDate !== "");
 
                 document.getElementById('loading').style.display = 'none';
 
                 if (rawData.length === 0) {
-                    document.getElementById('updateList').innerHTML = '<p style="text-align:center; color:#888;">更新情報が登録されていません。</p>';
+                    document.getElementById('updateList').innerHTML = '<p style="text-align:center; color:#888;">更新情報がありません。</p>';
                 }
 
                 filteredData = [...rawData];
@@ -386,8 +384,8 @@
             const events = data.map(item => ({
                 title: item.title,
                 start: item.calendarDate,
-                backgroundColor: item.color,
-                borderColor: item.color,
+                backgroundColor: item.hexColor,
+                borderColor: item.hexColor,
                 extendedProps: item
             }));
 
@@ -395,18 +393,16 @@
                 initialView: 'dayGridMonth',
                 locale: 'ja',
                 height: 'auto',
-                dayMaxEvents: 4, // 🔴 1日あたり最大4件まで表示し、超えた分は折りたたむ設定
+                dayMaxEvents: 4, // 🔴 日内表示最大4件制限
                 headerToolbar: {
                     left: 'prev,next',
                     center: 'title',
                     right: 'today'
                 },
                 events: events,
-                // 🔴 日付のマス目をクリックした際にその日の予定一覧を表示
                 dateClick: function(info) {
                     showDateEventsModal(info.dateStr);
                 },
-                // 🔴 イベントクリック時もその日の予定一覧を表示
                 eventClick: function(info) {
                     showDateEventsModal(info.event.startStr);
                 }
@@ -415,7 +411,6 @@
             calendar.render();
         }
 
-        // 指定した日付の更新情報をポップアップでまとめて表示する処理
         function showDateEventsModal(dateStr) {
             const dayEvents = filteredData.filter(item => item.calendarDate === dateStr);
             const container = document.getElementById('modalUpdateList');
@@ -451,35 +446,37 @@
             });
         }
 
-        // カード要素を生成する関数
         function createUpdateCard(item) {
-            const card = document.createElement('div');
-            card.className = `update-card ${item.className}`;
+            const div = document.createElement('div');
+            div.className = `update-item ${item.colorClass}`;
 
-            let html = '';
+            let htmlContent = '';
             if (item.formattedDate) {
-                html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.formattedDate)}</div>`;
+                htmlContent += `<div style="font-size:0.8rem; color:#888; font-weight:bold; margin-bottom:4px;"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.formattedDate)}</div>`;
             }
-            html += `<div class="update-title">${escapeHtml(item.title)}</div>`;
-
-            if (item.url && item.url.startsWith('http')) {
-                html += `
-                    <div style="margin-top: 8px;">
-                        <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color:${item.color};">
-                            📸 投稿を見る 🔗
-                        </a>
-                    </div>
-                `;
+            if (item.title) {
+                htmlContent += `<strong>${escapeHtml(item.title)}</strong>`;
+            }
+            if (item.detail && item.detail !== item.title) {
+                htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${escapeHtml(item.detail)}</span>`;
+            } else if (item.member && item.member !== item.title) {
+                htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${escapeHtml(item.member)}</span>`;
             }
 
-            card.innerHTML = html;
-            return card;
+            if (item.url) {
+                htmlContent += `<br><a href="${item.url}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color:${item.hexColor};">📸 投稿を見る 🔗</a>`;
+            }
+
+            div.innerHTML = htmlContent;
+            return div;
         }
 
         function filterUpdates() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             filteredData = rawData.filter(item => 
-                item.title.toLowerCase().includes(query) || item.formattedDate.toLowerCase().includes(query)
+                item.title.toLowerCase().includes(query) || 
+                item.detail.toLowerCase().includes(query) || 
+                item.formattedDate.toLowerCase().includes(query)
             );
 
             renderList(filteredData);
@@ -489,8 +486,8 @@
                 calendar.addEventSource(filteredData.map(item => ({
                     title: item.title,
                     start: item.calendarDate,
-                    backgroundColor: item.color,
-                    borderColor: item.color,
+                    backgroundColor: item.hexColor,
+                    borderColor: item.hexColor,
                     extendedProps: item
                 })));
             }
