@@ -354,7 +354,6 @@
             return `${month}/${day}(${weekStr})`;
         }
 
-        // データを解析してイベント構造に変換・描画する関数
         function processScheduleData(rawData) {
             let list = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
 
@@ -394,35 +393,39 @@
         }
 
         async function initSchedule() {
-            // 1. キャッシュが存在すれば即時描画
+            let hasCache = false;
+
+            // 1. キャッシュが存在すれば即時反映
             const cachedData = localStorage.getItem(CACHE_KEY);
             if (cachedData) {
                 try {
                     const json = JSON.parse(cachedData);
                     processScheduleData(json);
+                    hasCache = true;
                 } catch (e) {
                     console.error("Cache Read Error:", e);
                 }
             }
 
-            // 2. バックグラウンドで最新データを取得
+            // 2. バックグラウンドでGASから通信取得
             try {
                 const response = await fetch(CAL_API_URL);
-                if (!response.ok) throw new Error("通信エラー");
+                if (!response.ok) throw new Error("HTTPエラー");
 
                 const rawData = await response.json();
 
-                // キャッシュ更新
+                // 取得できたらキャッシュ保存＆描画を最新データにする
                 localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
-
-                // 最新データで更新
                 processScheduleData(rawData);
 
             } catch (e) {
-                console.error(e);
-                // キャッシュが全く存在しない場合にのみエラー表示
-                if (!cachedData) {
+                console.error("Fetch Error:", e);
+                // キャッシュもAPI通信も両方ダメだった場合のみエラーを表示
+                if (!hasCache) {
                     document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>データの読み込みに失敗しました。</p>";
+                } else {
+                    // キャッシュで表示できている場合はローディング表示だけ消す
+                    document.getElementById("loading").style.display = "none";
                 }
             }
         }
@@ -433,7 +436,7 @@
                 initialView: 'dayGridMonth',
                 locale: 'ja',
                 buttonText: {
-                    today: 'today' /* 「今日」ボタンの表記を「today」に変更 */
+                    today: 'today'
                 },
                 height: 'auto',
                 dayMaxEvents: 4,
