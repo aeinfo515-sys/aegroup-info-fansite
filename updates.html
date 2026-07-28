@@ -16,6 +16,201 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- FullCalendar CSS & JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+    <style>
+        .update-item {
+            position: relative;
+            padding: 12px 15px 12px 22px;
+            margin-bottom: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+
+        .update-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 8px;
+            background-color: #ff69b4;
+        }
+
+        .update-link-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 14px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .update-link-btn:hover {
+            background-color: #ff1493;
+            opacity: 0.9;
+        }
+
+        /* メンバーカラー設定 */
+        .bg-group::before { background-color: #ff69b4 !important; }
+        .bg-kojima::before { background-color: #800080 !important; }
+        .bg-masakado::before { background-color: #0000ff !important; }
+        .bg-suezawa::before { background-color: #ff0000 !important; }
+        .bg-sano::before { background-color: #008000 !important; }
+
+        /* 🔍 検索バー構造修正 */
+        .search-area {
+            background: #fff;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #ffd1dc;
+            margin-bottom: 20px;
+        }
+
+        .search-box-wrapper {
+            position: relative !important;
+            width: 100% !important;
+            margin-bottom: 12px !important;
+            display: block !important;
+        }
+
+        .search-input {
+            width: 100% !important;
+            padding: 10px 15px 10px 42px !important;
+            font-size: 0.95rem !important;
+            border: 2px solid #ddd !important;
+            border-radius: 25px !important;
+            outline: none !important;
+            box-sizing: border-box !important;
+            transition: border-color 0.2s !important;
+            height: 42px !important;
+            background-color: #fff !important;
+        }
+
+        .search-input:focus {
+            border-color: #ff69b4 !important;
+        }
+
+        /* アイコンを入力枠内の左側に固定 */
+        .search-icon {
+            position: absolute !important;
+            left: 15px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #888 !important;
+            font-size: 1rem !important;
+            pointer-events: none !important;
+            z-index: 10 !important;
+            line-height: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* メンバーフィルター（チェックボックス） */
+        .filter-checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .filter-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            user-select: none;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #f5f5f5;
+        }
+
+        .filter-label input[type="checkbox"] {
+            accent-color: #ff69b4;
+            cursor: pointer;
+        }
+
+        #calendar {
+            background: #fff;
+            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .fc-event {
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            padding: 2px 4px;
+            border: none !important;
+            margin-bottom: 2px;
+        }
+
+        .fc-daygrid-day {
+            cursor: pointer;
+        }
+
+        /* モーダル表示 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 450px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .modal-date-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #ff69b4;
+            padding-bottom: 6px;
+            margin-bottom: 15px;
+        }
+
+        #loading, #error-message {
+            text-align: center;
+            padding: 30px 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -36,81 +231,311 @@
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 15px auto; padding: 0 10px;">
-        
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         <section class="card">
-            <h2 style="color: #ff69b4; border-bottom: 2px solid #ffd1dc; padding-bottom: 8px; margin-bottom: 12px; font-size: 1.2rem;">
-                🆕 過去の更新情報一覧
-            </h2>
-            <div id="updates-list">
-                <div class="loading-text" style="text-align: center; color: #888; padding: 20px;">
-                    <i class="fa-solid fa-spinner fa-spin" style="color: #ff69b4; font-size:1.5rem;"></i><br>読み込み中...
+            <h2>🆕 過去更新情報</h2>
+            <p style="font-size: 0.85rem; color: #666; margin-bottom: 15px;">
+                サイトの更新履歴・お知らせ一覧です。
+            </p>
+
+            <!-- 検索＆絞り込みエリア -->
+            <div class="search-area">
+                <div class="search-box-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="キーワードで検索..." onkeyup="filterUpdates()">
+                </div>
+
+                <div class="filter-checkboxes">
+                    <label class="filter-label"><input type="checkbox" class="member-filter" value="Aぇ! group" checked onchange="filterUpdates()"> Aぇ! group</label>
+                    <label class="filter-label"><input type="checkbox" class="member-filter" value="正門" checked onchange="filterUpdates()"> 正門</label>
+                    <label class="filter-label"><input type="checkbox" class="member-filter" value="末澤" checked onchange="filterUpdates()"> 末澤</label>
+                    <label class="filter-label"><input type="checkbox" class="member-filter" value="小島" checked onchange="filterUpdates()"> 小島</label>
+                    <label class="filter-label"><input type="checkbox" class="member-filter" value="佐野" checked onchange="filterUpdates()"> 佐野</label>
                 </div>
             </div>
-        </section>
 
+            <!-- ローディング表示 -->
+            <div id="loading">
+                <div style="color:#ff69b4; font-size:1.5rem; margin-bottom:8px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                データを読み込み中...
+            </div>
+
+            <div id="error-message" style="display: none; color: #e53e3e;">
+                データの取得に失敗しました。<br>時間をおいて再度お試しください。
+            </div>
+
+            <!-- 📅 カレンダー表示のみ -->
+            <div id="calendar"></div>
+        </section>
     </main>
 
+    <!-- モーダル（日付選択時ポップアップ） -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="modal-date-title" id="modalDateTitle">📅 更新情報</div>
+            <div id="modalUpdateList"></div>
+        </div>
+    </div>
+
     <script>
-        const UPDATE_API_URL = "https://script.google.com/macros/s/AKfycbwqVSoDqfV4QfKoxY_sA2z0dI90z28N9gYJ5y3Z/exec";
-        const CACHE_KEY_ALL_UPDATES = "aegroup_all_updates_cache";
+        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        
+        let rawData = [];
+        let filteredData = [];
+        let calendar;
 
         function toggleMenu() {
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        async function loadAllUpdates() {
-            const container = document.getElementById("updates-list");
+        function getColorClass(text) {
+            if (!text) return "bg-group";
+            if (text.includes("小島")) return "bg-kojima";
+            if (text.includes("正門")) return "bg-masakado";
+            if (text.includes("末澤")) return "bg-suezawa";
+            if (text.includes("佐野")) return "bg-sano";
+            return "bg-group";
+        }
 
-            // キャッシュから高速表示
-            const cached = localStorage.getItem(CACHE_KEY_ALL_UPDATES);
-            if (cached) {
-                renderAllUpdates(JSON.parse(cached));
-            }
-
-            try {
-                const res = await fetch(UPDATE_API_URL);
-                if (!res.ok) throw new Error();
-                const rawData = await res.json();
-
-                localStorage.setItem(CACHE_KEY_ALL_UPDATES, JSON.stringify(rawData));
-                renderAllUpdates(rawData);
-            } catch (e) {
-                if (!cached) {
-                    container.innerHTML = "<p style='color:#e53e3e; text-align:center;'>データの読み込みに失敗しました。</p>";
-                }
+        function getMemberHexColor(colorClass) {
+            switch(colorClass) {
+                case 'bg-masakado': return '#0000ff';
+                case 'bg-suezawa': return '#ff0000';
+                case 'bg-kojima': return '#800080';
+                case 'bg-sano': return '#008000';
+                default: return '#ff69b4';
             }
         }
 
-        function renderAllUpdates(rawData) {
-            const container = document.getElementById("updates-list");
-            let list = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
+        function extractUrl(text) {
+            if (!text) return null;
+            const match = String(text).match(/(https?:\/\/[^\s]+)/);
+            return match ? match[0] : null;
+        }
 
-            if (list.length === 0) {
-                container.innerHTML = "<p style='color:#777; text-align:center; padding:15px;'>更新情報はありません。</p>";
-                return;
+        function parseItem(item) {
+            const rawTitle = item["タイトル"] || item["title"] || item["内容"] || "";
+            const detailText = item["詳細"] || item["detail"] || item["メモ"] || "";
+            const memberText = item["担当"] || item["メンバー"] || item["出演者"] || "";
+
+            let targetUrl = "";
+            for (let key in item) {
+                if (item.hasOwnProperty(key)) {
+                    const urlCheck = extractUrl(item[key]);
+                    if (urlCheck) {
+                        targetUrl = urlCheck;
+                        break;
+                    }
+                }
             }
 
-            let html = "";
-            list.forEach(item => {
-                const date = item["日付"] || item["date"] || item[0] || "";
-                const content = item["内容"] || item["text"] || item[1] || "";
+            let displayTitle = rawTitle;
+            if (rawTitle.startsWith("http")) {
+                displayTitle = "更新情報";
+            } else if (targetUrl && rawTitle.includes(targetUrl)) {
+                displayTitle = rawTitle.replace(targetUrl, '').trim() || "更新情報";
+            }
 
-                html += `
-                    <div style="background:#fff; border:1px solid #ffe4e8; border-radius:10px; padding:12px; margin-bottom:10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-                        <div style="color:#ff69b4; font-weight:bold; font-size:0.85rem; margin-bottom:4px;">🗓️ ${escapeHtml(date)}</div>
-                        <div style="color:#333; font-size:0.95rem; line-height:1.5;">${escapeHtml(content)}</div>
-                    </div>
-                `;
+            let cleanDetail = detailText;
+            if (targetUrl && detailText.includes(targetUrl)) {
+                cleanDetail = detailText.replace(targetUrl, '').trim();
+            }
+
+            let timeStr = "";
+            let calendarDate = "";
+            const timeVal = item["タイムスタンプ"] || item["Timestamp"] || item["時間"] || item["time"] || item["日付"] || item["date"];
+            
+            if (timeVal) {
+                try {
+                    const td = new Date(timeVal);
+                    if (!isNaN(td.getTime())) {
+                        const yyyy = td.getFullYear();
+                        const mm = String(td.getMonth() + 1).padStart(2, "0");
+                        const dd = String(td.getDate()).padStart(2, "0");
+                        const hh = String(td.getHours()).padStart(2, "0");
+                        const min = String(td.getMinutes()).padStart(2, "0");
+                        
+                        timeStr = `${yyyy}/${mm}/${dd} ${hh}:${min}`;
+                        calendarDate = `${yyyy}-${mm}-${dd}`;
+                    }
+                } catch(e){}
+            }
+
+            const colorClass = getColorClass(cleanDetail + displayTitle + memberText);
+            const hexColor = getMemberHexColor(colorClass);
+
+            return {
+                title: displayTitle,
+                detail: cleanDetail,
+                member: memberText,
+                url: targetUrl,
+                formattedDate: timeStr,
+                calendarDate: calendarDate,
+                colorClass: colorClass,
+                hexColor: hexColor,
+                fullText: (displayTitle + cleanDetail + memberText).toLowerCase()
+            };
+        }
+
+        async function initPage() {
+            try {
+                const response = await fetch(CAL_API_URL);
+                if (!response.ok) throw new Error("Network error");
+                
+                const json = await response.json();
+                const list = Array.isArray(json) ? json : (json.data || json.items || []);
+
+                rawData = list.map(item => parseItem(item)).filter(item => item.calendarDate !== "");
+
+                document.getElementById('loading').style.display = 'none';
+
+                filteredData = [...rawData];
+                initCalendar(filteredData);
+            } catch (error) {
+                console.error("API Fetch Error:", error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
+            }
+        }
+
+        function initCalendar(data) {
+            const calendarEl = document.getElementById('calendar');
+            
+            const events = data.map(item => ({
+                title: item.title,
+                start: item.calendarDate,
+                backgroundColor: item.hexColor,
+                borderColor: item.hexColor,
+                extendedProps: item
+            }));
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ja',
+                height: 'auto',
+                dayMaxEvents: 4,
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: 'today'
+                },
+                events: events,
+                dateClick: function(info) {
+                    showDateEventsModal(info.dateStr);
+                },
+                eventClick: function(info) {
+                    showDateEventsModal(info.event.startStr);
+                }
             });
-            container.innerHTML = html;
+
+            calendar.render();
+        }
+
+        function filterUpdates() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            // チェックされているメンバーフィルターの取得
+            const checkedBoxes = Array.from(document.querySelectorAll('.member-filter:checked')).map(cb => cb.value);
+
+            filteredData = rawData.filter(item => {
+                // 1. キーワード検索にヒットするか
+                const matchesKeyword = !query || item.fullText.includes(query) || item.formattedDate.includes(query);
+
+                // 2. チェックボックスの指定メンバーに該当するか
+                let matchesMember = false;
+                if (checkedBoxes.length === 0) {
+                    matchesMember = false; // 一つもチェックされていない場合は非表示
+                } else {
+                    // 各メンバー名の判定
+                    const isMasakado = item.fullText.includes("正門");
+                    const isSuezawa = item.fullText.includes("末澤");
+                    const isKojima = item.fullText.includes("小島");
+                    const isSano = item.fullText.includes("佐野");
+                    const isGroup = !isMasakado && !isSuezawa && !isKojima && !isSano; // 特定個人の指定がない場合はAぇ! group全体
+
+                    if (checkedBoxes.includes("正門") && isMasakado) matchesMember = true;
+                    if (checkedBoxes.includes("末澤") && isSuezawa) matchesMember = true;
+                    if (checkedBoxes.includes("小島") && isKojima) matchesMember = true;
+                    if (checkedBoxes.includes("佐野") && isSano) matchesMember = true;
+                    if (checkedBoxes.includes("Aぇ! group") && (isGroup || item.fullText.includes("aぇ! group") || item.fullText.includes("グループ"))) matchesMember = true;
+                }
+
+                return matchesKeyword && matchesMember;
+            });
+
+            // カレンダーを再描画
+            if (calendar) {
+                calendar.removeAllEvents();
+                calendar.addEventSource(filteredData.map(item => ({
+                    title: item.title,
+                    start: item.calendarDate,
+                    backgroundColor: item.hexColor,
+                    borderColor: item.hexColor,
+                    extendedProps: item
+                })));
+            }
+        }
+
+        function showDateEventsModal(dateStr) {
+            const dayEvents = filteredData.filter(item => item.calendarDate === dateStr);
+            const container = document.getElementById('modalUpdateList');
+            container.innerHTML = '';
+
+            const displayDateStr = dateStr ? dateStr.replace(/-/g, '/') : '';
+            document.getElementById('modalDateTitle').innerText = `📅 ${displayDateStr} の更新情報 (${dayEvents.length}件)`;
+
+            if (dayEvents.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888; padding:10px;">この日の更新情報はありません。</p>';
+            } else {
+                dayEvents.forEach(item => {
+                    const card = createUpdateCard(item);
+                    container.appendChild(card);
+                });
+            }
+
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function createUpdateCard(item) {
+            const div = document.createElement('div');
+            div.className = `update-item ${item.colorClass}`;
+
+            let htmlContent = '';
+            if (item.formattedDate) {
+                htmlContent += `<div style="font-size:0.8rem; color:#888; font-weight:bold; margin-bottom:4px;"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.formattedDate)}</div>`;
+            }
+            if (item.title) {
+                htmlContent += `<strong>${escapeHtml(item.title)}</strong>`;
+            }
+            if (item.detail && item.detail !== item.title) {
+                htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${escapeHtml(item.detail)}</span>`;
+            } else if (item.member && item.member !== item.title) {
+                htmlContent += `<br><span style="font-size:0.85rem; color:#666;">${escapeHtml(item.member)}</span>`;
+            }
+
+            if (item.url) {
+                htmlContent += `<br><a href="${item.url}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color:${item.hexColor};">📸 投稿を見る 🔗</a>`;
+            }
+
+            div.innerHTML = htmlContent;
+            return div;
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
         }
 
         function escapeHtml(str) {
-            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
-        document.addEventListener("DOMContentLoaded", loadAllUpdates);
+        document.addEventListener('DOMContentLoaded', initPage);
     </script>
 </body>
 </html>
