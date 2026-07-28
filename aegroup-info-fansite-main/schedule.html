@@ -24,8 +24,8 @@
         /* 検索ボックスとチェックボックスのエリア */
         .search-container {
             border: 2px solid #ffd1dc;
-            border-radius: 16px;
-            padding: 12px 15px;
+            border-radius: 18px;
+            padding: 14px 15px;
             background-color: #fff;
             margin-bottom: 15px;
         }
@@ -34,7 +34,7 @@
             position: relative;
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .search-box i {
@@ -58,32 +58,41 @@
             border-color: #ff69b4;
         }
 
-        /* メンバー絞り込みチェックボックス */
+        /* メンバー絞り込みチェックボックス (画像000.jpgの配置を再現) */
         .member-checkboxes {
             display: flex;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 8px;
-            justify-content: space-between;
-            padding-top: 4px;
+            align-items: center;
+        }
+
+        .checkbox-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
         }
 
         .member-label {
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
-            font-size: 0.8rem;
+            gap: 5px;
+            font-size: 0.85rem;
             font-weight: bold;
-            color: #444;
+            color: #333;
             cursor: pointer;
-            background: #f7f7f7;
-            padding: 4px 8px;
-            border-radius: 12px;
-            border: 1px solid #eee;
+            background: #f3f3f3;
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            user-select: none;
         }
 
         .member-label input {
             accent-color: #ff69b4;
             cursor: pointer;
+            width: 15px;
+            height: 15px;
         }
 
         /* カレンダー全体のサイズ調整 */
@@ -129,7 +138,7 @@
             padding: 1px 3px !important;
             margin-bottom: 1px !important;
             border-radius: 4px !important;
-            pointer-events: none; /* 日付セルタップを優先 */
+            pointer-events: none;
         }
 
         .fc-more-link {
@@ -239,18 +248,24 @@
                 📅 Schedule
             </h2>
 
-            <!-- 検索 & メンバー絞り込み (指定順: Aぇ! group・正門・末澤・小島・佐野) -->
+            <!-- 検索 & メンバー絞り込み (000.jpg と全く同じ2段配置) -->
             <div class="search-container">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="searchInput" placeholder="キーワードで検索..." oninput="filterCalendar()">
                 </div>
                 <div class="member-checkboxes">
-                    <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ!</label>
-                    <label class="member-label"><input type="checkbox" value="正門" checked onchange="filterCalendar()"> 正門</label>
-                    <label class="member-label"><input type="checkbox" value="末澤" checked onchange="filterCalendar()"> 末澤</label>
-                    <label class="member-label"><input type="checkbox" value="小島" checked onchange="filterCalendar()"> 小島</label>
-                    <label class="member-label"><input type="checkbox" value="佐野" checked onchange="filterCalendar()"> 佐野</label>
+                    <!-- 1段目: Aぇ! group / 正門 / 末澤 -->
+                    <div class="checkbox-row">
+                        <label class="member-label"><input type="checkbox" value="Aぇ! group" checked onchange="filterCalendar()"> Aぇ! group</label>
+                        <label class="member-label"><input type="checkbox" value="正門" checked onchange="filterCalendar()"> 正門</label>
+                        <label class="member-label"><input type="checkbox" value="末澤" checked onchange="filterCalendar()"> 末澤</label>
+                    </div>
+                    <!-- 2段目: 小島 / 佐野 -->
+                    <div class="checkbox-row">
+                        <label class="member-label"><input type="checkbox" value="小島" checked onchange="filterCalendar()"> 小島</label>
+                        <label class="member-label"><input type="checkbox" value="佐野" checked onchange="filterCalendar()"> 佐野</label>
+                    </div>
                 </div>
             </div>
 
@@ -288,7 +303,6 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
-        // メンバー名・判定カラーの一重定義
         function detectMemberInfo(item) {
             let fullStr = "";
             if (Array.isArray(item)) {
@@ -377,7 +391,6 @@
                     borderColor: e.hexColor
                 })),
                 dateClick: function(info) {
-                    // 日付セルタップで該当日の予定をモーダル表示
                     showDayModal(info.dateStr);
                 }
             });
@@ -408,7 +421,6 @@
             }
         }
 
-        // 日付タップ時のモーダル表示機能
         function showDayModal(dateStr) {
             const filtered = getFilteredEvents();
             const dayEvents = filtered.filter(e => e.start === dateStr);
