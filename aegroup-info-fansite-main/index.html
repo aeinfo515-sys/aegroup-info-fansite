@@ -37,8 +37,15 @@
             top: 0;
             bottom: 0;
             width: 8px;
-            background-color: #ff69b4;
+            background-color: #ff69b4; /* デフォルト（箱推しピンク） */
         }
+
+        /* メンバーカラー（左側ボーダー） */
+        .bg-group::before { background-color: #ff69b4 !important; }
+        .bg-kojima::before { background-color: #800080 !important; }
+        .bg-masakado::before { background-color: #0000ff !important; }
+        .bg-suezawa::before { background-color: #ff0000 !important; }
+        .bg-sano::before { background-color: #008000 !important; }
 
         .update-badge {
             color: #e53e3e;
@@ -70,7 +77,8 @@
         .update-member, .schedule-member {
             font-size: 0.85rem;
             color: #666;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            font-weight: bold;
         }
 
         .update-link-btn {
@@ -92,13 +100,6 @@
         .update-link-btn:hover {
             opacity: 0.85;
         }
-
-        /* メンバーカラー指定 */
-        .bg-group::before { background-color: #ff69b4 !important; }
-        .bg-kojima::before { background-color: #800080 !important; }
-        .bg-masakado::before { background-color: #0000ff !important; }
-        .bg-suezawa::before { background-color: #ff0000 !important; }
-        .bg-sano::before { background-color: #008000 !important; }
 
         .loading-box {
             text-align: center;
@@ -174,6 +175,7 @@
             document.getElementById("navTabs").classList.toggle("show");
         }
 
+        // テキスト内容（タイトル・詳細・メンバー名）からカラーClassを判定
         function getColorClass(text) {
             if (!text) return "bg-group";
             if (text.includes("小島")) return "bg-kojima";
@@ -183,13 +185,23 @@
             return "bg-group";
         }
 
+        // メンバーカラーのHexコード取得（ボタン背景色用）
+        function getMemberHexColor(colorClass) {
+            switch(colorClass) {
+                case 'bg-masakado': return '#0000ff'; // 青
+                case 'bg-suezawa': return '#ff0000';  // 赤
+                case 'bg-kojima': return '#800080';   // 紫
+                case 'bg-sano': return '#008000';     // 緑
+                default: return '#ff69b4';            // ピンク（Aぇ! group）
+            }
+        }
+
         function extractUrl(text) {
             if (!text) return null;
             const match = String(text).match(/(https?:\/\/[^\s]+)/);
             return match ? match[0] : null;
         }
 
-        // 日付を YYYY-MM-DD 形式の文字列にする関数
         function toYMD(val) {
             if (!val) return "";
             const d = new Date(val);
@@ -239,7 +251,6 @@
                     return toYMD(timestampVal) === todayYMD;
                 });
 
-                // 新しい時間順にソート
                 todayUpdates.sort((a, b) => {
                     const tA = new Date(a["タイムスタンプ"] || a["Timestamp"] || 0).getTime();
                     const tB = new Date(b["タイムスタンプ"] || b["Timestamp"] || 0).getTime();
@@ -252,7 +263,8 @@
                     todayUpdates.forEach(item => {
                         const title = item["タイトル"] || item["title"] || item["内容"] || "新着情報";
                         const detail = item["詳細"] || item["detail"] || "";
-                        const member = item["担当"] || item["メンバー"] || item["出演者"] || "";
+                        // メンバー名の取得（無ければ自動判定でグループ表記）
+                        let member = item["担当"] || item["メンバー"] || item["出演者"] || "";
                         
                         let targetUrl = "";
                         for (let key in item) {
@@ -271,18 +283,28 @@
                             }
                         }
 
+                        // メンバーカラークラスの適用
                         const colorClass = getColorClass(title + detail + member);
+                        const hexColor = getMemberHexColor(colorClass);
+
+                        // メンバー名が空の場合は判定結果から補助設定
+                        if (!member) {
+                            if (colorClass === 'bg-masakado') member = '正門';
+                            else if (colorClass === 'bg-suezawa') member = '末澤';
+                            else if (colorClass === 'bg-kojima') member = '小島';
+                            else if (colorClass === 'bg-sano') member = '佐野';
+                            else member = 'Aぇ! group';
+                        }
 
                         const div = document.createElement("div");
                         div.className = `update-item ${colorClass}`;
 
                         let html = `<div class="update-badge">🔥 新着情報 ${timeStr ? `(${timeStr} 更新)` : ''}</div>`;
                         html += `<div class="update-title">${escapeHtml(title)}</div>`;
-                        if (member) {
-                            html += `<div class="update-member">${escapeHtml(member)}</div>`;
-                        }
+                        html += `<div class="update-member">${escapeHtml(member)}</div>`;
+
                         if (targetUrl) {
-                            html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn">📸 投稿を見る 🔗</a>`;
+                            html += `<a href="${targetUrl}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="background-color: ${hexColor};">📸 投稿を見る 🔗</a>`;
                         }
 
                         div.innerHTML = html;
@@ -301,8 +323,8 @@
                 } else {
                     todaySchedules.forEach(item => {
                         const title = item["タイトル"] || item["title"] || item["内容"] || "本日の予定";
-                        const member = item["担当"] || item["メンバー"] || item["出演者"] || "Aぇ! group";
-                        
+                        let member = item["担当"] || item["メンバー"] || item["出演者"] || "";
+
                         let timeStr = "";
                         const timeVal = item["時間"] || item["time"] || item["日付"] || item["date"];
                         if (timeVal) {
@@ -315,6 +337,14 @@
                         }
 
                         const colorClass = getColorClass(title + member);
+
+                        if (!member) {
+                            if (colorClass === 'bg-masakado') member = '正門';
+                            else if (colorClass === 'bg-suezawa') member = '末澤';
+                            else if (colorClass === 'bg-kojima') member = '小島';
+                            else if (colorClass === 'bg-sano') member = '佐野';
+                            else member = 'Aぇ! group';
+                        }
 
                         const div = document.createElement("div");
                         div.className = `schedule-item ${colorClass}`;
