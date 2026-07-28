@@ -280,6 +280,7 @@
 
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        const CACHE_KEY = "aegroup_updates_data_cache";
         
         let rawData = [];
         let filteredData = [];
@@ -378,24 +379,46 @@
             };
         }
 
+        // JSONデータから表示データを処理・生成する関数
+        function processData(json) {
+            const list = Array.isArray(json) ? json : (json.data || json.items || []);
+            rawData = list.map(item => parseItem(item)).filter(item => item.calendarDate !== "");
+            document.getElementById('loading').style.display = 'none';
+            filterUpdates();
+        }
+
         async function initPage() {
+            // 1. キャッシュが存在すれば即時描画
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            if (cachedData) {
+                try {
+                    const json = JSON.parse(cachedData);
+                    processData(json);
+                } catch (e) {
+                    console.error("Cache Read Error:", e);
+                }
+            }
+
+            // 2. バックグラウンドで最新データを取得
             try {
                 const response = await fetch(CAL_API_URL);
                 if (!response.ok) throw new Error("Network error");
                 
                 const json = await response.json();
-                const list = Array.isArray(json) ? json : (json.data || json.items || []);
+                
+                // キャッシュ更新
+                localStorage.setItem(CACHE_KEY, JSON.stringify(json));
+                
+                // 最新データで更新
+                processData(json);
 
-                rawData = list.map(item => parseItem(item)).filter(item => item.calendarDate !== "");
-
-                document.getElementById('loading').style.display = 'none';
-
-                filteredData = [...rawData];
-                initCalendar(filteredData);
             } catch (error) {
                 console.error("API Fetch Error:", error);
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('error-message').style.display = 'block';
+                // キャッシュが全く存在しない場合にのみエラー表示
+                if (!cachedData) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('error-message').style.display = 'block';
+                }
             }
         }
 
@@ -409,6 +432,12 @@
                 borderColor: item.hexColor,
                 extendedProps: item
             }));
+
+            if (calendar) {
+                calendar.removeAllEvents();
+                calendar.addEventSource(events);
+                return;
+            }
 
             calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
@@ -464,17 +493,8 @@
                 return matchesKeyword && matchesMember;
             });
 
-            // カレンダーを再描画
-            if (calendar) {
-                calendar.removeAllEvents();
-                calendar.addEventSource(filteredData.map(item => ({
-                    title: item.title,
-                    start: item.calendarDate,
-                    backgroundColor: item.hexColor,
-                    borderColor: item.hexColor,
-                    extendedProps: item
-                })));
-            }
+            // カレンダーを再描画 / 初期化
+            initCalendar(filteredData);
         }
 
         function showDateEventsModal(dateStr) {
