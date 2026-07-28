@@ -305,6 +305,7 @@
 
     <script>
         const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        const CACHE_KEY = "aegroup_schedule_data_cache";
 
         let allEvents = [];
         let calendar = null;
@@ -353,47 +354,76 @@
             return `${month}/${day}(${weekStr})`;
         }
 
+        // データを解析してイベント構造に変換・描画する関数
+        function processScheduleData(rawData) {
+            let list = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
+
+            document.getElementById("loading").style.display = "none";
+
+            allEvents = list.map(item => {
+                const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
+                const titleVal = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
+                const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"]);
+                
+                const memberInfo = detectMemberInfo(item);
+                const ymd = toYMD(dateVal);
+
+                let timeStr = "";
+                if (timeVal) {
+                    const td = new Date(timeVal);
+                    if (!isNaN(td.getTime())) {
+                        timeStr = `${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")}`;
+                    }
+                }
+
+                return {
+                    title: titleVal,
+                    start: ymd,
+                    time: timeStr,
+                    member: memberInfo.name,
+                    colorClass: memberInfo.colorClass,
+                    hexColor: memberInfo.hex
+                };
+            }).filter(e => e.start !== "");
+
+            if (!calendar) {
+                renderCalendar(getFilteredEvents());
+            } else {
+                filterCalendar();
+            }
+        }
+
         async function initSchedule() {
+            // 1. キャッシュが存在すれば即時描画
+            const cachedData = localStorage.getItem(CACHE_KEY);
+            if (cachedData) {
+                try {
+                    const json = JSON.parse(cachedData);
+                    processScheduleData(json);
+                } catch (e) {
+                    console.error("Cache Read Error:", e);
+                }
+            }
+
+            // 2. バックグラウンドで最新データを取得
             try {
                 const response = await fetch(CAL_API_URL);
                 if (!response.ok) throw new Error("通信エラー");
 
                 const rawData = await response.json();
-                let list = Array.isArray(rawData) ? rawData : (rawData.data || rawData.items || []);
 
-                document.getElementById("loading").style.display = "none";
+                // キャッシュ更新
+                localStorage.setItem(CACHE_KEY, JSON.stringify(rawData));
 
-                allEvents = list.map(item => {
-                    const dateVal = Array.isArray(item) ? item[1] : (item["日付"] || item["date"] || item["B"] || Object.values(item)[1]);
-                    const titleVal = (Array.isArray(item) ? item[2] : (item["タイトル"] || item["title"] || item["内容"])) || "予定";
-                    const timeVal = Array.isArray(item) ? item[3] : (item["時間"] || item["time"]);
-                    
-                    const memberInfo = detectMemberInfo(item);
-                    const ymd = toYMD(dateVal);
-
-                    let timeStr = "";
-                    if (timeVal) {
-                        const td = new Date(timeVal);
-                        if (!isNaN(td.getTime())) {
-                            timeStr = `${String(td.getHours()).padStart(2, "0")}:${String(td.getMinutes()).padStart(2, "0")}`;
-                        }
-                    }
-
-                    return {
-                        title: titleVal,
-                        start: ymd,
-                        time: timeStr,
-                        member: memberInfo.name,
-                        colorClass: memberInfo.colorClass,
-                        hexColor: memberInfo.hex
-                    };
-                }).filter(e => e.start !== "");
-
-                renderCalendar(allEvents);
+                // 最新データで更新
+                processScheduleData(rawData);
 
             } catch (e) {
                 console.error(e);
-                document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>データの読み込みに失敗しました。</p>";
+                // キャッシュが全く存在しない場合にのみエラー表示
+                if (!cachedData) {
+                    document.getElementById("loading").innerHTML = "<p style='color:#e53e3e;'>データの読み込みに失敗しました。</p>";
+                }
             }
         }
 
