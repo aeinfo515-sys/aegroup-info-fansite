@@ -1,11 +1,171 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NPHVYVNK6L"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-NPHVYVNK6L');
+    </script>
+
     <meta charset="UTF-8">
-    <title>更新情報の振り返り - Aぇ! group Info</title>
+    <title>過去更新情報 - Aぇ! group info</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css?v=100">
+    <link rel="stylesheet" href="aegroup-info-fansite-main/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- FullCalendar CSS & JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+    <style>
+        .search-container {
+            margin: 15px 0 20px 0;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px 10px 38px;
+            font-size: 0.95rem;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #ff69b4;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 8px;
+            background: #eee;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            color: #555;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .toggle-btn.active {
+            background: #ff69b4;
+            color: #fff;
+        }
+
+        #calendar {
+            background: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .fc-event {
+            cursor: pointer;
+            background-color: #ff69b4 !important;
+            border-color: #ff69b4 !important;
+            font-size: 0.8rem;
+            padding: 2px 4px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .update-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .update-card {
+            padding: 14px 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            border-left: 5px solid #ff69b4;
+        }
+
+        .update-date {
+            font-size: 0.8rem;
+            color: #888;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .update-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .update-link-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 14px;
+            background-color: #ff69b4;
+            color: #fff !important;
+            text-decoration: none !important;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #loading, #error-message {
+            text-align: center;
+            padding: 30px 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -16,8 +176,8 @@
     </header>
 
     <nav class="tabs" id="navTabs">
-        <a href="index.html" class="active">🏠 Home</a>
-        <a href="updates.html">🆕 過去更新情報</a>
+        <a href="index.html">🏠 Home</a>
+        <a href="updates.html" class="active">🆕 過去更新情報</a>
         <a href="schedule.html">📅 Schedule</a>
         <a href="requests.html">✉️ リクエスト・募集</a>
         <a href="works.html">🎬 出演作品</a>
@@ -26,97 +186,276 @@
         <a href="members.html">👤 Members</a>
     </nav>
 
-    <main style="max-width: 800px; margin: 24px auto; padding: 0 16px;">
-        <!-- 🔍 絞り込み検索欄 -->
-        <section class="search-container">
-            <div class="search-title"><i class="fa-solid fa-filter"></i> 絞り込み検索</div>
-            <div class="checkbox-group">
-                <label class="checkbox-label"><input type="checkbox" value="Aぇ! group" onchange="applyFilters()"> Aぇ! group</label>
-                <label class="checkbox-label"><input type="checkbox" value="正門" onchange="applyFilters()"> 正門</label>
-                <label class="checkbox-label"><input type="checkbox" value="末澤" onchange="applyFilters()"> 末澤</label>
-                <label class="checkbox-label"><input type="checkbox" value="小島" onchange="applyFilters()"> 小島</label>
-                <label class="checkbox-label"><input type="checkbox" value="佐野" onchange="applyFilters()"> 佐野</label>
-            </div>
-            <div class="filter-inputs">
-                <input type="text" id="keywordInput" class="search-input-text" onkeyup="applyFilters()" placeholder="キーワードを入力...">
-                <input type="month" id="monthInput" class="search-input-month" onchange="applyFilters()">
-            </div>
-        </section>
-
+    <main style="max-width: 800px; margin: 20px auto; padding: 0 15px;">
         <section class="card">
-            <h2>🆕 過去の更新情報</h2>
-            <div id="allUpdateList">🔑 読み込み中...</div>
+            <h2>🆕 過去更新情報</h2>
+            <p style="font-size: 0.85rem; color: #666;">
+                サイトの更新履歴・お知らせ一覧です。
+            </p>
+
+            <!-- 🔍 検索ボックス -->
+            <div class="search-container">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="キーワードで検索..." onkeyup="filterUpdates()">
+            </div>
+
+            <!-- 表示切り替えボタン -->
+            <div class="view-toggle">
+                <button class="toggle-btn active" id="btnCalendarView" onclick="switchView('calendar')"><i class="fa-regular fa-calendar-days"></i> カレンダー表示</button>
+                <button class="toggle-btn" id="btnListView" onclick="switchView('list')"><i class="fa-solid fa-list"></i> リスト表示</button>
+            </div>
+
+            <!-- ローディング表示 -->
+            <div id="loading">
+                <div style="color:#ff69b4; font-size:1.5rem; margin-bottom:8px;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                データを読み込み中...
+            </div>
+
+            <div id="error-message" style="display: none; color: #e53e3e;">
+                データの取得に失敗しました。<br>時間をおいて再度お試しください。
+            </div>
+
+            <!-- 📅 カレンダー表示領域 -->
+            <div id="calendarView">
+                <div id="calendar"></div>
+            </div>
+
+            <!-- 📋 リスト表示領域 -->
+            <div id="listView" style="display: none;">
+                <div class="update-list" id="updateList"></div>
+            </div>
         </section>
     </main>
 
+    <!-- モーダル（クリック時の詳細ポップアップ） -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div class="update-date" id="modalDate"></div>
+            <div class="update-title" id="modalTitle" style="margin-top:8px;"></div>
+            <div id="modalLinkContainer" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
     <script>
-        const CAL_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
+        function toggleMenu() {
+            document.getElementById("navTabs").classList.toggle("show");
+        }
+
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbyesrXQviLrOUQrWMjm_4RdI0DmZEgzzj27GOz1kg0Bs__U4nJ7vlE5q7652I0bE6rF/exec";
         let rawData = [];
+        let filteredData = [];
+        let calendar;
 
-        function toggleMenu() { document.getElementById("navTabs").classList.toggle("show"); }
+        // データ解析（配列 or オブジェクト双方に対応）
+        function parseItem(item) {
+            let date = "", title = "", url = "";
 
-        function getColorClass(text) {
-            if (!text) return "bg-group";
-            if (text.includes("小島")) return "bg-kojima";
-            if (text.includes("正門")) return "bg-masakado";
-            if (text.includes("末澤")) return "bg-suezawa";
-            if (text.includes("佐野")) return "bg-sano";
-            return "bg-group";
-        }
-
-        function extractUrl(text) {
-            if (!text) return null;
-            const match = String(text).match(/(https?:\/\/[^\s]+)/);
-            return match ? match[0] : null;
-        }
-
-        function applyFilters() {
-            const checkedMembers = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(cb => cb.value);
-            const keyword = document.getElementById("keywordInput").value.toLowerCase();
-            const month = document.getElementById("monthInput").value;
-
-            const container = document.getElementById("allUpdateList");
-            container.innerHTML = "";
-
-            const filtered = rawData.filter(item => {
-                const str = JSON.stringify(item).toLowerCase();
-                if (members.length > 0 && !members.some(m => str.includes(m.toLowerCase()))) return false;
-                if (keyword && !str.includes(keyword)) return false;
-                if (month) {
-                    const ts = item["タイムスタンプ"] || item["Timestamp"] || item["日付"];
-                    if (ts) {
-                        const d = new Date(ts);
-                        const itemMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-                        if (itemMonth !== month) return false;
+            if (Array.isArray(item)) {
+                // A列: タイムスタンプ, B列: タイトル, C列: URL の構成
+                date = item[0] || "";
+                title = item[1] || "";
+                url = item[2] || "";
+            } else if (typeof item === 'object' && item !== null) {
+                const keys = Object.keys(item);
+                
+                // タイムスタンプ・日付の優先取得（A列優先）
+                for (let k of keys) {
+                    if (/タイムスタンプ|timestamp|date|時間|日時/i.test(k)) {
+                        date = item[k];
+                        break;
                     }
                 }
-                return true;
-            });
+                if (!date && keys.length > 0) date = item[keys[0]];
 
-            if (filtered.length === 0) container.innerHTML = "<p style='color:#777;'>該当する更新情報はありません</p>";
-            else {
-                filtered.forEach(item => {
-                    const title = item["タイトル"] || item["内容"] || "";
-                    const detail = item["詳細"] || item["メモ"] || "";
-                    const url = extractUrl(title + detail);
-                    const colorClass = getColorClass(title + detail);
+                // タイトルの取得
+                for (let k of keys) {
+                    if (/title|content|text|message|タイトル|内容/i.test(k)) {
+                        title = item[k];
+                        break;
+                    }
+                }
+                if (!title && keys.length > 1) title = item[keys[1]];
 
-                    const div = document.createElement("div");
-                    div.className = `update-item ${colorClass}`;
-                    div.innerHTML = `<strong>${title}</strong><br><span style="font-size:0.85rem; color:#666;">${detail}</span>${url ? `<br><a href="${url}" target="_blank" class="update-link-btn">📸 投稿を見る 🔗</a>` : ''}`;
-                    container.appendChild(div);
-                });
+                // URLの取得
+                for (let k of keys) {
+                    if (/url|link|href|リンク/i.test(k)) {
+                        url = item[k];
+                        break;
+                    }
+                }
+                if (!url && keys.length > 2) url = item[keys[2]];
+            }
+
+            return {
+                date: String(date || '').trim(),
+                title: String(title || '更新情報').trim(),
+                url: String(url || '').trim()
+            };
+        }
+
+        async function initPage() {
+            try {
+                const response = await fetch(GAS_API_URL, { redirect: 'follow' });
+                if (!response.ok) throw new Error('Network error');
+                
+                const json = await response.json();
+                const list = Array.isArray(json) ? json : (json.data || json.items || []);
+                
+                // 🔴 A列(タイムスタンプ/日付)に記載がある行のみ抽出（フィルタリング）
+                rawData = list.map(item => parseItem(item)).filter(item => item.date !== "");
+
+                document.getElementById('loading').style.display = 'none';
+
+                if (rawData.length === 0) {
+                    document.getElementById('updateList').innerHTML = '<p style="text-align:center; color:#888;">更新情報が登録されていません。</p>';
+                }
+
+                filteredData = [...rawData];
+                initCalendar(filteredData);
+                renderList(filteredData);
+            } catch (error) {
+                console.error("API Fetch Error:", error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error-message').style.display = 'block';
             }
         }
 
-        async function loadUpdatesData() {
-            try {
-                const response = await fetch(CAL_API_URL);
-                rawData = await response.json();
-                applyFilters();
-            } catch(e) { console.error(e); }
+        function initCalendar(data) {
+            const calendarEl = document.getElementById('calendar');
+            
+            const events = data.map(item => ({
+                title: item.title,
+                start: item.date,
+                extendedProps: {
+                    url: item.url,
+                    rawDate: item.date
+                }
+            }));
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ja',
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: 'today'
+                },
+                events: events,
+                eventClick: function(info) {
+                    showModal(
+                        info.event.title, 
+                        info.event.extendedProps.rawDate, 
+                        info.event.extendedProps.url
+                    );
+                }
+            });
+
+            calendar.render();
         }
-        document.addEventListener('DOMContentLoaded', loadUpdatesData);
+
+        function renderList(data) {
+            const updateList = document.getElementById('updateList');
+            updateList.innerHTML = '';
+
+            if (data.length === 0) {
+                updateList.innerHTML = '<p style="text-align:center; color:#888;">該当する情報はありません。</p>';
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'update-card';
+
+                let html = '';
+                if (item.date) html += `<div class="update-date"><i class="fa-regular fa-clock"></i> ${escapeHtml(item.date)}</div>`;
+                html += `<div class="update-title">${escapeHtml(item.title)}</div>`;
+
+                if (item.url && item.url.startsWith('http')) {
+                    html += `
+                        <div style="margin-top: 8px;">
+                            <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn">
+                                📸 投稿を見る 🔗
+                            </a>
+                        </div>
+                    `;
+                }
+
+                card.innerHTML = html;
+                updateList.appendChild(card);
+            });
+        }
+
+        function filterUpdates() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            filteredData = rawData.filter(item => 
+                item.title.toLowerCase().includes(query) || item.date.toLowerCase().includes(query)
+            );
+
+            renderList(filteredData);
+
+            if (calendar) {
+                calendar.removeAllEvents();
+                calendar.addEventSource(filteredData.map(item => ({
+                    title: item.title,
+                    start: item.date,
+                    extendedProps: { url: item.url, rawDate: item.date }
+                })));
+            }
+        }
+
+        function switchView(viewType) {
+            const calendarView = document.getElementById('calendarView');
+            const listView = document.getElementById('listView');
+            const btnCalendar = document.getElementById('btnCalendarView');
+            const btnList = document.getElementById('btnListView');
+
+            if (viewType === 'calendar') {
+                calendarView.style.display = 'block';
+                listView.style.display = 'none';
+                btnCalendar.classList.add('active');
+                btnList.classList.remove('active');
+                if (calendar) calendar.render();
+            } else {
+                calendarView.style.display = 'none';
+                listView.style.display = 'block';
+                btnList.classList.add('active');
+                btnCalendar.classList.remove('active');
+            }
+        }
+
+        function showModal(title, date, url) {
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDate').innerText = date ? `📅 ${date}` : '';
+            
+            const linkContainer = document.getElementById('modalLinkContainer');
+            if (url && url.startsWith('http')) {
+                linkContainer.innerHTML = `
+                    <a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="update-link-btn" style="width:100%; justify-content:center; box-sizing:border-box;">
+                        📸 投稿を見る 🔗
+                    </a>
+                `;
+            } else {
+                linkContainer.innerHTML = '';
+            }
+
+            document.getElementById('modalOverlay').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        document.addEventListener('DOMContentLoaded', initPage);
     </script>
 </body>
 </html>
